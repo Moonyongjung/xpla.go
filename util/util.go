@@ -1,12 +1,10 @@
 package util
 
 import (
-	"bufio"
 	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io"
 	"io/ioutil"
 	"math/big"
 	"os"
@@ -45,26 +43,11 @@ func GrpcUrlParsing(normalUrl string) string {
 }
 
 func AbiParsing(jsonFilePath string) (string, error) {
-	file, err := os.Open(jsonFilePath)
+	f, err := ioutil.ReadFile(jsonFilePath)
 	if err != nil {
 		return "", err
 	}
-	defer file.Close()
-
-	var abiStrSlice []string
-
-	reader := bufio.NewReader(file)
-	for {
-		str, err := reader.ReadString('\n')
-		abiStrSlice = append(abiStrSlice, str)
-		if err == io.EOF {
-			break
-		}
-	}
-	str := strings.Join(abiStrSlice, "")
-	str = strings.Replace(str, " ", "", -1)
-
-	return str, nil
+	return string(f), nil
 }
 
 type bytecodeParsingStruct struct {

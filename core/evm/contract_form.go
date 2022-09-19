@@ -5,27 +5,31 @@ package evm
 
 import (
 	"errors"
+	"math/big"
 	"strings"
 
+	ethereum "github.com/ethereum/go-ethereum"
 	"github.com/ethereum/go-ethereum/accounts/abi"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
+	"github.com/ethereum/go-ethereum/event"
+)
+
+// Reference imports to suppress errors if they are not otherwise used.
+var (
+	_ = errors.New
+	_ = big.NewInt
+	_ = strings.NewReader
+	_ = ethereum.NotFound
+	_ = bind.Bind
+	_ = common.Big1
+	_ = types.BloomLookup
+	_ = event.NewSubscription
 )
 
 // XplaSolContractMetaData contains all meta data concerning the XplaSolContract contract.
-var XplaSolContractMetaData = &bind.MetaData{
-	ABI: "",
-	Bin: "",
-}
-
-// XplaSolContractABI is the input ABI used to generate the binding from.
-// Deprecated: Use XplaSolContractMetaData.ABI instead.
-var XplaSolContractABI = XplaSolContractMetaData.ABI
-
-// XplaSolContractBin is the compiled bytecode used for deploying new contracts.
-// Deprecated: Use XplaSolContractMetaData.Bin instead.
-var XplaSolContractBin = XplaSolContractMetaData.Bin
+var XplaSolContractMetaData *bind.MetaData
 
 // DeployXplaSolContract deploys a new Ethereum contract, binding an instance of XplaSolContract to it.
 func DeployXplaSolContract(auth *bind.TransactOpts, backend bind.ContractBackend) (common.Address, *types.Transaction, *XplaSolContract, error) {
@@ -37,7 +41,7 @@ func DeployXplaSolContract(auth *bind.TransactOpts, backend bind.ContractBackend
 		return common.Address{}, nil, nil, errors.New("GetABI returned nil")
 	}
 
-	address, tx, contract, err := bind.DeployContract(auth, *parsed, common.FromHex(XplaSolContractBin), backend)
+	address, tx, contract, err := bind.DeployContract(auth, *parsed, common.FromHex(XplaSolContractMetaData.Bin), backend)
 	if err != nil {
 		return common.Address{}, nil, nil, err
 	}
@@ -141,7 +145,7 @@ func NewXplaSolContractFilterer(address common.Address, filterer bind.ContractFi
 
 // bindXplaSolContract binds a generic wrapper to an already deployed contract.
 func bindXplaSolContract(address common.Address, caller bind.ContractCaller, transactor bind.ContractTransactor, filterer bind.ContractFilterer) (*bind.BoundContract, error) {
-	parsed, err := abi.JSON(strings.NewReader(XplaSolContractABI))
+	parsed, err := abi.JSON(strings.NewReader(XplaSolContractMetaData.ABI))
 	if err != nil {
 		return nil, err
 	}

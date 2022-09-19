@@ -4,6 +4,7 @@ import (
 	"github.com/Moonyongjung/xpla.go/key"
 	"github.com/Moonyongjung/xpla.go/types"
 	"github.com/Moonyongjung/xpla.go/util"
+	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 )
 
 // Parsing - send coin
@@ -37,8 +38,10 @@ func parseDeploySolContractArgs(deploySolContractMsg types.DeploySolContractMsg)
 		return util.LogErr("empty parameters, need ABI and bytecode")
 	}
 
-	XplaSolContractMetaData.ABI = abi
-	XplaSolContractMetaData.Bin = util.ToTypeHexString(bytecode)
+	XplaSolContractMetaData = &bind.MetaData{
+		ABI: abi,
+		Bin: bytecode,
+	}
 
 	return nil
 }
@@ -59,8 +62,10 @@ func parseInvokeSolContractArgs(invokeSolContractMsg types.InvokeSolContractMsg)
 		}
 	}
 	invokeSolContractMsg.ContractAddress = util.ToTypeHexString(invokeSolContractMsg.ContractAddress)
-	XplaSolContractMetaData.ABI = abi
-	XplaSolContractMetaData.Bin = util.ToTypeHexString(bytecode)
+	XplaSolContractMetaData = &bind.MetaData{
+		ABI: abi,
+		Bin: bytecode,
+	}
 
 	return invokeSolContractMsg, nil
 }
@@ -81,8 +86,10 @@ func parseCallSolContractArgs(callSolContractMsg types.CallSolContractMsg) (type
 		}
 	}
 	callSolContractMsg.ContractAddress = util.ToTypeHexString(callSolContractMsg.ContractAddress)
-	XplaSolContractMetaData.ABI = abi
-	XplaSolContractMetaData.Bin = util.ToTypeHexString(bytecode)
+	XplaSolContractMetaData = &bind.MetaData{
+		ABI: abi,
+		Bin: bytecode,
+	}
 
 	return callSolContractMsg, nil
 }
