@@ -13,7 +13,7 @@ import (
 )
 
 // The xpla client is a client for performing all functions within the xpla.go library.
-// The user mandatorily inputs chain ID, gas price, gas adjustment, and private key.
+// The user mandatorily inputs chain ID and private key.
 type XplaClient struct {
 	ChainId        string
 	PrivateKey     key.PrivateKey
