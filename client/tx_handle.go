@@ -3,6 +3,7 @@ package client
 import (
 	"crypto/ecdsa"
 	"io/ioutil"
+	"math/big"
 
 	mauthz "github.com/Moonyongjung/xpla.go/core/authz"
 	mbank "github.com/Moonyongjung/xpla.go/core/bank"
@@ -37,6 +38,8 @@ import (
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 	slashingtypes "github.com/cosmos/cosmos-sdk/x/slashing/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
+	"github.com/ethereum/go-ethereum/common"
+	evmtypes "github.com/ethereum/go-ethereum/core/types"
 	ethcrypto "github.com/ethereum/go-ethereum/crypto"
 )
 
@@ -264,6 +267,38 @@ func txSignRound(xplac *XplaClient,
 	}
 
 	return nil
+}
+
+// Sign evm transaction by using given private key.
+func evmTxSignRound(xplac *XplaClient,
+	toAddr common.Address,
+	gasPrice *big.Int,
+	amount *big.Int,
+	invokeByteData []byte,
+	chainId *big.Int,
+	ethPrivKey *ecdsa.PrivateKey) ([]byte, error) {
+
+	tx := evmtypes.NewTransaction(
+		util.FromStringToUint64(xplac.Opts.Sequence),
+		toAddr,
+		amount,
+		util.FromStringToUint64(xplac.Opts.GasLimit),
+		gasPrice,
+		invokeByteData,
+	)
+
+	signer := evmtypes.NewEIP155Signer(chainId)
+
+	signedTx, err := evmtypes.SignTx(tx, signer, ethPrivKey)
+	if err != nil {
+		return nil, err
+	}
+	txbytes, err := signedTx.MarshalJSON()
+	if err != nil {
+		return nil, err
+	}
+
+	return txbytes, nil
 }
 
 // Read transaction file and make standard transaction.

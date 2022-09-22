@@ -111,13 +111,14 @@ func (xplac *XplaClient) WithURL(lcdURL string) *XplaClient {
 	return xplac
 }
 
-// Set GRPC URL for query
+// Set GRPC URL to query or broadcast tx
 func (xplac *XplaClient) WithGrpc(grpcUrl string) *XplaClient {
 	connUrl := util.GrpcUrlParsing(grpcUrl)
 	c, _ := grpc.Dial(
 		connUrl, grpc.WithInsecure(),
 	)
 	xplac.Grpc = c
+	xplac.Opts.GrpcURL = grpcUrl
 	return xplac
 }
 

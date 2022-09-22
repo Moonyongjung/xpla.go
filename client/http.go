@@ -25,18 +25,38 @@ const (
 
 // LoadAccount simulates gas and fee for a transaction
 func (xplac *XplaClient) LoadAccount(address sdk.AccAddress) (res authtypes.AccountI, err error) {
-	out, err := ctxHttpClient("GET", xplac.Opts.LcdURL+userInfoUrl+address.String(), nil)
-	if err != nil {
-		return nil, err
-	}
 
-	var response authtypes.QueryAccountResponse
-	err = xplac.EncodingConfig.Marshaler.UnmarshalJSON(out, &response)
-	if err != nil {
-		return nil, util.LogErr(err, "failed to unmarshal response")
-	}
+	if xplac.Opts.GrpcURL == "" {
+		out, err := ctxHttpClient("GET", xplac.Opts.LcdURL+userInfoUrl+address.String(), nil)
+		if err != nil {
+			return nil, err
+		}
 
-	return response.Account.GetCachedValue().(authtypes.AccountI), nil
+		var response authtypes.QueryAccountResponse
+		err = xplac.EncodingConfig.Marshaler.UnmarshalJSON(out, &response)
+		if err != nil {
+			return nil, util.LogErr(err, "failed to unmarshal response")
+		}
+		return response.Account.GetCachedValue().(authtypes.AccountI), nil
+
+	} else {
+		queryClient := authtypes.NewQueryClient(xplac.Grpc)
+		queryAccountRequest := authtypes.QueryAccountRequest{
+			Address: address.String(),
+		}
+		response, err := queryClient.Account(context.Background(), &queryAccountRequest)
+		if err != nil {
+			return nil, err
+		}
+
+		var newAccount authtypes.AccountI
+		err = xplac.EncodingConfig.InterfaceRegistry.UnpackAny(response.Account, &newAccount)
+		if err != nil {
+			return nil, err
+		}
+
+		return newAccount, nil
+	}
 }
 
 // Simulate tx and get response
@@ -59,25 +79,39 @@ func (xplac *XplaClient) Simulate(txbuilder cmclient.TxBuilder) (*sdktx.Simulate
 		return nil, err
 	}
 
-	reqBytes, err := xplac.EncodingConfig.Marshaler.MarshalJSON(&sdktx.SimulateRequest{
-		TxBytes: txBytes,
-	})
-	if err != nil {
-		return nil, err
-	}
+	if xplac.Opts.GrpcURL == "" {
+		reqBytes, err := xplac.EncodingConfig.Marshaler.MarshalJSON(&sdktx.SimulateRequest{
+			TxBytes: txBytes,
+		})
+		if err != nil {
+			return nil, err
+		}
 
-	out, err := ctxHttpClient("POST", xplac.Opts.LcdURL+simulateUrl, reqBytes)
-	if err != nil {
-		return nil, err
-	}
+		out, err := ctxHttpClient("POST", xplac.Opts.LcdURL+simulateUrl, reqBytes)
+		if err != nil {
+			return nil, err
+		}
 
-	var response sdktx.SimulateResponse
-	err = xplac.EncodingConfig.Marshaler.UnmarshalJSON(out, &response)
-	if err != nil {
-		return nil, err
-	}
+		var response sdktx.SimulateResponse
+		err = xplac.EncodingConfig.Marshaler.UnmarshalJSON(out, &response)
+		if err != nil {
+			return nil, err
+		}
 
-	return &response, nil
+		return &response, nil
+	} else {
+		serviceClient := sdktx.NewServiceClient(xplac.Grpc)
+		simulateRequest := sdktx.SimulateRequest{
+			TxBytes: txBytes,
+		}
+
+		response, err := serviceClient.Simulate(context.Background(), &simulateRequest)
+		if err != nil {
+			return nil, err
+		}
+
+		return response, nil
+	}
 }
 
 // Make new http client for inquiring several information.

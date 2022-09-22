@@ -3,7 +3,6 @@ package client
 import (
 	mevm "github.com/Moonyongjung/xpla.go/core/evm"
 	"github.com/Moonyongjung/xpla.go/types"
-	"github.com/Moonyongjung/xpla.go/util"
 	txtypes "github.com/cosmos/cosmos-sdk/types/tx"
 )
 
@@ -14,9 +13,7 @@ var xplaTxRes types.TxRes
 // The broadcast method is determined according to the broadcast mode option of the xpla client.
 // For evm transaction broadcast, use a separate method in this function.
 func (xplac *XplaClient) Broadcast(txBytes []byte) (*types.TxRes, error) {
-	if xplac.Opts.LcdURL == "" {
-		return nil, util.LogErr("error: need LCD URL when tx method")
-	}
+
 	if xplac.Module == mevm.EvmModule {
 		return xplac.broadcastEvm(txBytes)
 

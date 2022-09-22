@@ -32,7 +32,7 @@ xplac := client.NewXplaClient(
     }
 )
 
-// Need GRPC URL when "Query" methods
+// Need GRPC URL to query or broadcast tx
 xplac := client.NewXplaClient(
     "chain-id",    
     priKey,

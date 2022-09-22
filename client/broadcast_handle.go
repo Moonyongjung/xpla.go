@@ -1,6 +1,7 @@
 package client
 
 import (
+	"context"
 	"encoding/json"
 	"time"
 
@@ -14,34 +15,45 @@ import (
 
 // Broadcast generated transactions.
 // Broadcast responses, excluding evm, are delivered as "TxResponse" of the entire response structure of the xpla client.
+// Support broadcast by using LCD and gRPC at the same time. Default method is gRPC.
 func broadcastTx(xplac *XplaClient, txBytes []byte, mode txtypes.BroadcastMode) (*types.TxRes, error) {
+
 	broadcastReq := txtypes.BroadcastTxRequest{
 		TxBytes: txBytes,
 		Mode:    mode,
 	}
 
-	reqBytes, err := json.Marshal(broadcastReq)
-	if err != nil {
-		return nil, util.LogErr(err, "failed to marshal")
-	}
+	if xplac.Opts.GrpcURL == "" {
+		reqBytes, err := json.Marshal(broadcastReq)
+		if err != nil {
+			return nil, util.LogErr(err, "failed to marshal")
+		}
 
-	out, err := ctxHttpClient("POST", xplac.Opts.LcdURL+broadcastUrl, reqBytes)
-	if err != nil {
-		return nil, err
-	}
+		out, err := ctxHttpClient("POST", xplac.Opts.LcdURL+broadcastUrl, reqBytes)
+		if err != nil {
+			return nil, err
+		}
 
-	var broadcastTxResponse txtypes.BroadcastTxResponse
-	err = xplac.EncodingConfig.Marshaler.UnmarshalJSON(out, &broadcastTxResponse)
-	if err != nil {
-		return nil, util.LogErr(err, "failed to unmarshal response")
-	}
+		var broadcastTxResponse txtypes.BroadcastTxResponse
+		err = xplac.EncodingConfig.Marshaler.UnmarshalJSON(out, &broadcastTxResponse)
+		if err != nil {
+			return nil, util.LogErr(err, "failed to unmarshal response")
+		}
 
-	txResponse := broadcastTxResponse.TxResponse
-	if txResponse.Code != 0 {
-		return &xplaTxRes, util.LogErr("tx failed with code", txResponse.Code, ":", txResponse.RawLog)
-	}
+		txResponse := broadcastTxResponse.TxResponse
+		if txResponse.Code != 0 {
+			return &xplaTxRes, util.LogErr("tx failed with code", txResponse.Code, ":", txResponse.RawLog)
+		}
 
-	xplaTxRes.Response = txResponse
+		xplaTxRes.Response = txResponse
+	} else {
+		txClient := txtypes.NewServiceClient(xplac.Grpc)
+		txResponse, err := txClient.BroadcastTx(context.Background(), &broadcastReq)
+		if err != nil {
+			return nil, err
+		}
+		xplaTxRes.Response = txResponse.TxResponse
+	}
 
 	return &xplaTxRes, nil
 }

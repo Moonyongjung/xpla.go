@@ -19,7 +19,6 @@ import (
 	authclient "github.com/cosmos/cosmos-sdk/x/auth/client"
 	authcli "github.com/cosmos/cosmos-sdk/x/auth/client/cli"
 	authsigning "github.com/cosmos/cosmos-sdk/x/auth/signing"
-	evmtypes "github.com/ethereum/go-ethereum/core/types"
 )
 
 type deploySolTx struct {
@@ -33,6 +32,8 @@ type deploySolTx struct {
 const (
 	defaultGasPrice      = "850000000000"
 	defaultGasAdjustment = "1.75"
+	defaultAccNum        = 0
+	defaultAccSeq        = 0
 )
 
 // Create and sign a transaction before it is broadcasted to xpla chain.
@@ -41,6 +42,28 @@ const (
 func (xplac *XplaClient) CreateAndSignTx() ([]byte, error) {
 	if xplac.Err != nil {
 		return nil, xplac.Err
+	}
+
+	if xplac.Opts.AccountNumber == "" || xplac.Opts.Sequence == "" {
+		if xplac.Opts.LcdURL == "" && xplac.Opts.GrpcURL == "" {
+			xplac.WithAccountNumber(util.FromUint64ToString(defaultAccNum))
+			xplac.WithSequence(util.FromUint64ToString(defaultAccSeq))
+		} else {
+			account, err := xplac.LoadAccount(sdk.AccAddress(xplac.PrivateKey.PubKey().Address()))
+			if err != nil {
+				return nil, err
+			}
+			xplac.WithAccountNumber(util.FromUint64ToString(account.GetAccountNumber()))
+			xplac.WithSequence(util.FromUint64ToString(account.GetSequence()))
+		}
+	}
+
+	if xplac.Opts.GasAdjustment == "" {
+		xplac.WithGasAdjustment(defaultGasAdjustment)
+	}
+
+	if xplac.Opts.GasPrice == "" {
+		xplac.WithGasPrice(defaultGasPrice)
 	}
 
 	if xplac.Module == mevm.EvmModule {
@@ -57,19 +80,6 @@ func (xplac *XplaClient) CreateAndSignTx() ([]byte, error) {
 			xplac.WithSignMode(signing.SignMode_SIGN_MODE_DIRECT)
 		}
 
-		if xplac.Opts.AccountNumber == "" || xplac.Opts.Sequence == "" {
-			account, err := xplac.LoadAccount(sdk.AccAddress(xplac.PrivateKey.PubKey().Address()))
-			if err != nil {
-				return nil, err
-			}
-			xplac.WithAccountNumber(util.FromUint64ToString(account.GetAccountNumber()))
-			xplac.WithSequence(util.FromUint64ToString(account.GetSequence()))
-		}
-
-		if xplac.Opts.GasAdjustment == "" {
-			xplac.WithGasAdjustment(defaultGasAdjustment)
-		}
-
 		if xplac.Opts.GasLimit == "" {
 			simulate, err := xplac.Simulate(builder)
 			if err != nil {
@@ -80,10 +90,6 @@ func (xplac *XplaClient) CreateAndSignTx() ([]byte, error) {
 				return nil, err
 			}
 			xplac.WithGasLimit(gasLimitAdjustment)
-		}
-
-		if xplac.Opts.GasPrice == "" {
-			xplac.WithGasPrice(defaultGasPrice)
 		}
 
 		if xplac.Opts.FeeAmount == "" {
@@ -242,18 +248,16 @@ func (xplac *XplaClient) SignTx(signTxMsg types.SignTxMsg) ([]byte, error) {
 		}
 	}
 
-	if xplac.Opts.OutputDocument == "" {
-		return json, nil
+	if xplac.Opts.OutputDocument != "" {
+		util.SaveJsonPretty(json, xplac.Opts.OutputDocument)
+		return nil, nil
 	}
 
-	util.SaveJsonPretty(json, xplac.Opts.OutputDocument)
-	return nil, nil
+	return json, nil
 }
 
 // Sign created unsigned transaction with multi signatures.
 func (xplac *XplaClient) MultiSign(txMultiSignMsg types.TxMultiSignMsg) ([]byte, error) {
-	defaultAccNum := 0
-	defaultAccSeq := 0
 
 	clientCtx, err := util.NewClient()
 	if err != nil {
@@ -378,17 +382,8 @@ func (xplac *XplaClient) createAndSignEvmTx() ([]byte, error) {
 		return nil, err
 	}
 
-	if xplac.Opts.AccountNumber == "" || xplac.Opts.Sequence == "" {
-		account, err := xplac.LoadAccount(sdk.AccAddress(xplac.PrivateKey.PubKey().Address()))
-		if err != nil {
-			return nil, err
-		}
-		xplac.WithAccountNumber(util.FromUint64ToString(account.GetAccountNumber()))
-		xplac.WithSequence(util.FromUint64ToString(account.GetSequence()))
-	}
-
-	if xplac.Opts.GasAdjustment == "" {
-		xplac.WithGasAdjustment(defaultGasAdjustment)
+	if xplac.Opts.OutputDocument != "" {
+		util.LogInfo("no create output document as tx of evm")
 	}
 
 	if xplac.Opts.GasLimit == "" {
@@ -399,10 +394,6 @@ func (xplac *XplaClient) createAndSignEvmTx() ([]byte, error) {
 		xplac.WithGasLimit(gasLimitAdjustment)
 	}
 
-	if xplac.Opts.GasPrice == "" {
-		xplac.WithGasPrice(defaultGasPrice)
-	}
-
 	gasPrice, err := util.FromStringToBigInt(xplac.Opts.GasPrice)
 	if err != nil {
 		return nil, err
@@ -410,36 +401,14 @@ func (xplac *XplaClient) createAndSignEvmTx() ([]byte, error) {
 
 	switch {
 	case xplac.MsgType == mevm.EvmSendCoinMsgType:
-		var tx *evmtypes.Transaction
 		convertMsg, _ := xplac.Msg.(types.SendCoinMsg)
-
 		toAddr := util.FromStringToByte20Address(convertMsg.ToAddress)
 		amount, err := util.FromStringToBigInt(convertMsg.Amount)
 		if err != nil {
 			return nil, err
 		}
 
-		tx = evmtypes.NewTransaction(
-			util.FromStringToUint64(xplac.Opts.Sequence),
-			toAddr,
-			amount,
-			util.FromStringToUint64(xplac.Opts.GasLimit),
-			gasPrice,
-			nil,
-		)
-
-		signer := evmtypes.NewEIP155Signer(chainId)
-
-		signedTx, err := evmtypes.SignTx(tx, signer, ethPrivKey)
-		if err != nil {
-			return nil, err
-		}
-		txbytes, err := signedTx.MarshalJSON()
-		if err != nil {
-			return nil, err
-		}
-
-		return txbytes, nil
+		return evmTxSignRound(xplac, toAddr, gasPrice, amount, nil, chainId, ethPrivKey)
 
 	case xplac.MsgType == mevm.EvmDeploySolContractMsgType:
 		nonce, err := util.FromStringToBigInt(xplac.Opts.Sequence)
@@ -468,10 +437,7 @@ func (xplac *XplaClient) createAndSignEvmTx() ([]byte, error) {
 		return txbytes, nil
 
 	case xplac.MsgType == mevm.EvmInvokeSolContractMsgType:
-		var tx *evmtypes.Transaction
-
 		convertMsg, _ := xplac.Msg.(types.InvokeSolContractMsg)
-
 		invokeByteData, err := getAbiPack(convertMsg.ContractFuncCallName, convertMsg.Args...)
 		if err != nil {
 			return nil, err
@@ -483,27 +449,7 @@ func (xplac *XplaClient) createAndSignEvmTx() ([]byte, error) {
 			return nil, err
 		}
 
-		tx = evmtypes.NewTransaction(
-			util.FromStringToUint64(xplac.Opts.Sequence),
-			toAddr,
-			amount,
-			util.FromStringToUint64(xplac.Opts.GasLimit),
-			gasPrice,
-			invokeByteData,
-		)
-
-		signer := evmtypes.NewEIP155Signer(chainId)
-
-		signedTx, err := evmtypes.SignTx(tx, signer, ethPrivKey)
-		if err != nil {
-			return nil, err
-		}
-		txbytes, err := signedTx.MarshalJSON()
-		if err != nil {
-			return nil, err
-		}
-
-		return txbytes, nil
+		return evmTxSignRound(xplac, toAddr, gasPrice, amount, invokeByteData, chainId, ethPrivKey)
 
 	default:
 		return nil, util.LogErr("invalid evm msg type")
