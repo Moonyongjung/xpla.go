@@ -1,8 +1,6 @@
 package client
 
 import (
-	"context"
-
 	mauth "github.com/Moonyongjung/xpla.go/core/auth"
 	"github.com/Moonyongjung/xpla.go/util"
 
@@ -20,7 +18,7 @@ func queryAuth(xplac *XplaClient) (string, error) {
 	case xplac.MsgType == mauth.AuthQueryParamsMsgType:
 		convertMsg, _ := xplac.Msg.(authtypes.QueryParamsRequest)
 		res, err = queryClient.Params(
-			context.Background(),
+			xplac.Context,
 			&convertMsg,
 		)
 		if err != nil {
@@ -31,7 +29,7 @@ func queryAuth(xplac *XplaClient) (string, error) {
 	case xplac.MsgType == mauth.AuthQueryAccAddressMsgType:
 		convertMsg, _ := xplac.Msg.(authtypes.QueryAccountRequest)
 		res, err = queryClient.Account(
-			context.Background(),
+			xplac.Context,
 			&convertMsg,
 		)
 		if err != nil {
@@ -42,7 +40,7 @@ func queryAuth(xplac *XplaClient) (string, error) {
 	case xplac.MsgType == mauth.AuthQueryAccountsMsgType:
 		convertMsg, _ := xplac.Msg.(authtypes.QueryAccountsRequest)
 		res, err = queryClient.Accounts(
-			context.Background(),
+			xplac.Context,
 			&convertMsg,
 		)
 		if err != nil {

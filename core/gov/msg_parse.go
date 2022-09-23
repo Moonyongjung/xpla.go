@@ -128,12 +128,12 @@ func parseQueryProposalsArgs(queryProposalsMsg types.QueryProposalsMsg) (govtype
 }
 
 // Parsing - query deposit
-func parseQueryDepositArgs(queryDepositMsg types.QueryDepositMsg, grpcConn grpc.ClientConn) (interface{}, string, error) {
+func parseQueryDepositArgs(queryDepositMsg types.QueryDepositMsg, grpcConn grpc.ClientConn, ctx context.Context) (interface{}, string, error) {
 	queryClient := govtypes.NewQueryClient(grpcConn)
 	proposalId := util.FromStringToUint64(queryDepositMsg.ProposalID)
 
 	proposalRes, err := queryClient.Proposal(
-		context.Background(),
+		ctx,
 		&govtypes.QueryProposalRequest{ProposalId: proposalId},
 	)
 	if err != nil {
@@ -158,12 +158,12 @@ func parseQueryDepositArgs(queryDepositMsg types.QueryDepositMsg, grpcConn grpc.
 }
 
 // Parsing - query deposits
-func parseQueryDepositsArgs(queryDepositMsg types.QueryDepositMsg, grpcConn grpc.ClientConn) (interface{}, string, error) {
+func parseQueryDepositsArgs(queryDepositMsg types.QueryDepositMsg, grpcConn grpc.ClientConn, ctx context.Context) (interface{}, string, error) {
 	queryClient := govtypes.NewQueryClient(grpcConn)
 	proposalId := util.FromStringToUint64(queryDepositMsg.ProposalID)
 
 	proposalRes, err := queryClient.Proposal(
-		context.Background(),
+		ctx,
 		&govtypes.QueryProposalRequest{ProposalId: proposalId},
 	)
 	if err != nil {
@@ -183,12 +183,12 @@ func parseQueryDepositsArgs(queryDepositMsg types.QueryDepositMsg, grpcConn grpc
 }
 
 // Parsing - tally
-func parseGovTallyArgs(tallyMsg types.TallyMsg, grpcConn grpc.ClientConn) (govtypes.QueryTallyResultRequest, error) {
+func parseGovTallyArgs(tallyMsg types.TallyMsg, grpcConn grpc.ClientConn, ctx context.Context) (govtypes.QueryTallyResultRequest, error) {
 	queryClient := govtypes.NewQueryClient(grpcConn)
 	proposalId := util.FromStringToUint64(tallyMsg.ProposalID)
 
 	_, err := queryClient.Proposal(
-		context.Background(),
+		ctx,
 		&govtypes.QueryProposalRequest{ProposalId: proposalId},
 	)
 	if err != nil {
@@ -214,12 +214,12 @@ func parseGovParamArgs(govParamsMsg types.GovParamsMsg) (govtypes.QueryParamsReq
 }
 
 // Parsing - query vote
-func parseQueryVoteArgs(queryVoteMsg types.QueryVoteMsg, grpcConn grpc.ClientConn) (govtypes.QueryVoteRequest, error) {
+func parseQueryVoteArgs(queryVoteMsg types.QueryVoteMsg, grpcConn grpc.ClientConn, ctx context.Context) (govtypes.QueryVoteRequest, error) {
 	queryClient := govtypes.NewQueryClient(grpcConn)
 	proposalId := util.FromStringToUint64(queryVoteMsg.ProposalID)
 
 	_, err := queryClient.Proposal(
-		context.Background(),
+		ctx,
 		&govtypes.QueryProposalRequest{ProposalId: proposalId},
 	)
 	if err != nil {
@@ -233,12 +233,12 @@ func parseQueryVoteArgs(queryVoteMsg types.QueryVoteMsg, grpcConn grpc.ClientCon
 }
 
 // Parsing - query votes
-func parseQueryVotesArgs(queryVoteMsg types.QueryVoteMsg, grpcConn grpc.ClientConn) (interface{}, string, error) {
+func parseQueryVotesArgs(queryVoteMsg types.QueryVoteMsg, grpcConn grpc.ClientConn, ctx context.Context) (interface{}, string, error) {
 	queryClient := govtypes.NewQueryClient(grpcConn)
 	proposalId := util.FromStringToUint64(queryVoteMsg.ProposalID)
 
 	res, err := queryClient.Proposal(
-		context.Background(),
+		ctx,
 		&govtypes.QueryProposalRequest{ProposalId: proposalId},
 	)
 	if err != nil {

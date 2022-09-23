@@ -123,7 +123,7 @@ func (xplac *XplaClient) WithdrawRewards(withdrawRewardsMsg types.WithdrawReward
 
 // Withdraw all delegations rewards for a delegator.
 func (xplac *XplaClient) WithdrawAllRewards() *XplaClient {
-	msg, err := mdist.MakeWithdrawAllRewardsMsg(xplac.PrivateKey, xplac.Grpc)
+	msg, err := mdist.MakeWithdrawAllRewardsMsg(xplac.PrivateKey, xplac.Grpc, xplac.Context)
 	if err != nil {
 		xplac.Err = err
 	}

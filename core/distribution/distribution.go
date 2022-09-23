@@ -3,6 +3,7 @@ package distribution
 import (
 	"github.com/Moonyongjung/xpla.go/key"
 	"github.com/Moonyongjung/xpla.go/types"
+	"golang.org/x/net/context"
 
 	"github.com/cosmos/cosmos-sdk/simapp/params"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -42,8 +43,8 @@ func MakeWithdrawRewardsMsg(withdrawRewardsMsg types.WithdrawRewardsMsg, privKey
 }
 
 // (Tx) make msg - withdraw all rewards
-func MakeWithdrawAllRewardsMsg(privKey key.PrivateKey, grpcConn grpc.ClientConn) ([]sdk.Msg, error) {
-	msg, err := parseWithdrawAllRewardsArgs(privKey, grpcConn)
+func MakeWithdrawAllRewardsMsg(privKey key.PrivateKey, grpcConn grpc.ClientConn, ctx context.Context) ([]sdk.Msg, error) {
+	msg, err := parseWithdrawAllRewardsArgs(privKey, grpcConn, ctx)
 	if err != nil {
 		return nil, err
 	}

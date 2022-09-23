@@ -22,9 +22,7 @@ type EvmClient struct {
 
 // Make new evm client using RPC URL which normally TCP port number is 8545.
 // It supports that sending transaction, contract deployment, executing/querying contract and etc.
-func NewEvmClient(evmRpcUrl string) (*EvmClient, error) {
-	ctx := context.Background()
-
+func NewEvmClient(evmRpcUrl string, ctx context.Context) (*EvmClient, error) {
 	// Target blockchain node URL
 	httpDefaultTransport := http.DefaultTransport
 	defaultTransportPointer, ok := httpDefaultTransport.(*http.Transport)

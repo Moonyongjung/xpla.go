@@ -1,8 +1,6 @@
 package client
 
 import (
-	"context"
-
 	mparams "github.com/Moonyongjung/xpla.go/core/params"
 	"github.com/Moonyongjung/xpla.go/util"
 
@@ -18,7 +16,7 @@ func queryParams(xplac *XplaClient) (string, error) {
 	case xplac.MsgType == mparams.ParamsQuerySubpsaceMsgType:
 		convertMsg, _ := xplac.Msg.(proposal.QueryParamsRequest)
 		res, err = queryClient.Params(
-			context.Background(),
+			xplac.Context,
 			&convertMsg,
 		)
 		if err != nil {

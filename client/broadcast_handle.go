@@ -1,7 +1,6 @@
 package client
 
 import (
-	"context"
 	"encoding/json"
 	"time"
 
@@ -29,7 +28,7 @@ func broadcastTx(xplac *XplaClient, txBytes []byte, mode txtypes.BroadcastMode) 
 			return nil, util.LogErr(err, "failed to marshal")
 		}
 
-		out, err := ctxHttpClient("POST", xplac.Opts.LcdURL+broadcastUrl, reqBytes)
+		out, err := ctxHttpClient("POST", xplac.Opts.LcdURL+broadcastUrl, reqBytes, xplac.Context)
 		if err != nil {
 			return nil, err
 		}
@@ -48,7 +47,7 @@ func broadcastTx(xplac *XplaClient, txBytes []byte, mode txtypes.BroadcastMode) 
 		xplaTxRes.Response = txResponse
 	} else {
 		txClient := txtypes.NewServiceClient(xplac.Grpc)
-		txResponse, err := txClient.BroadcastTx(context.Background(), &broadcastReq)
+		txResponse, err := txClient.BroadcastTx(xplac.Context, &broadcastReq)
 		if err != nil {
 			return nil, err
 		}

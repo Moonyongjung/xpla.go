@@ -1,6 +1,8 @@
 package client
 
 import (
+	"context"
+
 	"github.com/Moonyongjung/xpla.go/core"
 	"github.com/Moonyongjung/xpla.go/key"
 	"github.com/Moonyongjung/xpla.go/types"
@@ -19,6 +21,7 @@ type XplaClient struct {
 	PrivateKey     key.PrivateKey
 	EncodingConfig params.EncodingConfig
 	Grpc           grpc1.ClientConn
+	Context        context.Context
 
 	Opts Options
 
@@ -57,7 +60,8 @@ func NewXplaClient(
 	return xplac.
 		WithChainId(chainId).
 		WithPrivateKey(privKey).
-		WithEncoding(types.MakeEncodingConfig())
+		WithEncoding(types.MakeEncodingConfig()).
+		WithContext(context.Background())
 }
 
 // Set options of xpla client.
@@ -102,6 +106,12 @@ func (xplac *XplaClient) WithPrivateKey(privateKey key.PrivateKey) *XplaClient {
 // Set encoding configuration
 func (xplac *XplaClient) WithEncoding(encodingConfig params.EncodingConfig) *XplaClient {
 	xplac.EncodingConfig = encodingConfig
+	return xplac
+}
+
+// Set xpla client context
+func (xplac *XplaClient) WithContext(ctx context.Context) *XplaClient {
+	xplac.Context = ctx
 	return xplac
 }
 

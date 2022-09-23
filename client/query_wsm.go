@@ -1,7 +1,6 @@
 package client
 
 import (
-	"context"
 	"io/ioutil"
 	"strings"
 
@@ -20,7 +19,7 @@ func queryWasm(xplac *XplaClient) (string, error) {
 	case xplac.MsgType == mwasm.WasmQueryContractMsgType:
 		convertMsg, _ := xplac.Msg.(wasmtypes.QuerySmartContractStateRequest)
 		res, err = queryClient.SmartContractState(
-			context.Background(),
+			xplac.Context,
 			&convertMsg,
 		)
 		if err != nil {
@@ -31,7 +30,7 @@ func queryWasm(xplac *XplaClient) (string, error) {
 	case xplac.MsgType == mwasm.WasmListCodeMsgType:
 		convertMsg, _ := xplac.Msg.(wasmtypes.QueryCodesRequest)
 		res, err = queryClient.Codes(
-			context.Background(),
+			xplac.Context,
 			&convertMsg,
 		)
 		if err != nil {
@@ -42,7 +41,7 @@ func queryWasm(xplac *XplaClient) (string, error) {
 	case xplac.MsgType == mwasm.WasmListContractByCodeMsgType:
 		convertMsg, _ := xplac.Msg.(wasmtypes.QueryContractsByCodeRequest)
 		res, err = queryClient.ContractsByCode(
-			context.Background(),
+			xplac.Context,
 			&convertMsg,
 		)
 		if err != nil {
@@ -57,7 +56,7 @@ func queryWasm(xplac *XplaClient) (string, error) {
 			downloadFileName = downloadFileName + ".wasm"
 		}
 		res, err := queryClient.Code(
-			context.Background(),
+			xplac.Context,
 			&convertMsg,
 		)
 		if err != nil {
@@ -69,7 +68,7 @@ func queryWasm(xplac *XplaClient) (string, error) {
 	case xplac.MsgType == mwasm.WasmCodeInfoMsgType:
 		convertMsg, _ := xplac.Msg.(wasmtypes.QueryCodeRequest)
 		res, err = queryClient.Code(
-			context.Background(),
+			xplac.Context,
 			&convertMsg,
 		)
 		if err != nil {
@@ -80,7 +79,7 @@ func queryWasm(xplac *XplaClient) (string, error) {
 	case xplac.MsgType == mwasm.WasmContractInfoMsgType:
 		convertMsg, _ := xplac.Msg.(wasmtypes.QueryContractInfoRequest)
 		res, err = queryClient.ContractInfo(
-			context.Background(),
+			xplac.Context,
 			&convertMsg,
 		)
 		if err != nil {
@@ -91,7 +90,7 @@ func queryWasm(xplac *XplaClient) (string, error) {
 	case xplac.MsgType == mwasm.WasmContractStateAllMsgType:
 		convertMsg, _ := xplac.Msg.(wasmtypes.QueryAllContractStateRequest)
 		res, err = queryClient.AllContractState(
-			context.Background(),
+			xplac.Context,
 			&convertMsg,
 		)
 		if err != nil {
@@ -102,7 +101,7 @@ func queryWasm(xplac *XplaClient) (string, error) {
 	case xplac.MsgType == mwasm.WasmContractHistoryMsgType:
 		convertMsg, _ := xplac.Msg.(wasmtypes.QueryContractHistoryRequest)
 		res, err = queryClient.ContractHistory(
-			context.Background(),
+			xplac.Context,
 			&convertMsg,
 		)
 		if err != nil {
@@ -113,7 +112,7 @@ func queryWasm(xplac *XplaClient) (string, error) {
 	case xplac.MsgType == mwasm.WasmPinnedMsgType:
 		convertMsg, _ := xplac.Msg.(wasmtypes.QueryPinnedCodesRequest)
 		res, err = queryClient.PinnedCodes(
-			context.Background(),
+			xplac.Context,
 			&convertMsg,
 		)
 		if err != nil {

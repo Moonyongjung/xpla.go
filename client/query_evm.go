@@ -11,7 +11,7 @@ import (
 
 // Query client for evm module.
 func queryEvm(xplac *XplaClient) (string, error) {
-	evmClient, err := NewEvmClient(xplac.Opts.EvmRpcURL)
+	evmClient, err := NewEvmClient(xplac.Opts.EvmRpcURL, xplac.Context)
 	if err != nil {
 		return "", err
 	}

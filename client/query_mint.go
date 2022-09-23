@@ -1,8 +1,6 @@
 package client
 
 import (
-	"context"
-
 	mmint "github.com/Moonyongjung/xpla.go/core/mint"
 	"github.com/Moonyongjung/xpla.go/util"
 
@@ -18,7 +16,7 @@ func queryMint(xplac *XplaClient) (string, error) {
 	case xplac.MsgType == mmint.MintQueryMintParamsMsgType:
 		convertMsg, _ := xplac.Msg.(minttypes.QueryParamsRequest)
 		res, err = queryClient.Params(
-			context.Background(),
+			xplac.Context,
 			&convertMsg,
 		)
 		if err != nil {
@@ -29,7 +27,7 @@ func queryMint(xplac *XplaClient) (string, error) {
 	case xplac.MsgType == mmint.MintQueryInflationMsgType:
 		convertMsg, _ := xplac.Msg.(minttypes.QueryInflationRequest)
 		res, err = queryClient.Inflation(
-			context.Background(),
+			xplac.Context,
 			&convertMsg,
 		)
 		if err != nil {
@@ -40,7 +38,7 @@ func queryMint(xplac *XplaClient) (string, error) {
 	case xplac.MsgType == mmint.MintQueryAnnualProvisionsMsgType:
 		convertMsg, _ := xplac.Msg.(minttypes.QueryAnnualProvisionsRequest)
 		res, err = queryClient.AnnualProvisions(
-			context.Background(),
+			xplac.Context,
 			&convertMsg,
 		)
 		if err != nil {

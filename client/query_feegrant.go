@@ -1,8 +1,6 @@
 package client
 
 import (
-	"context"
-
 	mfeegrant "github.com/Moonyongjung/xpla.go/core/feegrant"
 	"github.com/Moonyongjung/xpla.go/util"
 
@@ -18,7 +16,7 @@ func queryFeegrant(xplac *XplaClient) (string, error) {
 	case xplac.MsgType == mfeegrant.FeegrantQueryGrantMsgType:
 		convertMsg, _ := xplac.Msg.(feegrant.QueryAllowanceRequest)
 		res, err = queryClient.Allowance(
-			context.Background(),
+			xplac.Context,
 			&convertMsg,
 		)
 		if err != nil {
@@ -29,7 +27,7 @@ func queryFeegrant(xplac *XplaClient) (string, error) {
 	case xplac.MsgType == mfeegrant.FeegrantQueryGrantsByGranteeMsgType:
 		convertMsg, _ := xplac.Msg.(feegrant.QueryAllowancesRequest)
 		res, err = queryClient.Allowances(
-			context.Background(),
+			xplac.Context,
 			&convertMsg,
 		)
 		if err != nil {
@@ -40,7 +38,7 @@ func queryFeegrant(xplac *XplaClient) (string, error) {
 	case xplac.MsgType == mfeegrant.FeegrantQueryGrantsByGranterMsgType:
 		convertMsg, _ := xplac.Msg.(feegrant.QueryAllowancesByGranterRequest)
 		res, err = queryClient.AllowancesByGranter(
-			context.Background(),
+			xplac.Context,
 			&convertMsg,
 		)
 		if err != nil {

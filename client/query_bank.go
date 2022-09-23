@@ -1,8 +1,6 @@
 package client
 
 import (
-	"context"
-
 	mbank "github.com/Moonyongjung/xpla.go/core/bank"
 	"github.com/Moonyongjung/xpla.go/util"
 
@@ -18,7 +16,7 @@ func queryBank(xplac *XplaClient) (string, error) {
 	case xplac.MsgType == mbank.BankAllBalancesMsgType:
 		convertMsg, _ := xplac.Msg.(*banktypes.QueryAllBalancesRequest)
 		res, err = queryClient.AllBalances(
-			context.Background(),
+			xplac.Context,
 			convertMsg,
 		)
 		if err != nil {
@@ -29,7 +27,7 @@ func queryBank(xplac *XplaClient) (string, error) {
 	case xplac.MsgType == mbank.BankBalanceMsgType:
 		convertMsg, _ := xplac.Msg.(*banktypes.QueryBalanceRequest)
 		res, err = queryClient.Balance(
-			context.Background(),
+			xplac.Context,
 			convertMsg,
 		)
 		if err != nil {
@@ -40,7 +38,7 @@ func queryBank(xplac *XplaClient) (string, error) {
 	case xplac.MsgType == mbank.BankDenomsMetadataMsgType:
 		convertMsg, _ := xplac.Msg.(banktypes.QueryDenomsMetadataRequest)
 		res, err = queryClient.DenomsMetadata(
-			context.Background(),
+			xplac.Context,
 			&convertMsg,
 		)
 		if err != nil {
@@ -51,7 +49,7 @@ func queryBank(xplac *XplaClient) (string, error) {
 	case xplac.MsgType == mbank.BankDenomMetadataMsgType:
 		convertMsg, _ := xplac.Msg.(banktypes.QueryDenomMetadataRequest)
 		res, err = queryClient.DenomMetadata(
-			context.Background(),
+			xplac.Context,
 			&convertMsg,
 		)
 		if err != nil {
@@ -62,7 +60,7 @@ func queryBank(xplac *XplaClient) (string, error) {
 	case xplac.MsgType == mbank.BankTotalMsgType:
 		convertMsg, _ := xplac.Msg.(banktypes.QueryTotalSupplyRequest)
 		res, err = queryClient.TotalSupply(
-			context.Background(),
+			xplac.Context,
 			&convertMsg,
 		)
 		if err != nil {
@@ -73,7 +71,7 @@ func queryBank(xplac *XplaClient) (string, error) {
 	case xplac.MsgType == mbank.BankTotalSupplyOfMsgType:
 		convertMsg, _ := xplac.Msg.(banktypes.QuerySupplyOfRequest)
 		res, err = queryClient.SupplyOf(
-			context.Background(),
+			xplac.Context,
 			&convertMsg,
 		)
 		if err != nil {

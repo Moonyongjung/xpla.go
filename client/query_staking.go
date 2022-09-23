@@ -1,8 +1,6 @@
 package client
 
 import (
-	"context"
-
 	mstaking "github.com/Moonyongjung/xpla.go/core/staking"
 	"github.com/Moonyongjung/xpla.go/util"
 
@@ -18,7 +16,7 @@ func queryStaking(xplac *XplaClient) (string, error) {
 	case xplac.MsgType == mstaking.StakingQueryValidatorMsgType:
 		convertMsg, _ := xplac.Msg.(stakingtypes.QueryValidatorRequest)
 		res, err = queryClient.Validator(
-			context.Background(),
+			xplac.Context,
 			&convertMsg,
 		)
 		if err != nil {
@@ -29,7 +27,7 @@ func queryStaking(xplac *XplaClient) (string, error) {
 	case xplac.MsgType == mstaking.StakingQueryValidatorsMsgType:
 		convertMsg, _ := xplac.Msg.(stakingtypes.QueryValidatorsRequest)
 		res, err = queryClient.Validators(
-			context.Background(),
+			xplac.Context,
 			&convertMsg,
 		)
 		if err != nil {
@@ -40,7 +38,7 @@ func queryStaking(xplac *XplaClient) (string, error) {
 	case xplac.MsgType == mstaking.StakingQueryDelegationMsgType:
 		convertMsg, _ := xplac.Msg.(stakingtypes.QueryDelegationRequest)
 		res, err = queryClient.Delegation(
-			context.Background(),
+			xplac.Context,
 			&convertMsg,
 		)
 		if err != nil {
@@ -51,7 +49,7 @@ func queryStaking(xplac *XplaClient) (string, error) {
 	case xplac.MsgType == mstaking.StakingQueryDelegationsMsgType:
 		convertMsg, _ := xplac.Msg.(stakingtypes.QueryDelegatorDelegationsRequest)
 		res, err = queryClient.DelegatorDelegations(
-			context.Background(),
+			xplac.Context,
 			&convertMsg,
 		)
 		if err != nil {
@@ -62,7 +60,7 @@ func queryStaking(xplac *XplaClient) (string, error) {
 	case xplac.MsgType == mstaking.StakingQueryDelegationsToMsgType:
 		convertMsg, _ := xplac.Msg.(stakingtypes.QueryValidatorDelegationsRequest)
 		res, err = queryClient.ValidatorDelegations(
-			context.Background(),
+			xplac.Context,
 			&convertMsg,
 		)
 		if err != nil {
@@ -73,7 +71,7 @@ func queryStaking(xplac *XplaClient) (string, error) {
 	case xplac.MsgType == mstaking.StakingQueryUnbondingDelegationMsgType:
 		convertMsg, _ := xplac.Msg.(stakingtypes.QueryUnbondingDelegationRequest)
 		res, err = queryClient.UnbondingDelegation(
-			context.Background(),
+			xplac.Context,
 			&convertMsg,
 		)
 		if err != nil {
@@ -84,7 +82,7 @@ func queryStaking(xplac *XplaClient) (string, error) {
 	case xplac.MsgType == mstaking.StakingQueryUnbondingDelegationsMsgType:
 		convertMsg, _ := xplac.Msg.(stakingtypes.QueryDelegatorUnbondingDelegationsRequest)
 		res, err = queryClient.DelegatorUnbondingDelegations(
-			context.Background(),
+			xplac.Context,
 			&convertMsg,
 		)
 		if err != nil {
@@ -95,7 +93,7 @@ func queryStaking(xplac *XplaClient) (string, error) {
 	case xplac.MsgType == mstaking.StakingQueryUnbondingDelegationsFromMsgType:
 		convertMsg, _ := xplac.Msg.(stakingtypes.QueryValidatorUnbondingDelegationsRequest)
 		res, err = queryClient.ValidatorUnbondingDelegations(
-			context.Background(),
+			xplac.Context,
 			&convertMsg,
 		)
 		if err != nil {
@@ -108,7 +106,7 @@ func queryStaking(xplac *XplaClient) (string, error) {
 		xplac.MsgType == mstaking.StakingQueryRedelegationsFromMsgType:
 		convertMsg, _ := xplac.Msg.(stakingtypes.QueryRedelegationsRequest)
 		res, err = queryClient.Redelegations(
-			context.Background(),
+			xplac.Context,
 			&convertMsg,
 		)
 		if err != nil {
@@ -119,7 +117,7 @@ func queryStaking(xplac *XplaClient) (string, error) {
 	case xplac.MsgType == mstaking.StakingHistoricalInfoMsgType:
 		convertMsg, _ := xplac.Msg.(stakingtypes.QueryHistoricalInfoRequest)
 		res, err = queryClient.HistoricalInfo(
-			context.Background(),
+			xplac.Context,
 			&convertMsg,
 		)
 		if err != nil {
@@ -130,7 +128,7 @@ func queryStaking(xplac *XplaClient) (string, error) {
 	case xplac.MsgType == mstaking.StakingQueryStakingPoolMsgType:
 		convertMsg, _ := xplac.Msg.(stakingtypes.QueryPoolRequest)
 		res, err = queryClient.Pool(
-			context.Background(),
+			xplac.Context,
 			&convertMsg,
 		)
 		if err != nil {
@@ -141,7 +139,7 @@ func queryStaking(xplac *XplaClient) (string, error) {
 	case xplac.MsgType == mstaking.StakingQueryStakingParamsMsgType:
 		convertMsg, _ := xplac.Msg.(stakingtypes.QueryParamsRequest)
 		res, err = queryClient.Params(
-			context.Background(),
+			xplac.Context,
 			&convertMsg,
 		)
 		if err != nil {

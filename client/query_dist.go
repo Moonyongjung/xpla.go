@@ -1,8 +1,6 @@
 package client
 
 import (
-	"context"
-
 	mdist "github.com/Moonyongjung/xpla.go/core/distribution"
 	"github.com/Moonyongjung/xpla.go/util"
 
@@ -18,7 +16,7 @@ func queryDistribution(xplac *XplaClient) (string, error) {
 	case xplac.MsgType == mdist.DistributionQueryDistributionParamsMsgType:
 		convertMsg, _ := xplac.Msg.(disttypes.QueryParamsRequest)
 		res, err = queryClient.Params(
-			context.Background(),
+			xplac.Context,
 			&convertMsg,
 		)
 		if err != nil {
@@ -29,7 +27,7 @@ func queryDistribution(xplac *XplaClient) (string, error) {
 	case xplac.MsgType == mdist.DistributionValidatorOutstandingRewardsMSgType:
 		convertMsg, _ := xplac.Msg.(disttypes.QueryValidatorOutstandingRewardsRequest)
 		res, err = queryClient.ValidatorOutstandingRewards(
-			context.Background(),
+			xplac.Context,
 			&convertMsg,
 		)
 		if err != nil {
@@ -40,7 +38,7 @@ func queryDistribution(xplac *XplaClient) (string, error) {
 	case xplac.MsgType == mdist.DistributionQueryDistCommissionMsgType:
 		convertMsg, _ := xplac.Msg.(disttypes.QueryValidatorCommissionRequest)
 		res, err = queryClient.ValidatorCommission(
-			context.Background(),
+			xplac.Context,
 			&convertMsg,
 		)
 		if err != nil {
@@ -51,7 +49,7 @@ func queryDistribution(xplac *XplaClient) (string, error) {
 	case xplac.MsgType == mdist.DistributionQuerySlashesMsgType:
 		convertMsg, _ := xplac.Msg.(disttypes.QueryValidatorSlashesRequest)
 		res, err = queryClient.ValidatorSlashes(
-			context.Background(),
+			xplac.Context,
 			&convertMsg,
 		)
 		if err != nil {
@@ -62,7 +60,7 @@ func queryDistribution(xplac *XplaClient) (string, error) {
 	case xplac.MsgType == mdist.DistributionQueryRewardsMsgType:
 		convertMsg, _ := xplac.Msg.(disttypes.QueryDelegationRewardsRequest)
 		res, err = queryClient.DelegationRewards(
-			context.Background(),
+			xplac.Context,
 			&convertMsg,
 		)
 		if err != nil {
@@ -73,7 +71,7 @@ func queryDistribution(xplac *XplaClient) (string, error) {
 	case xplac.MsgType == mdist.DistributionQueryCommunityPoolMsgType:
 		convertMsg, _ := xplac.Msg.(disttypes.QueryCommunityPoolRequest)
 		res, err = queryClient.CommunityPool(
-			context.Background(),
+			xplac.Context,
 			&convertMsg,
 		)
 		if err != nil {

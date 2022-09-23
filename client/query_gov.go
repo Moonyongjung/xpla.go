@@ -1,7 +1,6 @@
 package client
 
 import (
-	"context"
 	mgov "github.com/Moonyongjung/xpla.go/core/gov"
 	"github.com/Moonyongjung/xpla.go/util"
 
@@ -19,7 +18,7 @@ func queryGov(xplac *XplaClient) (string, error) {
 	case xplac.MsgType == mgov.GovQueryProposalMsgType:
 		convertMsg, _ := xplac.Msg.(govtypes.QueryProposalRequest)
 		res, err = queryClient.Proposal(
-			context.Background(),
+			xplac.Context,
 			&convertMsg,
 		)
 		if err != nil {
@@ -30,7 +29,7 @@ func queryGov(xplac *XplaClient) (string, error) {
 	case xplac.MsgType == mgov.GovQueryProposalsMsgType:
 		convertMsg, _ := xplac.Msg.(govtypes.QueryProposalsRequest)
 		res, err = queryClient.Proposals(
-			context.Background(),
+			xplac.Context,
 			&convertMsg,
 		)
 		if err != nil {
@@ -59,7 +58,7 @@ func queryGov(xplac *XplaClient) (string, error) {
 	case xplac.MsgType == mgov.GovQueryDepositRequestMsgType:
 		convertMsg, _ := xplac.Msg.(govtypes.QueryDepositRequest)
 		res, err = queryClient.Deposit(
-			context.Background(),
+			xplac.Context,
 			&convertMsg,
 		)
 		if err != nil {
@@ -87,7 +86,7 @@ func queryGov(xplac *XplaClient) (string, error) {
 	case xplac.MsgType == mgov.GovQueryDepositsRequestMsgType:
 		convertMsg, _ := xplac.Msg.(govtypes.QueryDepositsRequest)
 		res, err = queryClient.Deposits(
-			context.Background(),
+			xplac.Context,
 			&convertMsg,
 		)
 		if err != nil {
@@ -98,7 +97,7 @@ func queryGov(xplac *XplaClient) (string, error) {
 	case xplac.MsgType == mgov.GovTallyMsgType:
 		convertMsg, _ := xplac.Msg.(govtypes.QueryTallyResultRequest)
 		res, err = queryClient.TallyResult(
-			context.Background(),
+			xplac.Context,
 			&convertMsg,
 		)
 		if err != nil {
@@ -108,7 +107,7 @@ func queryGov(xplac *XplaClient) (string, error) {
 	// Gov params
 	case xplac.MsgType == mgov.GovQueryGovParamsMsgType:
 		votingRes, err := queryClient.Params(
-			context.Background(),
+			xplac.Context,
 			&govtypes.QueryParamsRequest{ParamsType: "voting"},
 		)
 		if err != nil {
@@ -116,7 +115,7 @@ func queryGov(xplac *XplaClient) (string, error) {
 		}
 
 		tallyRes, err := queryClient.Params(
-			context.Background(),
+			xplac.Context,
 			&govtypes.QueryParamsRequest{ParamsType: "tallying"},
 		)
 		if err != nil {
@@ -124,7 +123,7 @@ func queryGov(xplac *XplaClient) (string, error) {
 		}
 
 		depositRes, err := queryClient.Params(
-			context.Background(),
+			xplac.Context,
 			&govtypes.QueryParamsRequest{ParamsType: "deposit"},
 		)
 		if err != nil {
@@ -147,7 +146,7 @@ func queryGov(xplac *XplaClient) (string, error) {
 	case xplac.MsgType == mgov.GovQueryGovParamVotingMsgType:
 		convertMsg, _ := xplac.Msg.(govtypes.QueryParamsRequest)
 		resParams, err := queryClient.Params(
-			context.Background(),
+			xplac.Context,
 			&convertMsg,
 		)
 		if err != nil {
@@ -164,7 +163,7 @@ func queryGov(xplac *XplaClient) (string, error) {
 	case xplac.MsgType == mgov.GovQueryGovParamTallyingMsgType:
 		convertMsg, _ := xplac.Msg.(govtypes.QueryParamsRequest)
 		resParams, err := queryClient.Params(
-			context.Background(),
+			xplac.Context,
 			&convertMsg,
 		)
 		if err != nil {
@@ -181,7 +180,7 @@ func queryGov(xplac *XplaClient) (string, error) {
 	case xplac.MsgType == mgov.GovQueryGovParamDepositMsgType:
 		convertMsg, _ := xplac.Msg.(govtypes.QueryParamsRequest)
 		resParams, err := queryClient.Params(
-			context.Background(),
+			xplac.Context,
 			&convertMsg,
 		)
 		if err != nil {
@@ -219,7 +218,7 @@ func queryGov(xplac *XplaClient) (string, error) {
 	case xplac.MsgType == mgov.GovQueryVoteMsgType:
 		convertMsg, _ := xplac.Msg.(govtypes.QueryVoteRequest)
 		resVote, err := queryClient.Vote(
-			context.Background(),
+			xplac.Context,
 			&convertMsg,
 		)
 		if err != nil {
@@ -276,7 +275,7 @@ func queryGov(xplac *XplaClient) (string, error) {
 	case xplac.MsgType == mgov.GovQueryVotesPassedMsgType:
 		convertMsg, _ := xplac.Msg.(govtypes.QueryVotesRequest)
 		res, err = queryClient.Votes(
-			context.Background(),
+			xplac.Context,
 			&convertMsg,
 		)
 		if err != nil {

@@ -19,7 +19,7 @@ func queryUpgrade(xplac *XplaClient) (string, error) {
 	case xplac.MsgType == mupgrade.UpgradeAppliedMsgType:
 		convertMsg, _ := xplac.Msg.(upgradetypes.QueryAppliedPlanRequest)
 		appliedPlanRes, err := queryClient.AppliedPlan(
-			context.Background(),
+			xplac.Context,
 			&convertMsg,
 		)
 		if err != nil {
@@ -29,7 +29,7 @@ func queryUpgrade(xplac *XplaClient) (string, error) {
 		if appliedPlanRes.Height == 0 {
 			return "", err
 		}
-		headerData, err := appliedReturnBlockheader(appliedPlanRes, xplac.Opts.RpcURL)
+		headerData, err := appliedReturnBlockheader(appliedPlanRes, xplac.Opts.RpcURL, xplac.Context)
 		if err != nil {
 			return "", err
 		}
@@ -40,7 +40,7 @@ func queryUpgrade(xplac *XplaClient) (string, error) {
 		xplac.MsgType == mupgrade.UpgradeQueryModuleVersionsMsgType:
 		convertMsg, _ := xplac.Msg.(upgradetypes.QueryModuleVersionsRequest)
 		res, err = queryClient.ModuleVersions(
-			context.Background(),
+			xplac.Context,
 			&convertMsg,
 		)
 		if err != nil {
@@ -51,7 +51,7 @@ func queryUpgrade(xplac *XplaClient) (string, error) {
 	case xplac.MsgType == mupgrade.UpgradePlanMsgType:
 		convertMsg, _ := xplac.Msg.(upgradetypes.QueryCurrentPlanRequest)
 		res, err = queryClient.CurrentPlan(
-			context.Background(),
+			xplac.Context,
 			&convertMsg,
 		)
 		if err != nil {
@@ -71,7 +71,7 @@ func queryUpgrade(xplac *XplaClient) (string, error) {
 	return string(out), nil
 }
 
-func appliedReturnBlockheader(res *upgradetypes.QueryAppliedPlanResponse, rpcUrl string) ([]byte, error) {
+func appliedReturnBlockheader(res *upgradetypes.QueryAppliedPlanResponse, rpcUrl string, ctx context.Context) ([]byte, error) {
 	if rpcUrl == "" {
 		return nil, util.LogErr("need RPC URL")
 	}
@@ -91,7 +91,7 @@ func appliedReturnBlockheader(res *upgradetypes.QueryAppliedPlanResponse, rpcUrl
 		return nil, err
 	}
 
-	headers, err := node.BlockchainInfo(context.Background(), res.Height, res.Height)
+	headers, err := node.BlockchainInfo(ctx, res.Height, res.Height)
 	if err != nil {
 		return nil, err
 	}

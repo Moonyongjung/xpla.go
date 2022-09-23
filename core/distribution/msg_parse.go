@@ -95,11 +95,11 @@ func parseWithdrawRewardsArgs(withdrawRewardsMsg types.WithdrawRewardsMsg, privK
 }
 
 // Parsing - withdraw all rewards
-func parseWithdrawAllRewardsArgs(privKey key.PrivateKey, grpcConn grpc.ClientConn) ([]sdk.Msg, error) {
+func parseWithdrawAllRewardsArgs(privKey key.PrivateKey, grpcConn grpc.ClientConn, ctx context.Context) ([]sdk.Msg, error) {
 	delAddr := util.GetAddrByPrivKey(privKey)
 	queryClient := disttypes.NewQueryClient(grpcConn)
 	delValsRes, err := queryClient.DelegatorValidators(
-		context.Background(),
+		ctx,
 		&disttypes.QueryDelegatorValidatorsRequest{
 			DelegatorAddress: delAddr.String(),
 		},

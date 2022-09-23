@@ -27,7 +27,7 @@ const (
 func (xplac *XplaClient) LoadAccount(address sdk.AccAddress) (res authtypes.AccountI, err error) {
 
 	if xplac.Opts.GrpcURL == "" {
-		out, err := ctxHttpClient("GET", xplac.Opts.LcdURL+userInfoUrl+address.String(), nil)
+		out, err := ctxHttpClient("GET", xplac.Opts.LcdURL+userInfoUrl+address.String(), nil, xplac.Context)
 		if err != nil {
 			return nil, err
 		}
@@ -44,7 +44,7 @@ func (xplac *XplaClient) LoadAccount(address sdk.AccAddress) (res authtypes.Acco
 		queryAccountRequest := authtypes.QueryAccountRequest{
 			Address: address.String(),
 		}
-		response, err := queryClient.Account(context.Background(), &queryAccountRequest)
+		response, err := queryClient.Account(xplac.Context, &queryAccountRequest)
 		if err != nil {
 			return nil, err
 		}
@@ -87,7 +87,7 @@ func (xplac *XplaClient) Simulate(txbuilder cmclient.TxBuilder) (*sdktx.Simulate
 			return nil, err
 		}
 
-		out, err := ctxHttpClient("POST", xplac.Opts.LcdURL+simulateUrl, reqBytes)
+		out, err := ctxHttpClient("POST", xplac.Opts.LcdURL+simulateUrl, reqBytes, xplac.Context)
 		if err != nil {
 			return nil, err
 		}
@@ -105,7 +105,7 @@ func (xplac *XplaClient) Simulate(txbuilder cmclient.TxBuilder) (*sdktx.Simulate
 			TxBytes: txBytes,
 		}
 
-		response, err := serviceClient.Simulate(context.Background(), &simulateRequest)
+		response, err := serviceClient.Simulate(xplac.Context, &simulateRequest)
 		if err != nil {
 			return nil, err
 		}
@@ -115,10 +115,10 @@ func (xplac *XplaClient) Simulate(txbuilder cmclient.TxBuilder) (*sdktx.Simulate
 }
 
 // Make new http client for inquiring several information.
-func ctxHttpClient(methodType string, url string, reqBody []byte) ([]byte, error) {
+func ctxHttpClient(methodType string, url string, reqBody []byte, ctx context.Context) ([]byte, error) {
 	var resp *http.Response
 	var err error
-	ctx := context.Background()
+
 	httpClient := &http.Client{Timeout: 30 * time.Second}
 
 	if methodType == "GET" {

@@ -1,8 +1,6 @@
 package client
 
 import (
-	"context"
-
 	mevidence "github.com/Moonyongjung/xpla.go/core/evidence"
 	"github.com/Moonyongjung/xpla.go/util"
 	evidencetypes "github.com/cosmos/cosmos-sdk/x/evidence/types"
@@ -17,7 +15,7 @@ func queryEvidence(xplac *XplaClient) (string, error) {
 	case xplac.MsgType == mevidence.EvidenceQueryAllMsgType:
 		convertMsg, _ := xplac.Msg.(*evidencetypes.QueryAllEvidenceRequest)
 		res, err = queryClient.AllEvidence(
-			context.Background(),
+			xplac.Context,
 			convertMsg,
 		)
 		if err != nil {
@@ -28,7 +26,7 @@ func queryEvidence(xplac *XplaClient) (string, error) {
 	case xplac.MsgType == mevidence.EvidenceQueryMsgType:
 		convertMsg, _ := xplac.Msg.(*evidencetypes.QueryEvidenceRequest)
 		res, err = queryClient.Evidence(
-			context.Background(),
+			xplac.Context,
 			convertMsg,
 		)
 		if err != nil {

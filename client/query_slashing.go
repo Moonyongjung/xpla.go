@@ -1,8 +1,6 @@
 package client
 
 import (
-	"context"
-
 	mslashing "github.com/Moonyongjung/xpla.go/core/slashing"
 	"github.com/Moonyongjung/xpla.go/util"
 
@@ -18,7 +16,7 @@ func querySlashing(xplac *XplaClient) (string, error) {
 	case xplac.MsgType == mslashing.SlahsingQuerySlashingParamsMsgType:
 		convertMsg, _ := xplac.Msg.(slashingtypes.QueryParamsRequest)
 		res, err = queryClient.Params(
-			context.Background(),
+			xplac.Context,
 			&convertMsg,
 		)
 		if err != nil {
@@ -29,7 +27,7 @@ func querySlashing(xplac *XplaClient) (string, error) {
 	case xplac.MsgType == mslashing.SlashingQuerySigningInfosMsgType:
 		convertMsg, _ := xplac.Msg.(slashingtypes.QuerySigningInfosRequest)
 		res, err = queryClient.SigningInfos(
-			context.Background(),
+			xplac.Context,
 			&convertMsg,
 		)
 		if err != nil {
@@ -40,7 +38,7 @@ func querySlashing(xplac *XplaClient) (string, error) {
 	case xplac.MsgType == mslashing.SlashingQuerySigningInfoMsgType:
 		convertMsg, _ := xplac.Msg.(slashingtypes.QuerySigningInfoRequest)
 		res, err = queryClient.SigningInfo(
-			context.Background(),
+			xplac.Context,
 			&convertMsg,
 		)
 		if err != nil {

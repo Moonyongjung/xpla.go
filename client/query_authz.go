@@ -1,8 +1,6 @@
 package client
 
 import (
-	"context"
-
 	mauthz "github.com/Moonyongjung/xpla.go/core/authz"
 	"github.com/Moonyongjung/xpla.go/util"
 
@@ -18,7 +16,7 @@ func queryAuthz(xplac *XplaClient) (string, error) {
 	case xplac.MsgType == mauthz.AuthzQueryGrantMsgType:
 		convertMsg, _ := xplac.Msg.(authz.QueryGrantsRequest)
 		res, err = queryClient.Grants(
-			context.Background(),
+			xplac.Context,
 			&convertMsg,
 		)
 		if err != nil {
@@ -29,7 +27,7 @@ func queryAuthz(xplac *XplaClient) (string, error) {
 	case xplac.MsgType == mauthz.AuthzQueryGrantsByGranteeMsgType:
 		convertMsg, _ := xplac.Msg.(authz.QueryGranteeGrantsRequest)
 		res, err = queryClient.GranteeGrants(
-			context.Background(),
+			xplac.Context,
 			&convertMsg,
 		)
 		if err != nil {
@@ -40,7 +38,7 @@ func queryAuthz(xplac *XplaClient) (string, error) {
 	case xplac.MsgType == mauthz.AuthzQueryGrantsByGranterMsgType:
 		convertMsg, _ := xplac.Msg.(authz.QueryGranterGrantsRequest)
 		res, err = queryClient.GranterGrants(
-			context.Background(),
+			xplac.Context,
 			&convertMsg,
 		)
 		if err != nil {

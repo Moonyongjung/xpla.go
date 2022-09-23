@@ -1,6 +1,8 @@
 package gov
 
 import (
+	"context"
+
 	"github.com/Moonyongjung/xpla.go/key"
 	"github.com/Moonyongjung/xpla.go/types"
 
@@ -69,8 +71,8 @@ func MakeQueryProposalsMsg(queryProposalsMsg types.QueryProposalsMsg) (govtypes.
 }
 
 // (Query) make msg - query deposit
-func MakeQueryDepositMsg(queryDepositMsg types.QueryDepositMsg, grpcConn grpc.ClientConn) (interface{}, string, error) {
-	msg, argsType, err := parseQueryDepositArgs(queryDepositMsg, grpcConn)
+func MakeQueryDepositMsg(queryDepositMsg types.QueryDepositMsg, grpcConn grpc.ClientConn, ctx context.Context) (interface{}, string, error) {
+	msg, argsType, err := parseQueryDepositArgs(queryDepositMsg, grpcConn, ctx)
 	if err != nil {
 		return nil, "", err
 	}
@@ -79,8 +81,8 @@ func MakeQueryDepositMsg(queryDepositMsg types.QueryDepositMsg, grpcConn grpc.Cl
 }
 
 // (Query) make msg - query deposits
-func MakeQueryDepositsMsg(queryDepositMsg types.QueryDepositMsg, grpcConn grpc.ClientConn) (interface{}, string, error) {
-	msg, argsType, err := parseQueryDepositsArgs(queryDepositMsg, grpcConn)
+func MakeQueryDepositsMsg(queryDepositMsg types.QueryDepositMsg, grpcConn grpc.ClientConn, ctx context.Context) (interface{}, string, error) {
+	msg, argsType, err := parseQueryDepositsArgs(queryDepositMsg, grpcConn, ctx)
 	if err != nil {
 		return nil, "", err
 	}
@@ -89,8 +91,8 @@ func MakeQueryDepositsMsg(queryDepositMsg types.QueryDepositMsg, grpcConn grpc.C
 }
 
 // (Query) make msg - tally
-func MakeGovTallyMsg(tallyMsg types.TallyMsg, grpcConn grpc.ClientConn) (interface{}, error) {
-	msg, err := parseGovTallyArgs(tallyMsg, grpcConn)
+func MakeGovTallyMsg(tallyMsg types.TallyMsg, grpcConn grpc.ClientConn, ctx context.Context) (interface{}, error) {
+	msg, err := parseGovTallyArgs(tallyMsg, grpcConn, ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -109,8 +111,8 @@ func MakeGovParamsMsg(govParamsMsg types.GovParamsMsg) (govtypes.QueryParamsRequ
 }
 
 // (Query) make msg - query vote
-func MakeQueryVoteMsg(queryVoteMsg types.QueryVoteMsg, grpcConn grpc.ClientConn) (govtypes.QueryVoteRequest, error) {
-	msg, err := parseQueryVoteArgs(queryVoteMsg, grpcConn)
+func MakeQueryVoteMsg(queryVoteMsg types.QueryVoteMsg, grpcConn grpc.ClientConn, ctx context.Context) (govtypes.QueryVoteRequest, error) {
+	msg, err := parseQueryVoteArgs(queryVoteMsg, grpcConn, ctx)
 	if err != nil {
 		return govtypes.QueryVoteRequest{}, err
 	}
@@ -119,8 +121,8 @@ func MakeQueryVoteMsg(queryVoteMsg types.QueryVoteMsg, grpcConn grpc.ClientConn)
 }
 
 // (Query) make msg - query votes
-func MakeQueryVotesMsg(queryVoteMsg types.QueryVoteMsg, grpcConn grpc.ClientConn) (interface{}, string, error) {
-	msg, status, err := parseQueryVotesArgs(queryVoteMsg, grpcConn)
+func MakeQueryVotesMsg(queryVoteMsg types.QueryVoteMsg, grpcConn grpc.ClientConn, ctx context.Context) (interface{}, string, error) {
+	msg, status, err := parseQueryVotesArgs(queryVoteMsg, grpcConn, ctx)
 	if err != nil {
 		return nil, "", err
 	}
