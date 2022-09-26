@@ -3,7 +3,7 @@ package client
 import (
 	"bytes"
 	"context"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"time"
 
@@ -139,7 +139,7 @@ func ctxHttpClient(methodType string, url string, reqBody []byte, ctx context.Co
 
 	defer resp.Body.Close()
 
-	out, err := ioutil.ReadAll(resp.Body)
+	out, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, util.LogErr(err, "failed to read response")
 	}

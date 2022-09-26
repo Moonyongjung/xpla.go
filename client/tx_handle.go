@@ -2,8 +2,8 @@ package client
 
 import (
 	"crypto/ecdsa"
-	"io/ioutil"
 	"math/big"
+	"os"
 
 	mauthz "github.com/Moonyongjung/xpla.go/core/authz"
 	mbank "github.com/Moonyongjung/xpla.go/core/bank"
@@ -329,7 +329,7 @@ func marshalSignatureJSON(txConfig cmclient.TxConfig, txBldr cmclient.TxBuilder,
 // Unmarshal signature type JSON.
 func unmarshalSignatureJSON(clientCtx cmclient.Context, filename string) (sigs []signing.SignatureV2, err error) {
 	var bytes []byte
-	if bytes, err = ioutil.ReadFile(filename); err != nil {
+	if bytes, err = os.ReadFile(filename); err != nil {
 		return
 	}
 	return clientCtx.TxConfig.UnmarshalSignatureJSON(bytes)
