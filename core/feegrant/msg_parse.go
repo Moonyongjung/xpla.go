@@ -23,7 +23,12 @@ func parseGrantArgs(grantMsg types.GrantMsg, privKey key.PrivateKey) (*feegrant.
 	if err != nil {
 		return nil, err
 	}
-	spendLimit, err := sdk.ParseCoinsNormalized(util.DenomAdd(grantMsg.SpendLimit))
+
+	limit := util.DenomAdd(grantMsg.SpendLimit)
+	if grantMsg.SpendLimit == "" {
+		limit = ""
+	}
+	spendLimit, err := sdk.ParseCoinsNormalized(limit)
 	if err != nil {
 		return nil, err
 	}
