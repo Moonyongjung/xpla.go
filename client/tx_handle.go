@@ -9,7 +9,6 @@ import (
 	mbank "github.com/Moonyongjung/xpla.go/core/bank"
 	mcrisis "github.com/Moonyongjung/xpla.go/core/crisis"
 	mdist "github.com/Moonyongjung/xpla.go/core/distribution"
-	mevm "github.com/Moonyongjung/xpla.go/core/evm"
 	mfeegrant "github.com/Moonyongjung/xpla.go/core/feegrant"
 	mgov "github.com/Moonyongjung/xpla.go/core/gov"
 	mparams "github.com/Moonyongjung/xpla.go/core/params"
@@ -353,28 +352,4 @@ func getMultisigInfo(clientCtx cmclient.Context, name string) (keyring.Info, err
 	}
 
 	return multisigInfo, nil
-}
-
-// For invoke(as execute) contract, parameters are packed by using ABI.
-func getAbiPack(callName string, args ...interface{}) ([]byte, error) {
-	contractAbi, err := mevm.XplaSolContractMetaData.GetAbi()
-	if err != nil {
-		return nil, err
-	}
-
-	var abiByteData []byte
-
-	if args == nil {
-		abiByteData, err = contractAbi.Pack(callName)
-		if err != nil {
-			return nil, err
-		}
-	} else {
-		abiByteData, err = contractAbi.Pack(callName, args...)
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	return abiByteData, nil
 }

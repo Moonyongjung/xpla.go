@@ -4,6 +4,7 @@ import (
 	"encoding/base64"
 	"math/big"
 
+	"github.com/Moonyongjung/xpla.go/client/module"
 	mevm "github.com/Moonyongjung/xpla.go/core/evm"
 	"github.com/Moonyongjung/xpla.go/key"
 	"github.com/Moonyongjung/xpla.go/types"
@@ -29,13 +30,6 @@ type deploySolTx struct {
 	GasPrice *big.Int
 }
 
-const (
-	defaultGasPrice      = "850000000000"
-	defaultGasAdjustment = "1.75"
-	defaultAccNum        = 0
-	defaultAccSeq        = 0
-)
-
 // Create and sign a transaction before it is broadcasted to xpla chain.
 // Options required for create and sign are stored in the xpla client and reflected when the values of those options exist.
 // Create and sign transaction must be needed in order to send transaction to the chain.
@@ -46,8 +40,8 @@ func (xplac *XplaClient) CreateAndSignTx() ([]byte, error) {
 
 	if xplac.Opts.AccountNumber == "" || xplac.Opts.Sequence == "" {
 		if xplac.Opts.LcdURL == "" && xplac.Opts.GrpcURL == "" {
-			xplac.WithAccountNumber(util.FromUint64ToString(defaultAccNum))
-			xplac.WithSequence(util.FromUint64ToString(defaultAccSeq))
+			xplac.WithAccountNumber(util.FromUint64ToString(types.DefaultAccNum))
+			xplac.WithSequence(util.FromUint64ToString(types.DefaultAccSeq))
 		} else {
 			account, err := xplac.LoadAccount(sdk.AccAddress(xplac.PrivateKey.PubKey().Address()))
 			if err != nil {
@@ -59,11 +53,11 @@ func (xplac *XplaClient) CreateAndSignTx() ([]byte, error) {
 	}
 
 	if xplac.Opts.GasAdjustment == "" {
-		xplac.WithGasAdjustment(defaultGasAdjustment)
+		xplac.WithGasAdjustment(types.DefaultGasAdjustment)
 	}
 
 	if xplac.Opts.GasPrice == "" {
-		xplac.WithGasPrice(defaultGasPrice)
+		xplac.WithGasPrice(types.DefaultGasPrice)
 	}
 
 	if xplac.Module == mevm.EvmModule {
@@ -274,8 +268,8 @@ func (xplac *XplaClient) MultiSign(txMultiSignMsg types.TxMultiSignMsg) ([]byte,
 		txFactory = txFactory.WithSignMode(signing.SignMode_SIGN_MODE_LEGACY_AMINO_JSON)
 	}
 	txFactory = txFactory.WithChainID(xplac.ChainId).
-		WithAccountNumber(uint64(defaultAccNum)).
-		WithSequence(uint64(defaultAccSeq))
+		WithAccountNumber(uint64(types.DefaultAccNum)).
+		WithSequence(uint64(types.DefaultAccSeq))
 
 	txCfg := clientCtx.TxConfig
 	txBuilder, err := txCfg.WrapTxBuilder(parseTx)
@@ -387,7 +381,7 @@ func (xplac *XplaClient) createAndSignEvmTx() ([]byte, error) {
 	}
 
 	if xplac.Opts.GasLimit == "" {
-		gasLimitAdjustment, err := util.GasLimitAdjustment(util.FromStringToUint64(defaultEvmGasLimit), xplac.Opts.GasAdjustment)
+		gasLimitAdjustment, err := util.GasLimitAdjustment(util.FromStringToUint64(util.DefaultEvmGasLimit), xplac.Opts.GasAdjustment)
 		if err != nil {
 			return nil, err
 		}
@@ -416,7 +410,7 @@ func (xplac *XplaClient) createAndSignEvmTx() ([]byte, error) {
 			return nil, err
 		}
 
-		value, err := util.FromStringToBigInt(defaultSolidityValue)
+		value, err := util.FromStringToBigInt(util.DefaultSolidityValue)
 		if err != nil {
 			return nil, err
 		}
@@ -438,7 +432,7 @@ func (xplac *XplaClient) createAndSignEvmTx() ([]byte, error) {
 
 	case xplac.MsgType == mevm.EvmInvokeSolContractMsgType:
 		convertMsg, _ := xplac.Msg.(types.InvokeSolContractMsg)
-		invokeByteData, err := getAbiPack(convertMsg.ContractFuncCallName, convertMsg.Args...)
+		invokeByteData, err := module.GetAbiPack(convertMsg.ContractFuncCallName, convertMsg.Args...)
 		if err != nil {
 			return nil, err
 		}

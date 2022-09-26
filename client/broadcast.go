@@ -3,6 +3,7 @@ package client
 import (
 	mevm "github.com/Moonyongjung/xpla.go/core/evm"
 	"github.com/Moonyongjung/xpla.go/types"
+	"github.com/Moonyongjung/xpla.go/util"
 	txtypes "github.com/cosmos/cosmos-sdk/types/tx"
 )
 
@@ -46,7 +47,7 @@ func (xplac *XplaClient) BroadcastAsync(txBytes []byte) (*types.TxRes, error) {
 
 // Broadcast the transaction which is evm transaction by using ethclient of go-ethereum.
 func (xplac *XplaClient) broadcastEvm(txBytes []byte) (*types.TxRes, error) {
-	evmClient, err := NewEvmClient(xplac.Opts.EvmRpcURL, xplac.Context)
+	evmClient, err := util.NewEvmClient(xplac.Opts.EvmRpcURL, xplac.Context)
 	if err != nil {
 		return nil, err
 	}

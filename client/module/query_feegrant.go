@@ -1,4 +1,4 @@
-package client
+package module
 
 import (
 	mfeegrant "github.com/Moonyongjung/xpla.go/core/feegrant"
@@ -8,15 +8,15 @@ import (
 )
 
 // Query client for fee-grant module.
-func queryFeegrant(xplac *XplaClient) (string, error) {
-	queryClient := feegrant.NewQueryClient(xplac.Grpc)
+func (i IXplaClient) QueryFeegrant() (string, error) {
+	queryClient := feegrant.NewQueryClient(i.Ixplac.GetGrpcClient())
 
 	switch {
 	// Feegrant state
-	case xplac.MsgType == mfeegrant.FeegrantQueryGrantMsgType:
-		convertMsg, _ := xplac.Msg.(feegrant.QueryAllowanceRequest)
+	case i.Ixplac.GetMsgType() == mfeegrant.FeegrantQueryGrantMsgType:
+		convertMsg, _ := i.Ixplac.GetMsg().(feegrant.QueryAllowanceRequest)
 		res, err = queryClient.Allowance(
-			xplac.Context,
+			i.Ixplac.GetContext(),
 			&convertMsg,
 		)
 		if err != nil {
@@ -24,10 +24,10 @@ func queryFeegrant(xplac *XplaClient) (string, error) {
 		}
 
 	// Feegrant grants by grantee
-	case xplac.MsgType == mfeegrant.FeegrantQueryGrantsByGranteeMsgType:
-		convertMsg, _ := xplac.Msg.(feegrant.QueryAllowancesRequest)
+	case i.Ixplac.GetMsgType() == mfeegrant.FeegrantQueryGrantsByGranteeMsgType:
+		convertMsg, _ := i.Ixplac.GetMsg().(feegrant.QueryAllowancesRequest)
 		res, err = queryClient.Allowances(
-			xplac.Context,
+			i.Ixplac.GetContext(),
 			&convertMsg,
 		)
 		if err != nil {
@@ -35,10 +35,10 @@ func queryFeegrant(xplac *XplaClient) (string, error) {
 		}
 
 	// Feegrant grants by granter
-	case xplac.MsgType == mfeegrant.FeegrantQueryGrantsByGranterMsgType:
-		convertMsg, _ := xplac.Msg.(feegrant.QueryAllowancesByGranterRequest)
+	case i.Ixplac.GetMsgType() == mfeegrant.FeegrantQueryGrantsByGranterMsgType:
+		convertMsg, _ := i.Ixplac.GetMsg().(feegrant.QueryAllowancesByGranterRequest)
 		res, err = queryClient.AllowancesByGranter(
-			xplac.Context,
+			i.Ixplac.GetContext(),
 			&convertMsg,
 		)
 		if err != nil {
@@ -49,7 +49,7 @@ func queryFeegrant(xplac *XplaClient) (string, error) {
 		return "", util.LogErr("invalid msg type")
 	}
 
-	out, err = printProto(xplac, res)
+	out, err = printProto(i, res)
 	if err != nil {
 		return "", err
 	}

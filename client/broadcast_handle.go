@@ -59,7 +59,7 @@ func broadcastTx(xplac *XplaClient, txBytes []byte, mode txtypes.BroadcastMode) 
 
 // Broadcast generated transactions of ethereum type.
 // Broadcast responses, including evm, are delivered as "TxResponse".
-func broadcastTxEvm(xplac *XplaClient, txBytes []byte, broadcastMode string, evmClient *EvmClient) (*types.TxRes, error) {
+func broadcastTxEvm(xplac *XplaClient, txBytes []byte, broadcastMode string, evmClient *util.EvmClient) (*types.TxRes, error) {
 	switch {
 	case xplac.MsgType == mevm.EvmSendCoinMsgType ||
 		xplac.MsgType == mevm.EvmInvokeSolContractMsgType:
@@ -112,7 +112,7 @@ func broadcastTxEvm(xplac *XplaClient, txBytes []byte, broadcastMode string, evm
 
 // Handle evm broadcast mode.
 // Similarly, determine broadcast mode included in the options of xpla client.
-func checkEvmBroadcastMode(broadcastMode string, evmClient *EvmClient, tx *evmtypes.Transaction) (*types.TxRes, error) {
+func checkEvmBroadcastMode(broadcastMode string, evmClient *util.EvmClient, tx *evmtypes.Transaction) (*types.TxRes, error) {
 	// Wait tx receipt (Broadcast Block)
 	if broadcastMode == "block" {
 		receipt, err := waitTxReceipt(evmClient, tx)
@@ -129,8 +129,8 @@ func checkEvmBroadcastMode(broadcastMode string, evmClient *EvmClient, tx *evmty
 // If broadcast mode is "block", client waits transaction receipt of evm.
 // The wait time is in seconds and is set inside the library as timeout count.
 // When the timeout occurs, no longer wait for the transaction receipt.
-func waitTxReceipt(evmClient *EvmClient, signedTx *evmtypes.Transaction) (*evmtypes.Receipt, error) {
-	count := defaultEvmTxReceiptTimeout
+func waitTxReceipt(evmClient *util.EvmClient, signedTx *evmtypes.Transaction) (*evmtypes.Receipt, error) {
+	count := util.DefaultEvmTxReceiptTimeout
 	for {
 		receipt, err := evmClient.Client.TransactionReceipt(evmClient.Ctx, signedTx.Hash())
 		if err != nil {

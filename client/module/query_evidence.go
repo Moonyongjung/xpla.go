@@ -1,4 +1,4 @@
-package client
+package module
 
 import (
 	mevidence "github.com/Moonyongjung/xpla.go/core/evidence"
@@ -7,15 +7,15 @@ import (
 )
 
 // Query client for evidence module.
-func queryEvidence(xplac *XplaClient) (string, error) {
-	queryClient := evidencetypes.NewQueryClient(xplac.Grpc)
+func (i IXplaClient) QueryEvidence() (string, error) {
+	queryClient := evidencetypes.NewQueryClient(i.Ixplac.GetGrpcClient())
 
 	switch {
 	// Query all evidences
-	case xplac.MsgType == mevidence.EvidenceQueryAllMsgType:
-		convertMsg, _ := xplac.Msg.(*evidencetypes.QueryAllEvidenceRequest)
+	case i.Ixplac.GetMsgType() == mevidence.EvidenceQueryAllMsgType:
+		convertMsg, _ := i.Ixplac.GetMsg().(*evidencetypes.QueryAllEvidenceRequest)
 		res, err = queryClient.AllEvidence(
-			xplac.Context,
+			i.Ixplac.GetContext(),
 			convertMsg,
 		)
 		if err != nil {
@@ -23,10 +23,10 @@ func queryEvidence(xplac *XplaClient) (string, error) {
 		}
 
 	// Query evidence
-	case xplac.MsgType == mevidence.EvidenceQueryMsgType:
-		convertMsg, _ := xplac.Msg.(*evidencetypes.QueryEvidenceRequest)
+	case i.Ixplac.GetMsgType() == mevidence.EvidenceQueryMsgType:
+		convertMsg, _ := i.Ixplac.GetMsg().(*evidencetypes.QueryEvidenceRequest)
 		res, err = queryClient.Evidence(
-			xplac.Context,
+			i.Ixplac.GetContext(),
 			convertMsg,
 		)
 		if err != nil {
@@ -37,7 +37,7 @@ func queryEvidence(xplac *XplaClient) (string, error) {
 		return "", util.LogErr("invalid msg type")
 	}
 
-	out, err = printProto(xplac, res)
+	out, err = printProto(i, res)
 	if err != nil {
 		return "", err
 	}

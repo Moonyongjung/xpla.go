@@ -1,4 +1,4 @@
-package client
+package module
 
 import (
 	mevm "github.com/Moonyongjung/xpla.go/core/evm"
@@ -10,44 +10,47 @@ import (
 )
 
 // Query client for evm module.
-func queryEvm(xplac *XplaClient) (string, error) {
-	evmClient, err := NewEvmClient(xplac.Opts.EvmRpcURL, xplac.Context)
+func (i IXplaClient) QueryEvm() (string, error) {
+	evmClient, err := util.NewEvmClient(i.Ixplac.GetEvmRpc(), i.Ixplac.GetContext())
 	if err != nil {
 		return "", err
 	}
 
-	if xplac.Opts.GasAdjustment == "" {
-		xplac.WithGasAdjustment(defaultGasAdjustment)
+	gasAdj := i.Ixplac.GetGasAdjustment()
+	if i.Ixplac.GetGasAdjustment() == "" {
+		gasAdj = types.DefaultGasAdjustment
 	}
 
-	if xplac.Opts.GasLimit == "" {
-		gasLimitAdjustment, err := util.GasLimitAdjustment(util.FromStringToUint64(defaultEvmGasLimit), xplac.Opts.GasAdjustment)
+	gasLimit := i.Ixplac.GetGasLimit()
+	if i.Ixplac.GetGasLimit() == "" {
+		gasLimitAdjustment, err := util.GasLimitAdjustment(util.FromStringToUint64(util.DefaultEvmGasLimit), gasAdj)
 		if err != nil {
 			return "", err
 		}
-		xplac.WithGasLimit(gasLimitAdjustment)
+		gasLimit = gasLimitAdjustment
 	}
 
-	if xplac.Opts.GasPrice == "" {
-		xplac.WithGasPrice(defaultGasPrice)
+	gasPrice := i.Ixplac.GetGasPrice()
+	if i.Ixplac.GetGasPrice() == "" {
+		gasPrice = types.DefaultGasPrice
 	}
 
-	gasPrice, err := util.FromStringToBigInt(xplac.Opts.GasPrice)
+	gasPriceBigInt, err := util.FromStringToBigInt(gasPrice)
 	if err != nil {
 		return "", err
 	}
 
 	switch {
 	// Evm call contract
-	case xplac.MsgType == mevm.EvmCallSolContractMsgType:
-		convertMsg, _ := xplac.Msg.(types.CallSolContractMsg)
+	case i.Ixplac.GetMsgType() == mevm.EvmCallSolContractMsgType:
+		convertMsg, _ := i.Ixplac.GetMsg().(types.CallSolContractMsg)
 
-		callByteData, err := getAbiPack(convertMsg.ContractFuncCallName, convertMsg.Args...)
+		callByteData, err := GetAbiPack(convertMsg.ContractFuncCallName, convertMsg.Args...)
 		if err != nil {
 			return "", err
 		}
 
-		fromAddr := util.FromStringToByte20Address(xplac.PrivateKey.PubKey().Address().String())
+		fromAddr := util.FromStringToByte20Address(i.Ixplac.GetPrivateKey().PubKey().Address().String())
 		toAddr := util.FromStringToByte20Address(convertMsg.ContractAddress)
 		value, err := util.FromStringToBigInt("0")
 		if err != nil {
@@ -57,8 +60,8 @@ func queryEvm(xplac *XplaClient) (string, error) {
 		msg := ethereum.CallMsg{
 			From:     fromAddr,
 			To:       &toAddr,
-			Gas:      util.FromStringToUint64(xplac.Opts.GasLimit),
-			GasPrice: gasPrice,
+			Gas:      util.FromStringToUint64(gasLimit),
+			GasPrice: gasPriceBigInt,
 			Value:    value,
 			Data:     callByteData,
 		}
@@ -68,7 +71,7 @@ func queryEvm(xplac *XplaClient) (string, error) {
 			return "", err
 		}
 
-		result, err := getAbiUnpack(convertMsg.ContractFuncCallName, res)
+		result, err := GetAbiUnpack(convertMsg.ContractFuncCallName, res)
 		if err != nil {
 			return "", err
 		}
@@ -81,8 +84,8 @@ func queryEvm(xplac *XplaClient) (string, error) {
 		return jsonReturn(callSolContractResponse)
 
 	// Evm transaction by hash
-	case xplac.MsgType == mevm.EvmGetTransactionByHashMsgType:
-		convertMsg, _ := xplac.Msg.(types.GetTransactionByHashMsg)
+	case i.Ixplac.GetMsgType() == mevm.EvmGetTransactionByHashMsgType:
+		convertMsg, _ := i.Ixplac.GetMsg().(types.GetTransactionByHashMsg)
 		commonTxHash := util.FromStringHexToHash(convertMsg.TxHash)
 		tx, isPending, err := evmClient.Client.TransactionByHash(evmClient.Ctx, commonTxHash)
 		if isPending {
@@ -100,8 +103,8 @@ func queryEvm(xplac *XplaClient) (string, error) {
 		return string(json), nil
 
 	// Evm block by hash or height
-	case xplac.MsgType == mevm.EvmGetBlockByHashHeightMsgType:
-		convertMsg, _ := xplac.Msg.(types.GetBlockByHashHeightMsg)
+	case i.Ixplac.GetMsgType() == mevm.EvmGetBlockByHashHeightMsgType:
+		convertMsg, _ := i.Ixplac.GetMsg().(types.GetBlockByHashHeightMsg)
 		var block *ethtypes.Block
 		var blockResponse types.BlockResponse
 
@@ -133,8 +136,8 @@ func queryEvm(xplac *XplaClient) (string, error) {
 		return jsonReturn(blockResponse)
 
 	// Evm account information
-	case xplac.MsgType == mevm.EvmQueryAccountInfoMsgType:
-		convertMsg, _ := xplac.Msg.(types.AccountInfoMsg)
+	case i.Ixplac.GetMsgType() == mevm.EvmQueryAccountInfoMsgType:
+		convertMsg, _ := i.Ixplac.GetMsg().(types.AccountInfoMsg)
 		account := util.FromStringToByte20Address(convertMsg.Account)
 
 		balance, err := evmClient.Client.BalanceAt(evmClient.Ctx, account, nil)
@@ -196,7 +199,7 @@ func queryEvm(xplac *XplaClient) (string, error) {
 		return jsonReturn(accountInfoResponse)
 
 	// Evm suggest gas price
-	case xplac.MsgType == mevm.EvmSuggestGasPriceMsgType:
+	case i.Ixplac.GetMsgType() == mevm.EvmSuggestGasPriceMsgType:
 		gasPrice, err := evmClient.Client.SuggestGasPrice(evmClient.Ctx)
 		if err != nil {
 			return "", err
@@ -214,7 +217,7 @@ func queryEvm(xplac *XplaClient) (string, error) {
 		return jsonReturn(suggestGasPriceResponse)
 
 	// Evm chain ID
-	case xplac.MsgType == mevm.EvmQueryChainIdMsgType:
+	case i.Ixplac.GetMsgType() == mevm.EvmQueryChainIdMsgType:
 		chainId, err := evmClient.Client.ChainID(evmClient.Ctx)
 		if err != nil {
 			return "", err
@@ -226,7 +229,7 @@ func queryEvm(xplac *XplaClient) (string, error) {
 		return jsonReturn(ethChainIdResponse)
 
 	// Evm latest block height
-	case xplac.MsgType == mevm.EvmQueryCurrentBlockNumberMsgType:
+	case i.Ixplac.GetMsgType() == mevm.EvmQueryCurrentBlockNumberMsgType:
 		blockNumber, err := evmClient.Client.BlockNumber(evmClient.Ctx)
 		if err != nil {
 			return "", err

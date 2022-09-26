@@ -1,4 +1,4 @@
-package client
+package module
 
 import (
 	"context"
@@ -11,15 +11,15 @@ import (
 )
 
 // Query client for upgrade module.
-func queryUpgrade(xplac *XplaClient) (string, error) {
-	queryClient := upgradetypes.NewQueryClient(xplac.Grpc)
+func (i IXplaClient) QueryUpgrade() (string, error) {
+	queryClient := upgradetypes.NewQueryClient(i.Ixplac.GetGrpcClient())
 
 	switch {
 	// Upgrade applied
-	case xplac.MsgType == mupgrade.UpgradeAppliedMsgType:
-		convertMsg, _ := xplac.Msg.(upgradetypes.QueryAppliedPlanRequest)
+	case i.Ixplac.GetMsgType() == mupgrade.UpgradeAppliedMsgType:
+		convertMsg, _ := i.Ixplac.GetMsg().(upgradetypes.QueryAppliedPlanRequest)
 		appliedPlanRes, err := queryClient.AppliedPlan(
-			xplac.Context,
+			i.Ixplac.GetContext(),
 			&convertMsg,
 		)
 		if err != nil {
@@ -29,18 +29,18 @@ func queryUpgrade(xplac *XplaClient) (string, error) {
 		if appliedPlanRes.Height == 0 {
 			return "", err
 		}
-		headerData, err := appliedReturnBlockheader(appliedPlanRes, xplac.Opts.RpcURL, xplac.Context)
+		headerData, err := appliedReturnBlockheader(appliedPlanRes, i.Ixplac.GetRpc(), i.Ixplac.GetContext())
 		if err != nil {
 			return "", err
 		}
 		return string(headerData), nil
 
 	// Upgrade all module versions
-	case xplac.MsgType == mupgrade.UpgradeQueryAllModuleVersionsMsgType ||
-		xplac.MsgType == mupgrade.UpgradeQueryModuleVersionsMsgType:
-		convertMsg, _ := xplac.Msg.(upgradetypes.QueryModuleVersionsRequest)
+	case i.Ixplac.GetMsgType() == mupgrade.UpgradeQueryAllModuleVersionsMsgType ||
+		i.Ixplac.GetMsgType() == mupgrade.UpgradeQueryModuleVersionsMsgType:
+		convertMsg, _ := i.Ixplac.GetMsg().(upgradetypes.QueryModuleVersionsRequest)
 		res, err = queryClient.ModuleVersions(
-			xplac.Context,
+			i.Ixplac.GetContext(),
 			&convertMsg,
 		)
 		if err != nil {
@@ -48,10 +48,10 @@ func queryUpgrade(xplac *XplaClient) (string, error) {
 		}
 
 	// Upgrade plan
-	case xplac.MsgType == mupgrade.UpgradePlanMsgType:
-		convertMsg, _ := xplac.Msg.(upgradetypes.QueryCurrentPlanRequest)
+	case i.Ixplac.GetMsgType() == mupgrade.UpgradePlanMsgType:
+		convertMsg, _ := i.Ixplac.GetMsg().(upgradetypes.QueryCurrentPlanRequest)
 		res, err = queryClient.CurrentPlan(
-			xplac.Context,
+			i.Ixplac.GetContext(),
 			&convertMsg,
 		)
 		if err != nil {
@@ -63,7 +63,7 @@ func queryUpgrade(xplac *XplaClient) (string, error) {
 
 	}
 
-	out, err = printProto(xplac, res)
+	out, err = printProto(i, res)
 	if err != nil {
 		return "", err
 	}

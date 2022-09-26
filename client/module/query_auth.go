@@ -1,4 +1,4 @@
-package client
+package module
 
 import (
 	mauth "github.com/Moonyongjung/xpla.go/core/auth"
@@ -10,15 +10,15 @@ import (
 )
 
 // Query client for auth module.
-func queryAuth(xplac *XplaClient) (string, error) {
-	queryClient := authtypes.NewQueryClient(xplac.Grpc)
+func (i IXplaClient) QueryAuth() (string, error) {
+	queryClient := authtypes.NewQueryClient(i.Ixplac.GetGrpcClient())
 
 	switch {
 	// Auth params
-	case xplac.MsgType == mauth.AuthQueryParamsMsgType:
-		convertMsg, _ := xplac.Msg.(authtypes.QueryParamsRequest)
+	case i.Ixplac.GetMsgType() == mauth.AuthQueryParamsMsgType:
+		convertMsg, _ := i.Ixplac.GetMsg().(authtypes.QueryParamsRequest)
 		res, err = queryClient.Params(
-			xplac.Context,
+			i.Ixplac.GetContext(),
 			&convertMsg,
 		)
 		if err != nil {
@@ -26,10 +26,10 @@ func queryAuth(xplac *XplaClient) (string, error) {
 		}
 
 	// Auth account
-	case xplac.MsgType == mauth.AuthQueryAccAddressMsgType:
-		convertMsg, _ := xplac.Msg.(authtypes.QueryAccountRequest)
+	case i.Ixplac.GetMsgType() == mauth.AuthQueryAccAddressMsgType:
+		convertMsg, _ := i.Ixplac.GetMsg().(authtypes.QueryAccountRequest)
 		res, err = queryClient.Account(
-			xplac.Context,
+			i.Ixplac.GetContext(),
 			&convertMsg,
 		)
 		if err != nil {
@@ -37,10 +37,10 @@ func queryAuth(xplac *XplaClient) (string, error) {
 		}
 
 	// Auth accounts
-	case xplac.MsgType == mauth.AuthQueryAccountsMsgType:
-		convertMsg, _ := xplac.Msg.(authtypes.QueryAccountsRequest)
+	case i.Ixplac.GetMsgType() == mauth.AuthQueryAccountsMsgType:
+		convertMsg, _ := i.Ixplac.GetMsg().(authtypes.QueryAccountsRequest)
 		res, err = queryClient.Accounts(
-			xplac.Context,
+			i.Ixplac.GetContext(),
 			&convertMsg,
 		)
 		if err != nil {
@@ -48,16 +48,16 @@ func queryAuth(xplac *XplaClient) (string, error) {
 		}
 
 	// Auth tx by event
-	case xplac.MsgType == mauth.AuthQueryTxsByEventsMsgType:
-		if xplac.Opts.RpcURL == "" {
-			return "", util.LogErr("Error: Need RPC URL when txs methods")
+	case i.Ixplac.GetMsgType() == mauth.AuthQueryTxsByEventsMsgType:
+		if i.Ixplac.GetRpc() == "" {
+			return "", util.LogErr("error: need RPC URL when txs methods")
 		}
-		convertMsg, _ := xplac.Msg.([]string)
+		convertMsg, _ := i.Ixplac.GetMsg().([]string)
 		msgLength := len(convertMsg)
 		tmEvents := convertMsg[:msgLength-2]
 		page := util.FromStringToInt(convertMsg[msgLength-2])
 		limit := util.FromStringToInt(convertMsg[msgLength-1])
-		clientCtx, err := clientForQuery(xplac)
+		clientCtx, err := clientForQuery(i)
 		if err != nil {
 			return "", err
 		}
@@ -68,16 +68,16 @@ func queryAuth(xplac *XplaClient) (string, error) {
 		}
 
 	// Auth tx
-	case xplac.MsgType == mauth.AuthQueryTxMsgType:
-		if xplac.Opts.RpcURL == "" {
+	case i.Ixplac.GetMsgType() == mauth.AuthQueryTxMsgType:
+		if i.Ixplac.GetRpc() == "" {
 			return "", util.LogErr("Error: Need RPC URL when txs methods")
 		}
-		convertMsg, _ := xplac.Msg.([]string)
+		convertMsg, _ := i.Ixplac.GetMsg().([]string)
 		msgLength := len(convertMsg)
 		tmEvents := convertMsg[:msgLength-1]
 		txType := convertMsg[msgLength-1]
 
-		clientCtx, err := clientForQuery(xplac)
+		clientCtx, err := clientForQuery(i)
 		if err != nil {
 			return "", err
 		}
@@ -98,7 +98,7 @@ func queryAuth(xplac *XplaClient) (string, error) {
 		return "", util.LogErr("invalid msg type")
 	}
 
-	out, err = printProto(xplac, res)
+	out, err = printProto(i, res)
 	if err != nil {
 		return "", err
 	}

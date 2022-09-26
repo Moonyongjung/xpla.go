@@ -1,4 +1,4 @@
-package client
+package module
 
 import (
 	mauthz "github.com/Moonyongjung/xpla.go/core/authz"
@@ -8,15 +8,15 @@ import (
 )
 
 // Query client for authz module.
-func queryAuthz(xplac *XplaClient) (string, error) {
-	queryClient := authz.NewQueryClient(xplac.Grpc)
+func (i IXplaClient) QueryAuthz() (string, error) {
+	queryClient := authz.NewQueryClient(i.Ixplac.GetGrpcClient())
 
 	switch {
 	// Authz grant
-	case xplac.MsgType == mauthz.AuthzQueryGrantMsgType:
-		convertMsg, _ := xplac.Msg.(authz.QueryGrantsRequest)
+	case i.Ixplac.GetMsgType() == mauthz.AuthzQueryGrantMsgType:
+		convertMsg, _ := i.Ixplac.GetMsg().(authz.QueryGrantsRequest)
 		res, err = queryClient.Grants(
-			xplac.Context,
+			i.Ixplac.GetContext(),
 			&convertMsg,
 		)
 		if err != nil {
@@ -24,10 +24,10 @@ func queryAuthz(xplac *XplaClient) (string, error) {
 		}
 
 	// Authz grant by grantee
-	case xplac.MsgType == mauthz.AuthzQueryGrantsByGranteeMsgType:
-		convertMsg, _ := xplac.Msg.(authz.QueryGranteeGrantsRequest)
+	case i.Ixplac.GetMsgType() == mauthz.AuthzQueryGrantsByGranteeMsgType:
+		convertMsg, _ := i.Ixplac.GetMsg().(authz.QueryGranteeGrantsRequest)
 		res, err = queryClient.GranteeGrants(
-			xplac.Context,
+			i.Ixplac.GetContext(),
 			&convertMsg,
 		)
 		if err != nil {
@@ -35,10 +35,10 @@ func queryAuthz(xplac *XplaClient) (string, error) {
 		}
 
 	// Authz grant by granter
-	case xplac.MsgType == mauthz.AuthzQueryGrantsByGranterMsgType:
-		convertMsg, _ := xplac.Msg.(authz.QueryGranterGrantsRequest)
+	case i.Ixplac.GetMsgType() == mauthz.AuthzQueryGrantsByGranterMsgType:
+		convertMsg, _ := i.Ixplac.GetMsg().(authz.QueryGranterGrantsRequest)
 		res, err = queryClient.GranterGrants(
-			xplac.Context,
+			i.Ixplac.GetContext(),
 			&convertMsg,
 		)
 		if err != nil {
@@ -49,7 +49,7 @@ func queryAuthz(xplac *XplaClient) (string, error) {
 		return "", util.LogErr("invalid msg type")
 	}
 
-	out, err = printProto(xplac, res)
+	out, err = printProto(i, res)
 	if err != nil {
 		return "", err
 	}

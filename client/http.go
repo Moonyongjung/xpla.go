@@ -24,6 +24,7 @@ const (
 )
 
 // LoadAccount simulates gas and fee for a transaction
+// If xpla client has gRPC client, query account information by using gRPC
 func (xplac *XplaClient) LoadAccount(address sdk.AccAddress) (res authtypes.AccountI, err error) {
 
 	if xplac.Opts.GrpcURL == "" {
@@ -60,6 +61,7 @@ func (xplac *XplaClient) LoadAccount(address sdk.AccAddress) (res authtypes.Acco
 }
 
 // Simulate tx and get response
+// If xpla client has gRPC client, query simulation by using gRPC
 func (xplac *XplaClient) Simulate(txbuilder cmclient.TxBuilder) (*sdktx.SimulateResponse, error) {
 	sig := signing.SignatureV2{
 		PubKey: xplac.PrivateKey.PubKey(),

@@ -1,4 +1,4 @@
-package client
+package module
 
 import (
 	mslashing "github.com/Moonyongjung/xpla.go/core/slashing"
@@ -8,15 +8,15 @@ import (
 )
 
 // Query client for slashing module.
-func querySlashing(xplac *XplaClient) (string, error) {
-	queryClient := slashingtypes.NewQueryClient(xplac.Grpc)
+func (i IXplaClient) QuerySlashing() (string, error) {
+	queryClient := slashingtypes.NewQueryClient(i.Ixplac.GetGrpcClient())
 
 	switch {
 	// Slashing parameters
-	case xplac.MsgType == mslashing.SlahsingQuerySlashingParamsMsgType:
-		convertMsg, _ := xplac.Msg.(slashingtypes.QueryParamsRequest)
+	case i.Ixplac.GetMsgType() == mslashing.SlahsingQuerySlashingParamsMsgType:
+		convertMsg, _ := i.Ixplac.GetMsg().(slashingtypes.QueryParamsRequest)
 		res, err = queryClient.Params(
-			xplac.Context,
+			i.Ixplac.GetContext(),
 			&convertMsg,
 		)
 		if err != nil {
@@ -24,10 +24,10 @@ func querySlashing(xplac *XplaClient) (string, error) {
 		}
 
 	// Slashing signing information
-	case xplac.MsgType == mslashing.SlashingQuerySigningInfosMsgType:
-		convertMsg, _ := xplac.Msg.(slashingtypes.QuerySigningInfosRequest)
+	case i.Ixplac.GetMsgType() == mslashing.SlashingQuerySigningInfosMsgType:
+		convertMsg, _ := i.Ixplac.GetMsg().(slashingtypes.QuerySigningInfosRequest)
 		res, err = queryClient.SigningInfos(
-			xplac.Context,
+			i.Ixplac.GetContext(),
 			&convertMsg,
 		)
 		if err != nil {
@@ -35,10 +35,10 @@ func querySlashing(xplac *XplaClient) (string, error) {
 		}
 
 	// Slashing signing information
-	case xplac.MsgType == mslashing.SlashingQuerySigningInfoMsgType:
-		convertMsg, _ := xplac.Msg.(slashingtypes.QuerySigningInfoRequest)
+	case i.Ixplac.GetMsgType() == mslashing.SlashingQuerySigningInfoMsgType:
+		convertMsg, _ := i.Ixplac.GetMsg().(slashingtypes.QuerySigningInfoRequest)
 		res, err = queryClient.SigningInfo(
-			xplac.Context,
+			i.Ixplac.GetContext(),
 			&convertMsg,
 		)
 		if err != nil {
@@ -49,7 +49,7 @@ func querySlashing(xplac *XplaClient) (string, error) {
 		return "", util.LogErr("invalid msg type")
 	}
 
-	out, err = printProto(xplac, res)
+	out, err = printProto(i, res)
 	if err != nil {
 		return "", err
 	}

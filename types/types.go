@@ -15,4 +15,9 @@ const (
 	DefaultXplaKeyAlgo = "eth_secp256k1"
 	// Xpla tool default name
 	XplaToolDefaultName = "xpla"
+
+	DefaultGasPrice      = "850000000000"
+	DefaultGasAdjustment = "1.75"
+	DefaultAccNum        = 0
+	DefaultAccSeq        = 0
 )

@@ -1,4 +1,4 @@
-package client
+package module
 
 import (
 	mmint "github.com/Moonyongjung/xpla.go/core/mint"
@@ -8,15 +8,15 @@ import (
 )
 
 // Query client for mint module.
-func queryMint(xplac *XplaClient) (string, error) {
-	queryClient := minttypes.NewQueryClient(xplac.Grpc)
+func (i IXplaClient) QueryMint() (string, error) {
+	queryClient := minttypes.NewQueryClient(i.Ixplac.GetGrpcClient())
 
 	switch {
 	// Mint parameters
-	case xplac.MsgType == mmint.MintQueryMintParamsMsgType:
-		convertMsg, _ := xplac.Msg.(minttypes.QueryParamsRequest)
+	case i.Ixplac.GetMsgType() == mmint.MintQueryMintParamsMsgType:
+		convertMsg, _ := i.Ixplac.GetMsg().(minttypes.QueryParamsRequest)
 		res, err = queryClient.Params(
-			xplac.Context,
+			i.Ixplac.GetContext(),
 			&convertMsg,
 		)
 		if err != nil {
@@ -24,10 +24,10 @@ func queryMint(xplac *XplaClient) (string, error) {
 		}
 
 	// Mint inflation
-	case xplac.MsgType == mmint.MintQueryInflationMsgType:
-		convertMsg, _ := xplac.Msg.(minttypes.QueryInflationRequest)
+	case i.Ixplac.GetMsgType() == mmint.MintQueryInflationMsgType:
+		convertMsg, _ := i.Ixplac.GetMsg().(minttypes.QueryInflationRequest)
 		res, err = queryClient.Inflation(
-			xplac.Context,
+			i.Ixplac.GetContext(),
 			&convertMsg,
 		)
 		if err != nil {
@@ -35,10 +35,10 @@ func queryMint(xplac *XplaClient) (string, error) {
 		}
 
 	// Mint annual provisions
-	case xplac.MsgType == mmint.MintQueryAnnualProvisionsMsgType:
-		convertMsg, _ := xplac.Msg.(minttypes.QueryAnnualProvisionsRequest)
+	case i.Ixplac.GetMsgType() == mmint.MintQueryAnnualProvisionsMsgType:
+		convertMsg, _ := i.Ixplac.GetMsg().(minttypes.QueryAnnualProvisionsRequest)
 		res, err = queryClient.AnnualProvisions(
-			xplac.Context,
+			i.Ixplac.GetContext(),
 			&convertMsg,
 		)
 		if err != nil {
@@ -49,7 +49,7 @@ func queryMint(xplac *XplaClient) (string, error) {
 		return "", util.LogErr("invalid msg type")
 	}
 
-	out, err = printProto(xplac, res)
+	out, err = printProto(i, res)
 	if err != nil {
 		return "", err
 	}
