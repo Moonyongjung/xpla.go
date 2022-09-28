@@ -22,7 +22,7 @@ const (
 // Provide cosmos sdk client.
 func NewClient() (cmclient.Context, error) {
 	clientCtx := cmclient.Context{}
-	encodingConfig := types.MakeEncodingConfig()
+	encodingConfig := MakeEncodingConfig()
 	clientKeyring, err := NewKeyring(BackendMemory, "")
 	if err != nil {
 		return cmclient.Context{}, err

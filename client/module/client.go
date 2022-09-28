@@ -7,12 +7,12 @@ import (
 	"github.com/Moonyongjung/xpla.go/key"
 	"github.com/Moonyongjung/xpla.go/util"
 	cmclient "github.com/cosmos/cosmos-sdk/client"
-	"github.com/cosmos/cosmos-sdk/simapp/params"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/query"
 	"github.com/cosmos/cosmos-sdk/types/tx/signing"
 	"github.com/gogo/protobuf/grpc"
 	"github.com/gogo/protobuf/proto"
+	"github.com/xpladev/xpla/app/params"
 )
 
 var out []byte

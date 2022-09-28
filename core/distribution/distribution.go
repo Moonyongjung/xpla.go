@@ -5,11 +5,11 @@ import (
 	"github.com/Moonyongjung/xpla.go/types"
 	"golang.org/x/net/context"
 
-	"github.com/cosmos/cosmos-sdk/simapp/params"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	disttypes "github.com/cosmos/cosmos-sdk/x/distribution/types"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 	"github.com/gogo/protobuf/grpc"
+	"github.com/xpladev/xpla/app/params"
 )
 
 // (Tx) make msg - proposal community pool

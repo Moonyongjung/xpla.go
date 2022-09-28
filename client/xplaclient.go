@@ -7,11 +7,12 @@ import (
 	"github.com/Moonyongjung/xpla.go/key"
 	"github.com/Moonyongjung/xpla.go/types"
 	"github.com/Moonyongjung/xpla.go/util"
-	"github.com/cosmos/cosmos-sdk/simapp/params"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/query"
 	"github.com/cosmos/cosmos-sdk/types/tx/signing"
 	grpc1 "github.com/gogo/protobuf/grpc"
+	"github.com/xpladev/xpla/app/params"
 	"google.golang.org/grpc"
 )
 
@@ -61,7 +62,7 @@ func NewXplaClient(
 	return xplac.
 		WithChainId(chainId).
 		WithPrivateKey(privKey).
-		WithEncoding(types.MakeEncodingConfig()).
+		WithEncoding(util.MakeEncodingConfig()).
 		WithContext(context.Background())
 }
 

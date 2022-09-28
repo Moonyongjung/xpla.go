@@ -3,9 +3,10 @@ package params
 import (
 	"github.com/Moonyongjung/xpla.go/key"
 	"github.com/Moonyongjung/xpla.go/types"
-	"github.com/cosmos/cosmos-sdk/simapp/params"
+
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 	"github.com/cosmos/cosmos-sdk/x/params/types/proposal"
+	"github.com/xpladev/xpla/app/params"
 )
 
 // (Tx) make msg - param change

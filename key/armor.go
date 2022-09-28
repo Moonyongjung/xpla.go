@@ -45,7 +45,7 @@ func encryptPrivKey(privKey cryptotypes.PrivKey, passphrase string) string {
 	}
 
 	key = crypto.Sha256(key) // get 32 bytes
-	encodingConfig := types.MakeEncodingConfig()
+	encodingConfig := util.MakeEncodingConfig()
 	privKeyBytes := encodingConfig.Amino.MustMarshal(privKey)
 
 	encBytes := xsalsa20symmetric.EncryptSymmetric(privKeyBytes, key)

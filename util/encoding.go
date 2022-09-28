@@ -1,13 +1,12 @@
-package types
+package util
 
 import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/codec/types"
-	"github.com/cosmos/cosmos-sdk/simapp/params"
 	"github.com/cosmos/cosmos-sdk/x/auth/tx"
-
 	"github.com/evmos/ethermint/app"
 	enccodec "github.com/evmos/ethermint/encoding/codec"
+	"github.com/xpladev/xpla/app/params"
 )
 
 func MakeEncodingConfig() params.EncodingConfig {

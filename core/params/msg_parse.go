@@ -5,11 +5,11 @@ import (
 	"github.com/Moonyongjung/xpla.go/types"
 	"github.com/Moonyongjung/xpla.go/util"
 
-	"github.com/cosmos/cosmos-sdk/simapp/params"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 	paramscutils "github.com/cosmos/cosmos-sdk/x/params/client/utils"
 	paramsproposal "github.com/cosmos/cosmos-sdk/x/params/types/proposal"
+	"github.com/xpladev/xpla/app/params"
 )
 
 // Parsing - param change

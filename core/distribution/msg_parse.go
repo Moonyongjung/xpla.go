@@ -8,12 +8,12 @@ import (
 	"github.com/Moonyongjung/xpla.go/types"
 	"github.com/Moonyongjung/xpla.go/util"
 
-	"github.com/cosmos/cosmos-sdk/simapp/params"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	distcli "github.com/cosmos/cosmos-sdk/x/distribution/client/cli"
 	disttypes "github.com/cosmos/cosmos-sdk/x/distribution/types"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 	"github.com/gogo/protobuf/grpc"
+	"github.com/xpladev/xpla/app/params"
 )
 
 // Parsing - fund community pool

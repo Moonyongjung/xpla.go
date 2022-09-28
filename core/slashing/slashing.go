@@ -3,8 +3,9 @@ package slashing
 import (
 	"github.com/Moonyongjung/xpla.go/key"
 	"github.com/Moonyongjung/xpla.go/types"
-	"github.com/cosmos/cosmos-sdk/simapp/params"
+
 	slashingtypes "github.com/cosmos/cosmos-sdk/x/slashing/types"
+	"github.com/xpladev/xpla/app/params"
 )
 
 // (Tx) make msg - unjail
