@@ -26,9 +26,16 @@ res, err := xplac.Broadcast(txbytes)
 
 ### (Tx) Authz exec
 ```go
+// Execute by using file
 authzExecMsg := types.AuthzExecMsg{
     Grantee: "xpla19yq7kjcgse7x672faptju0lxmy4cvdlcpmxnyn",
     ExecFile: "execFile.json",
+}
+
+// Execute by using transaction json string
+authzExecMsg := types.AuthzExecMsg{
+    Grantee: "xpla19yq7kjcgse7x672faptju0lxmy4cvdlcpmxnyn",
+    ExecTxString: `{TRANSACTION_JSON}`,
 }
 
 txbytes, err := xplac.AuthzExec(authzExecMsg).CreateAndSignTx()
