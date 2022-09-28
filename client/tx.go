@@ -75,15 +75,19 @@ func (xplac *XplaClient) CreateAndSignTx() ([]byte, error) {
 		}
 
 		if xplac.Opts.GasLimit == "" {
-			simulate, err := xplac.Simulate(builder)
-			if err != nil {
-				return nil, err
+			if xplac.Opts.LcdURL == "" && xplac.Opts.GrpcURL == "" {
+				xplac.WithGasLimit(types.DefaultGasAdjustment)
+			} else {
+				simulate, err := xplac.Simulate(builder)
+				if err != nil {
+					return nil, err
+				}
+				gasLimitAdjustment, err := util.GasLimitAdjustment(simulate.GasInfo.GasUsed, xplac.Opts.GasAdjustment)
+				if err != nil {
+					return nil, err
+				}
+				xplac.WithGasLimit(gasLimitAdjustment)
 			}
-			gasLimitAdjustment, err := util.GasLimitAdjustment(simulate.GasInfo.GasUsed, xplac.Opts.GasAdjustment)
-			if err != nil {
-				return nil, err
-			}
-			xplac.WithGasLimit(gasLimitAdjustment)
 		}
 
 		if xplac.Opts.FeeAmount == "" {

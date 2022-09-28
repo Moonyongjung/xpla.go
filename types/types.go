@@ -16,6 +16,7 @@ const (
 	// Xpla tool default name
 	XplaToolDefaultName = "xpla"
 
+	DefaultGasLimit      = "250000"
 	DefaultGasPrice      = "850000000000"
 	DefaultGasAdjustment = "1.75"
 	DefaultAccNum        = 0
