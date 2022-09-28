@@ -45,7 +45,7 @@ func (xplac *XplaClient) AuthzRevoke(authzRevokeMsg types.AuthzRevokeMsg) *XplaC
 
 // Execute transaction on behalf of granter account.
 func (xplac *XplaClient) AuthzExec(authzExecMsg types.AuthzExecMsg) *XplaClient {
-	msg, err := mauthz.MakeAuthzExecMsg(authzExecMsg)
+	msg, err := mauthz.MakeAuthzExecMsg(authzExecMsg, xplac.EncodingConfig)
 	if err != nil {
 		xplac.Err = err
 	}

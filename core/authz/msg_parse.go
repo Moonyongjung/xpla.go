@@ -12,6 +12,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/authz"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
+	"github.com/xpladev/xpla/app/params"
 )
 
 // Parsing - authz grant
@@ -107,7 +108,8 @@ func parseAuthzRevokeArgs(authzRevokeMsg types.AuthzRevokeMsg, privKey key.Priva
 }
 
 // Parsing - authz execute
-func parseAuthzExecArgs(authzExecMsg types.AuthzExecMsg) (authz.MsgExec, error) {
+func parseAuthzExecArgs(authzExecMsg types.AuthzExecMsg, encodingConfig params.EncodingConfig) (authz.MsgExec, error) {
+	var readTx sdk.Tx
 	grantee, err := sdk.AccAddressFromBech32(authzExecMsg.Grantee)
 	if err != nil {
 		return authz.MsgExec{}, err
@@ -117,9 +119,18 @@ func parseAuthzExecArgs(authzExecMsg types.AuthzExecMsg) (authz.MsgExec, error) 
 	if err != nil {
 		return authz.MsgExec{}, err
 	}
-	readTx, err := authclient.ReadTxFromFile(clientCtx, authzExecMsg.ExecFile)
-	if err != nil {
-		return authz.MsgExec{}, err
+	if authzExecMsg.ExecFile != "" {
+		readTx, err = authclient.ReadTxFromFile(clientCtx, authzExecMsg.ExecFile)
+		if err != nil {
+			return authz.MsgExec{}, err
+		}
+	} else if authzExecMsg.ExecTxString != "" {
+		readTx, err = encodingConfig.TxConfig.TxJSONDecoder()([]byte(authzExecMsg.ExecTxString))
+		if err != nil {
+			return authz.MsgExec{}, err
+		}
+	} else {
+		return authz.MsgExec{}, util.LogErr("no authz exec info")
 	}
 
 	msg := authz.NewMsgExec(grantee, readTx.GetMsgs())

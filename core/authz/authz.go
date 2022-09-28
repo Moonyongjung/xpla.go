@@ -4,6 +4,7 @@ import (
 	"github.com/Moonyongjung/xpla.go/key"
 	"github.com/Moonyongjung/xpla.go/types"
 	"github.com/cosmos/cosmos-sdk/x/authz"
+	"github.com/xpladev/xpla/app/params"
 )
 
 // (Tx) make msg - authz grant
@@ -27,8 +28,8 @@ func MakeAuthzRevokeMsg(authzRevokeMsg types.AuthzRevokeMsg, privKey key.Private
 }
 
 // (Tx) make msg - authz execute
-func MakeAuthzExecMsg(authzExecMsg types.AuthzExecMsg) (authz.MsgExec, error) {
-	msg, err := parseAuthzExecArgs(authzExecMsg)
+func MakeAuthzExecMsg(authzExecMsg types.AuthzExecMsg, encodingConfig params.EncodingConfig) (authz.MsgExec, error) {
+	msg, err := parseAuthzExecArgs(authzExecMsg, encodingConfig)
 	if err != nil {
 		return authz.MsgExec{}, err
 	}

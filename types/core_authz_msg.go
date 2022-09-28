@@ -18,8 +18,9 @@ type AuthzRevokeMsg struct {
 }
 
 type AuthzExecMsg struct {
-	Grantee  string
-	ExecFile string
+	Grantee      string
+	ExecFile     string
+	ExecTxString string
 }
 
 type QueryAuthzGrantMsg struct {
