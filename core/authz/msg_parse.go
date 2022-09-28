@@ -32,6 +32,9 @@ func parseAuthzGrantArgs(authzGrantMsg types.AuthzGrantMsg, privKey key.PrivateK
 	switch authzGrantMsg.AuthorizationType {
 	case "send":
 		limit := authzGrantMsg.SpendLimit
+		if limit == "" {
+			return nil, util.LogErr("require bank spend limit")
+		}
 		spendLimit, err := sdk.ParseCoinsNormalized(util.DenomAdd(limit))
 		if err != nil {
 			return nil, err
@@ -40,31 +43,36 @@ func parseAuthzGrantArgs(authzGrantMsg types.AuthzGrantMsg, privKey key.PrivateK
 			return nil, util.LogErr("spend-limit should be greater than zero")
 		}
 		authorization = banktypes.NewSendAuthorization(spendLimit)
+
 	case "generic":
 		msgType := authzGrantMsg.MsgType
 		authorization = authz.NewGenericAuthorization(msgType)
+
 	case "delegate", "unbond", "redelegate":
 		limit := authzGrantMsg.SpendLimit
+		if limit == "" {
+			return nil, util.LogErr("require spend limit")
+		}
 		allowValidators := authzGrantMsg.AllowValidators
 		denyValidators := authzGrantMsg.DenyValidators
 
 		var delegateLimit *sdk.Coin
-		if limit == "" {
-			spendLimit, err := sdk.ParseCoinsNormalized(util.DenomAdd(limit))
-			if err != nil {
-				return nil, err
-			}
 
-			if !spendLimit.IsAllPositive() {
-				return nil, util.LogErr("spend-limit should be greater than zero")
-			}
-			delegateLimit = &spendLimit[0]
+		spendLimit, err := sdk.ParseCoinsNormalized(util.DenomAdd(limit))
+		if err != nil {
+			return nil, err
 		}
+
+		if !spendLimit.IsAllPositive() {
+			return nil, util.LogErr("spend-limit should be greater than zero")
+		}
+		delegateLimit = &spendLimit[0]
 
 		allowed, err := util.Bech32toValidatorAddress(allowValidators)
 		if err != nil {
 			return nil, err
 		}
+
 		denied, err := util.Bech32toValidatorAddress(denyValidators)
 		if err != nil {
 			return nil, err
