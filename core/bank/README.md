@@ -6,7 +6,7 @@
 bankSendMsg := types.BankSendMsg {
     FromAddress: "xpla19w2r47nczglwlpfynqe5769cwkwq5fvmzu5pu7", 
     ToAddress: "xpla13trl452wgle9qxpxhse9605k9x0399cmkfzn7g", 
-    AmountL "10",
+    Amount: "10",
 }
 txbytes, err := xplac.BankSend(bankSendMsg).CreateAndSignTx()
 res, err := xplac.Broadcast(txbytes)
