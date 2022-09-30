@@ -240,7 +240,7 @@ func (xplac *XplaClient) DistSlashes(queryDistSlashesMsg types.QueryDistSlashesM
 
 // Query all ditribution delegator rewards or rewards from a particular validator.
 func (xplac *XplaClient) DistRewards(queryDistRewardsMsg types.QueryDistRewardsMsg) *XplaClient {
-	msg, err := mdist.MakeyQueryDistRewardsMsg(queryDistRewardsMsg, xplac.PrivateKey)
+	msg, err := mdist.MakeyQueryDistRewardsMsg(queryDistRewardsMsg)
 	if err != nil {
 		xplac.Err = err
 	}
