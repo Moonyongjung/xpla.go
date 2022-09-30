@@ -188,15 +188,16 @@ func parseDistSlashesArgs(queryDistSlashesMsg types.QueryDistSlashesMsg) (distty
 }
 
 // Parsing - distribution rewards
-func parseQueryDistRewardsArgs(queryDistRewardsMsg types.QueryDistRewardsMsg, privKey key.PrivateKey) (disttypes.QueryDelegationRewardsRequest, error) {
-	delAddr := util.GetAddrByPrivKey(privKey)
+func parseQueryDistRewardsArgs(queryDistRewardsMsg types.QueryDistRewardsMsg) (disttypes.QueryDelegationRewardsRequest, error) {
+	// delAddr := util.GetAddrByPrivKey(privKey)
+	delAddr := queryDistRewardsMsg.DelegatorAddr
 	valAddr, err := sdk.ValAddressFromBech32(queryDistRewardsMsg.ValidatorAddr)
 	if err != nil {
 		return disttypes.QueryDelegationRewardsRequest{}, err
 	}
 
 	return disttypes.QueryDelegationRewardsRequest{
-		DelegatorAddress: delAddr.String(),
+		DelegatorAddress: delAddr,
 		ValidatorAddress: valAddr.String(),
 	}, nil
 }

@@ -103,8 +103,8 @@ func MakeQueryDistSlashesMsg(queryDistSlashesMsg types.QueryDistSlashesMsg) (dis
 }
 
 // (Query) make msg - distribution rewards
-func MakeyQueryDistRewardsMsg(queryDistRewardsMsg types.QueryDistRewardsMsg, privKey key.PrivateKey) (disttypes.QueryDelegationRewardsRequest, error) {
-	msg, err := parseQueryDistRewardsArgs(queryDistRewardsMsg, privKey)
+func MakeyQueryDistRewardsMsg(queryDistRewardsMsg types.QueryDistRewardsMsg) (disttypes.QueryDelegationRewardsRequest, error) {
+	msg, err := parseQueryDistRewardsArgs(queryDistRewardsMsg)
 	if err != nil {
 		return disttypes.QueryDelegationRewardsRequest{}, err
 	}
