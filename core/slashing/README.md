@@ -13,10 +13,16 @@ res, err := xplac.SlashingParams().Query()
 
 ### (Query) slashing signing infos
 ```go
-// Query a validator's signing information
+// Query a validator's signing information by using public key
 signingInfoMsg := types.SigningInfoMsg{
     ConsPubKey: `{"@type": "/cosmos.crypto.ed25519.PubKey","key": "6RBPm24ckoWhRt8mArcSCnEKvt0FMGvcaMwchfZ3ue8="}`,
 }
+
+// Query a validator's signing information by using bech32 address
+signingInfoMsg := types.SigningInfoMsg{
+    ConsPubKey: `{"@type": "/cosmos.crypto.ed25519.PubKey","key": "6RBPm24ckoWhRt8mArcSCnEKvt0FMGvcaMwchfZ3ue8="}`,
+}
+
 res, err := xplac.SigningInfos(signingInfoMsg).Query()
 
 // Query signing information of all validators

@@ -34,13 +34,21 @@ func parseQuerySigingInfosArgs() (slashingtypes.QuerySigningInfosRequest, error)
 
 // Parsing - signing info
 func parseQuerySigingInfoArgs(signingInfoMsg types.SigningInfoMsg, xplacEncodingConfig params.EncodingConfig) (slashingtypes.QuerySigningInfoRequest, error) {
-	var pk cryptotypes.PubKey
-	err := xplacEncodingConfig.Marshaler.UnmarshalInterfaceJSON([]byte(signingInfoMsg.ConsPubKey), &pk)
-	if err != nil {
-		return slashingtypes.QuerySigningInfoRequest{}, err
-	}
+	if signingInfoMsg.ConsPubKey != "" {
+		var pk cryptotypes.PubKey
+		err := xplacEncodingConfig.Marshaler.UnmarshalInterfaceJSON([]byte(signingInfoMsg.ConsPubKey), &pk)
+		if err != nil {
+			return slashingtypes.QuerySigningInfoRequest{}, err
+		}
 
-	return slashingtypes.QuerySigningInfoRequest{
-		ConsAddress: sdk.ConsAddress(pk.Address()).String(),
-	}, nil
+		return slashingtypes.QuerySigningInfoRequest{
+			ConsAddress: sdk.ConsAddress(pk.Address()).String(),
+		}, nil
+	} else if signingInfoMsg.ConsAddr != "" {
+		return slashingtypes.QuerySigningInfoRequest{
+			ConsAddress: signingInfoMsg.ConsAddr,
+		}, nil
+	} else {
+		return slashingtypes.QuerySigningInfoRequest{}, util.LogErr("need at least one input")
+	}
 }
