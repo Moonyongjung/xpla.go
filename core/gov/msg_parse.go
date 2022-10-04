@@ -67,11 +67,16 @@ func parseVoteArgs(voteMsg types.VoteMsg, privKey key.PrivateKey) (*govtypes.Msg
 func parseWeightedVoteArgs(weightedVoteMsg types.WeightedVoteMsg, privKey key.PrivateKey) (*govtypes.MsgVoteWeighted, error) {
 	proposalId := util.FromStringToUint64(weightedVoteMsg.ProposalID)
 	from := util.GetAddrByPrivKey(privKey)
-	weightedOption := weightedVoteOptionConverting(weightedVoteMsg)
-	options, err := govtypes.WeightedVoteOptionsFromString(govutils.NormalizeWeightedVoteOptions(weightedOption))
+
+	options, err := weightedVoteOptionConverting(weightedVoteMsg)
 	if err != nil {
 		return nil, err
 	}
+	// options, err := govtypes.weight
+	// options, err := govtypes.WeightedVoteOptionsFromString(govutils.NormalizeWeightedVoteOptions(weightedOption))
+	// if err != nil {
+	// 	return nil, err
+	// }
 
 	msg := govtypes.NewMsgVoteWeighted(from, proposalId, options)
 	err = msg.ValidateBasic()
@@ -258,22 +263,33 @@ func parseQueryVotesArgs(queryVoteMsg types.QueryVoteMsg, grpcConn grpc.ClientCo
 
 }
 
-func weightedVoteOptionConverting(weightedVoteMsg types.WeightedVoteMsg) string {
-	var returnStr string
+func weightedVoteOptionConverting(weightedVoteMsg types.WeightedVoteMsg) (govtypes.WeightedVoteOptions, error) {
+	weightedVoteOptions := govtypes.WeightedVoteOptions{}
 
 	if weightedVoteMsg.Yes != "" {
-		returnStr = returnStr + "yes=" + weightedVoteMsg.Yes + ","
-	} else if weightedVoteMsg.No != "" {
-		returnStr = returnStr + "no=" + weightedVoteMsg.No + ","
-	} else if weightedVoteMsg.Abstain != "" {
-		returnStr = returnStr + "abstain=" + weightedVoteMsg.Abstain + ","
-	} else if weightedVoteMsg.NoWithVeto != "" {
-		returnStr = returnStr + "no_with_veto=" + weightedVoteMsg.NoWithVeto + ","
+		weightedVoteOptions = append(weightedVoteOptions, govtypes.WeightedVoteOption{
+			Option: govtypes.OptionYes,
+			Weight: sdk.MustNewDecFromStr(weightedVoteMsg.Yes),
+		})
+	}
+	if weightedVoteMsg.Abstain != "" {
+		weightedVoteOptions = append(weightedVoteOptions, govtypes.WeightedVoteOption{
+			Option: govtypes.OptionAbstain,
+			Weight: sdk.MustNewDecFromStr(weightedVoteMsg.Abstain),
+		})
+	}
+	if weightedVoteMsg.No != "" {
+		weightedVoteOptions = append(weightedVoteOptions, govtypes.WeightedVoteOption{
+			Option: govtypes.OptionNo,
+			Weight: sdk.MustNewDecFromStr(weightedVoteMsg.No),
+		})
+	}
+	if weightedVoteMsg.NoWithVeto != "" {
+		weightedVoteOptions = append(weightedVoteOptions, govtypes.WeightedVoteOption{
+			Option: govtypes.OptionNoWithVeto,
+			Weight: sdk.MustNewDecFromStr(weightedVoteMsg.NoWithVeto),
+		})
 	}
 
-	if returnStr[len(returnStr)-1:] == "," {
-		returnStr = returnStr[:len(returnStr)-1]
-	}
-
-	return returnStr
+	return weightedVoteOptions, nil
 }
