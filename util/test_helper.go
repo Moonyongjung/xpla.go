@@ -1,6 +1,7 @@
 package util
 
 import (
+	"bytes"
 	"encoding/json"
 	"math/rand"
 	"time"
@@ -140,4 +141,25 @@ func FundAccount(bankKeeper bankkeeper.Keeper, ctx sdk.Context, addr sdk.AccAddr
 	}
 
 	return bankKeeper.SendCoinsFromModuleToAccount(ctx, minttypes.ModuleName, addr, amounts)
+}
+
+func TestAddr(addr string, bech string) (sdk.AccAddress, error) {
+	res, err := sdk.AccAddressFromHex(addr)
+	if err != nil {
+		return nil, err
+	}
+	bechexpected := res.String()
+	if bech != bechexpected {
+		return nil, LogErr("bech encoding doesn't match reference")
+	}
+
+	bechres, err := sdk.AccAddressFromBech32(bech)
+	if err != nil {
+		return nil, err
+	}
+	if !bytes.Equal(bechres, res) {
+		return nil, err
+	}
+
+	return res, nil
 }
