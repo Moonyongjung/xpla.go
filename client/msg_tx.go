@@ -291,7 +291,7 @@ func (xplac *XplaClient) Unjail() *XplaClient {
 
 // Create new validator initialized with a self-delegation to it.
 func (xplac *XplaClient) CreateValidator(createValidatorMsg types.CreateValidatorMsg) *XplaClient {
-	msg, err := mstaking.MakeCreateValidatorMsg(createValidatorMsg, xplac.Opts.OutputDocument)
+	msg, err := mstaking.MakeCreateValidatorMsg(createValidatorMsg, xplac.PrivateKey, xplac.Opts.OutputDocument)
 	if err != nil {
 		xplac.Err = err
 	}

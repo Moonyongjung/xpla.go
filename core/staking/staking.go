@@ -8,8 +8,8 @@ import (
 )
 
 // (Tx) make msg - create validator
-func MakeCreateValidatorMsg(createValidatorMsg types.CreateValidatorMsg, output string) (sdk.Msg, error) {
-	msg, err := parseCreateValidatorArgs(createValidatorMsg, output)
+func MakeCreateValidatorMsg(createValidatorMsg types.CreateValidatorMsg, privKey key.PrivateKey, output string) (sdk.Msg, error) {
+	msg, err := parseCreateValidatorArgs(createValidatorMsg, privKey, output)
 	if err != nil {
 		return nil, err
 	}

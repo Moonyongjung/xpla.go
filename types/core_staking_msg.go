@@ -16,6 +16,9 @@ var (
 )
 
 type CreateValidatorMsg struct {
+	NodeKey                 string
+	PrivValidatorKey        string
+	ValidatorAddress        string
 	HomeDir                 string
 	Website                 string
 	SecurityContact         string
