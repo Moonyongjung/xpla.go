@@ -1,9 +1,7 @@
 package slashing_test
 
 import (
-	"bytes"
 	"context"
-	"strconv"
 	"time"
 
 	"github.com/Moonyongjung/xpla.go/core"
@@ -16,7 +14,6 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
-	minttypes "github.com/cosmos/cosmos-sdk/x/mint/types"
 	"github.com/cosmos/cosmos-sdk/x/slashing/testslashing"
 	slashingtypes "github.com/cosmos/cosmos-sdk/x/slashing/types"
 	"github.com/stretchr/testify/suite"
@@ -33,8 +30,6 @@ type TestSuite struct {
 	addrDels    []sdk.AccAddress
 }
 
-type GenerateAccountStrategy func(int) []sdk.AccAddress
-
 func (suite *TestSuite) SetupTest() {
 	app := util.Setup(false, 5)
 	ctx := app.BaseApp.NewContext(false, tmproto.Header{})
@@ -43,7 +38,7 @@ func (suite *TestSuite) SetupTest() {
 	app.BankKeeper.SetParams(ctx, banktypes.DefaultParams())
 	app.SlashingKeeper.SetParams(ctx, testslashing.TestParams())
 
-	addrDels := AddTestAddrsIncremental(app, ctx, 2, app.StakingKeeper.TokensFromConsensusPower(ctx, 200))
+	addrDels := util.AddTestAddrsIncremental(app, ctx, 2, app.StakingKeeper.TokensFromConsensusPower(ctx, 200))
 
 	info1 := slashingtypes.NewValidatorSigningInfo(sdk.ConsAddress(addrDels[0]), int64(4), int64(3),
 		time.Unix(2, 0), false, int64(10))
@@ -149,56 +144,4 @@ func (suite *TestSuite) TestGRPCSigningInfos() {
 	suite.Equal(signingInfos[0], infoResp.Info[0])
 	suite.NotNil(infoResp.Pagination.NextKey)
 	suite.Equal(uint64(2), infoResp.Pagination.Total)
-}
-
-// AddTestAddrs constructs and returns accNum amount of accounts with an
-// initial balance of accAmt in random order
-func AddTestAddrsIncremental(app *xapp.XplaApp, ctx sdk.Context, accNum int, accAmt sdk.Int) []sdk.AccAddress {
-	return addTestAddrs(app, ctx, accNum, accAmt, createIncrementalAccounts)
-}
-
-func addTestAddrs(app *xapp.XplaApp, ctx sdk.Context, accNum int, accAmt sdk.Int, strategy GenerateAccountStrategy) []sdk.AccAddress {
-	testAddrs := strategy(accNum)
-
-	initCoins := sdk.NewCoins(sdk.NewCoin(app.StakingKeeper.BondDenom(ctx), accAmt))
-
-	for _, addr := range testAddrs {
-		initAccountWithCoins(app, ctx, addr, initCoins)
-	}
-
-	return testAddrs
-}
-
-func initAccountWithCoins(app *xapp.XplaApp, ctx sdk.Context, addr sdk.AccAddress, coins sdk.Coins) {
-	err := app.BankKeeper.MintCoins(ctx, minttypes.ModuleName, coins)
-	if err != nil {
-		panic(err)
-	}
-
-	err = app.BankKeeper.SendCoinsFromModuleToAccount(ctx, minttypes.ModuleName, addr, coins)
-	if err != nil {
-		panic(err)
-	}
-}
-
-// createIncrementalAccounts is a strategy used by addTestAddrs() in order to generated addresses in ascending order.
-func createIncrementalAccounts(accNum int) []sdk.AccAddress {
-	var addresses []sdk.AccAddress
-	var buffer bytes.Buffer
-
-	// start at 100 so we can make up to 999 test addresses with valid test addresses
-	for i := 100; i < (accNum + 100); i++ {
-		numString := strconv.Itoa(i)
-		buffer.WriteString("A58856F0FD53BF058B4909A21AEC019107BA6") // base address string
-
-		buffer.WriteString(numString) // adding on final two digits to make addresses unique
-		res, _ := sdk.AccAddressFromHex(buffer.String())
-		bech := res.String()
-		addr, _ := util.TestAddr(buffer.String(), bech)
-
-		addresses = append(addresses, addr)
-		buffer.Reset()
-	}
-
-	return addresses
 }
