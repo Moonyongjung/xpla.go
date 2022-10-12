@@ -359,7 +359,7 @@ func SimulateMsgExec(ak authz.AccountKeeper, bk authz.BankKeeper, k keeper.Keepe
 			return simtypes.NoOpMsg(authz.ModuleName, TypeMsgExec, err.Error()), nil, nil
 		}
 
-		xplac := client.NewXplaClient(chainID, grantee.PrivKey)
+		xplac := client.NewXplaClient(chainID)
 		bankSendMsg := types.BankSendMsg{
 			FromAddress: granteeAddr.String(),
 			ToAddress:   granterAddr.String(),

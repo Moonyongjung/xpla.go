@@ -17,7 +17,7 @@ import (
 )
 
 // The xpla client is a client for performing all functions within the xpla.go library.
-// The user mandatorily inputs chain ID and private key.
+// The user mandatorily inputs chain ID.
 type XplaClient struct {
 	ChainId        string
 	PrivateKey     key.PrivateKey
@@ -35,6 +35,7 @@ type XplaClient struct {
 
 // Optional parameters of xpla client.
 type Options struct {
+	PrivateKey     key.PrivateKey
 	AccountNumber  string
 	Sequence       string
 	BroadcastMode  string
@@ -56,12 +57,10 @@ type Options struct {
 // Make new xpla client.
 func NewXplaClient(
 	chainId string,
-	privKey key.PrivateKey,
 ) *XplaClient {
 	var xplac XplaClient
 	return xplac.
 		WithChainId(chainId).
-		WithPrivateKey(privKey).
 		WithEncoding(util.MakeEncodingConfig()).
 		WithContext(context.Background())
 }
@@ -71,6 +70,7 @@ func (xplac *XplaClient) WithOptions(
 	options Options,
 ) *XplaClient {
 	return xplac.
+		WithPrivateKey(options.PrivateKey).
 		WithAccountNumber(options.AccountNumber).
 		WithBroadcastMode(options.BroadcastMode).
 		WithSequence(options.Sequence).

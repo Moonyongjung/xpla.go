@@ -1,6 +1,6 @@
 # Xpla client
 The xpla client is a client for performing all functions within the xpla.go library.
-The user mandatorily inputs chain ID and private key.
+The user mandatorily inputs chain ID.
 
 ## Ready to run Xpla client
 ```go
@@ -17,15 +17,17 @@ if err != nil {
 // Can check addr (string type)
 addr, err := key.Bech32AddrString(priKey)
 
-// Chain ID, Private key
-xplac := client.NewXplaClient("chain-id", priKey)
+// Create new XPLA client
+xplac := client.NewXplaClient("chain-id")
+
+// Set private key
+xplac = xplac.WithOptions(client.Options{PrivateKey: priKey})
 ```
 ### Set URLs for xpla client
 ```go
 // Need LCD URL when broadcast transactions
 xplac := client.NewXplaClient(
     "chain-id",    
-    priKey,
 ).WithOptions(
     client.Options{
         LcdURL: "http://localhost:1317",
@@ -35,7 +37,6 @@ xplac := client.NewXplaClient(
 // Need GRPC URL to query or broadcast tx
 xplac := client.NewXplaClient(
     "chain-id",    
-    priKey,
 ).WithOptions(
     client.Options{
         GrpcURL: "http://localhost:9090",
@@ -46,7 +47,6 @@ xplac := client.NewXplaClient(
 // i.e. xplad query tx, xplad query txs
 xplac := client.NewXplaClient(
     "chain-id",    
-    priKey,
 ).WithOptions(
     client.Options{
         RpcURL: "http://localhost:26657",
@@ -56,7 +56,6 @@ xplac := client.NewXplaClient(
 // Need EVM RPC URL when use evm module
 xplac := client.NewXplaClient(
     "chain-id",    
-    priKey,
 ).WithOptions(
     client.Options{
         EvmRpcURL: "http://localhost:8545",
@@ -67,6 +66,8 @@ xplac := client.NewXplaClient(
 ### Optional parameters of xpla client
 ```go
 type Options struct {    
+    // Set private key
+    PrivateKey     key.PrivateKey
     // Set account number of address
     AccountNumber  string
     // Set account sequence of address
