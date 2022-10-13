@@ -30,7 +30,7 @@ import (
 )
 
 var normalAccountNum = 3
-var denom = "stake"
+var denom = "axpla"
 var validatorAddress = "xplavaloper10gv4zj9633v6cje6s2sc0a0xl52hjr6f9jp0q7"
 
 const NodeKey = `{"priv_key":{"type":"tendermint/PrivKeyEd25519","value":"F20DGZKfFFCqgXe2AxF6855KrzfqVasdunk2LMG/EBV+U3gf7GVokgm+X8JP0WG1dyzZ7UddnmC9LGpUMRRQmQ=="}}`
@@ -140,7 +140,7 @@ func TestSimulateMsgDelegate(t *testing.T) {
 	require.True(t, operationMsg.OK)
 	require.Equal(t, "xpla1ghekyjucln7y67ntx7cf27m9dpuxxemntll57s", msg.DelegatorAddress)
 	require.Equal(t, "98100858108421259236", msg.Amount.Amount.String())
-	require.Equal(t, "stake", msg.Amount.Denom)
+	require.Equal(t, "axpla", msg.Amount.Denom)
 	require.Equal(t, stakingtypes.TypeMsgDelegate, msg.Type())
 	require.Equal(t, "xplavaloper1tnh2q55v8wyygtt9srz5safamzdengsn0rl7kl", msg.ValidatorAddress)
 	require.Len(t, futureOperations, 0)
@@ -185,7 +185,7 @@ func TestSimulateMsgUndelegate(t *testing.T) {
 	require.True(t, operationMsg.OK)
 	require.Equal(t, "xpla1p8wcgrjr4pjju90xg6u9cgq55dxwq8j7zj7eku", msg.DelegatorAddress)
 	require.Equal(t, "280623462081924937", msg.Amount.Amount.String())
-	require.Equal(t, "stake", msg.Amount.Denom)
+	require.Equal(t, "axpla", msg.Amount.Denom)
 	require.Equal(t, stakingtypes.TypeMsgUndelegate, msg.Type())
 	require.Equal(t, "xplavaloper1tnh2q55v8wyygtt9srz5safamzdengsn0rl7kl", msg.ValidatorAddress)
 	require.Len(t, futureOperations, 0)
@@ -233,7 +233,7 @@ func TestSimulateMsgBeginRedelegate(t *testing.T) {
 	require.True(t, operationMsg.OK)
 	require.Equal(t, "xpla12gwd9jchc69wck8dhstxgwz3z8qs8yv6qxgms0", msg.DelegatorAddress)
 	require.Equal(t, "489348507626016866", msg.Amount.Amount.String())
-	require.Equal(t, "stake", msg.Amount.Denom)
+	require.Equal(t, "axpla", msg.Amount.Denom)
 	require.Equal(t, stakingtypes.TypeMsgBeginRedelegate, msg.Type())
 	require.Equal(t, "xplavaloper1h6a7shta7jyc72hyznkys683z98z36e0gre5qc", msg.ValidatorDstAddress)
 	require.Equal(t, "xplavaloper17s94pzwhsn4ah25tec27w70n65h5t2sczgd9yh", msg.ValidatorSrcAddress)
@@ -385,8 +385,6 @@ func SimulateMsgDelegate(ak stakingtypes.AccountKeeper, bk stakingtypes.BankKeep
 	return func(
 		r *rand.Rand, app *baseapp.BaseApp, ctx sdk.Context, accs []simtypes.Account, chainID string,
 	) (simtypes.OperationMsg, []simtypes.FutureOperation, error) {
-		denom := k.GetParams(ctx).BondDenom
-
 		if len(k.GetAllValidators(ctx)) == 0 {
 			return simtypes.NoOpMsg(stakingtypes.ModuleName, stakingtypes.TypeMsgDelegate, "number of validators equal zero"), nil, nil
 		}
@@ -647,7 +645,7 @@ func SimulateMsgBeginRedelegate(ak stakingtypes.AccountKeeper, bk stakingtypes.B
 // returns context and an app with updated mint keeper
 func createTestApp(isCheckTx bool) (*xapp.XplaApp, sdk.Context) {
 	app := util.Setup(isCheckTx, 5)
-	p := minttypes.Params{
+	mp := minttypes.Params{
 		MintDenom:           denom,
 		InflationRateChange: sdk.NewDecWithPrec(13, 2),
 		InflationMax:        sdk.NewDecWithPrec(20, 2),
@@ -657,8 +655,11 @@ func createTestApp(isCheckTx bool) (*xapp.XplaApp, sdk.Context) {
 	}
 
 	ctx := app.BaseApp.NewContext(isCheckTx, tmproto.Header{})
-	app.MintKeeper.SetParams(ctx, p)
+	app.MintKeeper.SetParams(ctx, mp)
 	app.MintKeeper.SetMinter(ctx, minttypes.DefaultInitialMinter())
+	sp := stakingtypes.DefaultParams()
+	sp.BondDenom = denom
+	app.StakingKeeper.SetParams(ctx, sp)
 
 	return app, ctx
 }
