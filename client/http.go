@@ -64,7 +64,7 @@ func (xplac *XplaClient) LoadAccount(address sdk.AccAddress) (res authtypes.Acco
 // If xpla client has gRPC client, query simulation by using gRPC
 func (xplac *XplaClient) Simulate(txbuilder cmclient.TxBuilder) (*sdktx.SimulateResponse, error) {
 	sig := signing.SignatureV2{
-		PubKey: xplac.PrivateKey.PubKey(),
+		PubKey: xplac.Opts.PrivateKey.PubKey(),
 		Data: &signing.SingleSignatureData{
 			SignMode: xplac.Opts.SignMode,
 		},

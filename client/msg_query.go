@@ -839,7 +839,7 @@ func (xplac *XplaClient) Plan() *XplaClient {
 
 // Calls contract with given address with query data and prints the returned result.
 func (xplac *XplaClient) QueryContract(queryMsg types.QueryMsg) *XplaClient {
-	addr := util.GetAddrByPrivKey(xplac.PrivateKey)
+	addr := util.GetAddrByPrivKey(xplac.Opts.PrivateKey)
 	msg, err := mwasm.MakeQueryMsg(queryMsg, addr)
 	if err != nil {
 		xplac.Err = err

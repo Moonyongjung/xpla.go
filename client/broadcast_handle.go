@@ -84,7 +84,7 @@ func broadcastTxEvm(xplac *XplaClient, txBytes []byte, broadcastMode string, evm
 			return nil, err
 		}
 
-		ethPrivKey, err := toECDSA(xplac.PrivateKey)
+		ethPrivKey, err := toECDSA(xplac.Opts.PrivateKey)
 		if err != nil {
 			return nil, err
 		}

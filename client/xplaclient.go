@@ -20,7 +20,6 @@ import (
 // The user mandatorily inputs chain ID.
 type XplaClient struct {
 	ChainId        string
-	PrivateKey     key.PrivateKey
 	EncodingConfig params.EncodingConfig
 	Grpc           grpc1.ClientConn
 	Context        context.Context
@@ -99,12 +98,6 @@ func (xplac *XplaClient) WithChainId(chainId string) *XplaClient {
 	return xplac
 }
 
-// Set private key
-func (xplac *XplaClient) WithPrivateKey(privateKey key.PrivateKey) *XplaClient {
-	xplac.PrivateKey = privateKey
-	return xplac
-}
-
 // Set encoding configuration
 func (xplac *XplaClient) WithEncoding(encodingConfig params.EncodingConfig) *XplaClient {
 	xplac.EncodingConfig = encodingConfig
@@ -114,6 +107,12 @@ func (xplac *XplaClient) WithEncoding(encodingConfig params.EncodingConfig) *Xpl
 // Set xpla client context
 func (xplac *XplaClient) WithContext(ctx context.Context) *XplaClient {
 	xplac.Context = ctx
+	return xplac
+}
+
+// Set private key
+func (xplac *XplaClient) WithPrivateKey(privateKey key.PrivateKey) *XplaClient {
+	xplac.Opts.PrivateKey = privateKey
 	return xplac
 }
 
@@ -235,7 +234,7 @@ func (xplac *XplaClient) GetChainId() string {
 
 // Get private key
 func (xplac *XplaClient) GetPrivateKey() key.PrivateKey {
-	return xplac.PrivateKey
+	return xplac.Opts.PrivateKey
 }
 
 // Get encoding configuration

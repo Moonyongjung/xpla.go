@@ -43,7 +43,7 @@ func (xplac *XplaClient) CreateAndSignTx() ([]byte, error) {
 			xplac.WithAccountNumber(util.FromUint64ToString(types.DefaultAccNum))
 			xplac.WithSequence(util.FromUint64ToString(types.DefaultAccSeq))
 		} else {
-			account, err := xplac.LoadAccount(sdk.AccAddress(xplac.PrivateKey.PubKey().Address()))
+			account, err := xplac.LoadAccount(sdk.AccAddress(xplac.Opts.PrivateKey.PubKey().Address()))
 			if err != nil {
 				return nil, err
 			}
@@ -97,7 +97,7 @@ func (xplac *XplaClient) CreateAndSignTx() ([]byte, error) {
 
 		builder = convertAndSetBuilder(xplac, builder)
 
-		privs := []cryptotypes.PrivKey{xplac.PrivateKey}
+		privs := []cryptotypes.PrivKey{xplac.Opts.PrivateKey}
 		accNums := []uint64{util.FromStringToUint64(xplac.Opts.AccountNumber)}
 		accSeqs := []uint64{util.FromStringToUint64(xplac.Opts.Sequence)}
 
@@ -174,7 +174,7 @@ func (xplac *XplaClient) SignTx(signTxMsg types.SignTxMsg) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	err = clientCtx.Keyring.ImportPrivKey(types.XplaToolDefaultName, key.EncryptArmorPrivKey(xplac.PrivateKey, key.DefaultEncryptPassphrase), key.DefaultEncryptPassphrase)
+	err = clientCtx.Keyring.ImportPrivKey(types.XplaToolDefaultName, key.EncryptArmorPrivKey(xplac.Opts.PrivateKey, key.DefaultEncryptPassphrase), key.DefaultEncryptPassphrase)
 	if err != nil {
 		return nil, err
 	}
@@ -370,7 +370,7 @@ func (xplac *XplaClient) MultiSign(txMultiSignMsg types.TxMultiSignMsg) ([]byte,
 
 // Create and sign transaction of evm.
 func (xplac *XplaClient) createAndSignEvmTx() ([]byte, error) {
-	ethPrivKey, err := toECDSA(xplac.PrivateKey)
+	ethPrivKey, err := toECDSA(xplac.Opts.PrivateKey)
 	if err != nil {
 		return nil, err
 	}

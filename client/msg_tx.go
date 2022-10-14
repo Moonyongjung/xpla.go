@@ -21,7 +21,7 @@ import (
 
 // Grant authorization to an address.
 func (xplac *XplaClient) AuthzGrant(authzGrantMsg types.AuthzGrantMsg) *XplaClient {
-	msg, err := mauthz.MakeAuthzGrantMsg(authzGrantMsg, xplac.PrivateKey)
+	msg, err := mauthz.MakeAuthzGrantMsg(authzGrantMsg, xplac.Opts.PrivateKey)
 	if err != nil {
 		xplac.Err = err
 	}
@@ -33,7 +33,7 @@ func (xplac *XplaClient) AuthzGrant(authzGrantMsg types.AuthzGrantMsg) *XplaClie
 
 // Revoke authorization.
 func (xplac *XplaClient) AuthzRevoke(authzRevokeMsg types.AuthzRevokeMsg) *XplaClient {
-	msg, err := mauthz.MakeAuthzRevokeMsg(authzRevokeMsg, xplac.PrivateKey)
+	msg, err := mauthz.MakeAuthzRevokeMsg(authzRevokeMsg, xplac.Opts.PrivateKey)
 	if err != nil {
 		xplac.Err = err
 	}
@@ -59,7 +59,7 @@ func (xplac *XplaClient) AuthzExec(authzExecMsg types.AuthzExecMsg) *XplaClient 
 
 // Send funds from one account to another.
 func (xplac *XplaClient) BankSend(bankSendMsg types.BankSendMsg) *XplaClient {
-	msg, err := mbank.MakeBankSendMsg(bankSendMsg, xplac.PrivateKey)
+	msg, err := mbank.MakeBankSendMsg(bankSendMsg, xplac.Opts.PrivateKey)
 	if err != nil {
 		xplac.Err = err
 	}
@@ -73,7 +73,7 @@ func (xplac *XplaClient) BankSend(bankSendMsg types.BankSendMsg) *XplaClient {
 
 // Submit proof that an invariant broken to halt the chain.
 func (xplac *XplaClient) InvariantBroken(invariantBrokenMsg types.InvariantBrokenMsg) *XplaClient {
-	msg, err := mcrisis.MakeInvariantRouteMsg(invariantBrokenMsg, xplac.PrivateKey)
+	msg, err := mcrisis.MakeInvariantRouteMsg(invariantBrokenMsg, xplac.Opts.PrivateKey)
 	if err != nil {
 		xplac.Err = err
 	}
@@ -87,7 +87,7 @@ func (xplac *XplaClient) InvariantBroken(invariantBrokenMsg types.InvariantBroke
 
 // Funds the community pool with the specified amount.
 func (xplac *XplaClient) FundCommunityPool(fundCommunityPoolMsg types.FundCommunityPoolMsg) *XplaClient {
-	msg, err := mdist.MakeFundCommunityPoolMsg(fundCommunityPoolMsg, xplac.PrivateKey)
+	msg, err := mdist.MakeFundCommunityPoolMsg(fundCommunityPoolMsg, xplac.Opts.PrivateKey)
 	if err != nil {
 		xplac.Err = err
 	}
@@ -99,7 +99,7 @@ func (xplac *XplaClient) FundCommunityPool(fundCommunityPoolMsg types.FundCommun
 
 // Submit a community pool spend proposal.
 func (xplac *XplaClient) CommunityPoolSpend(communityPoolSpendMsg types.CommunityPoolSpendMsg) *XplaClient {
-	msg, err := mdist.MakeProposalCommunityPoolSpendMsg(communityPoolSpendMsg, xplac.PrivateKey, xplac.EncodingConfig)
+	msg, err := mdist.MakeProposalCommunityPoolSpendMsg(communityPoolSpendMsg, xplac.Opts.PrivateKey, xplac.EncodingConfig)
 	if err != nil {
 		xplac.Err = err
 	}
@@ -111,7 +111,7 @@ func (xplac *XplaClient) CommunityPoolSpend(communityPoolSpendMsg types.Communit
 
 // Withdraw rewards from a given delegation address, and optionally withdraw validator commission if the delegation address given is a validator operator.
 func (xplac *XplaClient) WithdrawRewards(withdrawRewardsMsg types.WithdrawRewardsMsg) *XplaClient {
-	msg, err := mdist.MakeWithdrawRewardsMsg(withdrawRewardsMsg, xplac.PrivateKey)
+	msg, err := mdist.MakeWithdrawRewardsMsg(withdrawRewardsMsg, xplac.Opts.PrivateKey)
 	if err != nil {
 		xplac.Err = err
 	}
@@ -123,7 +123,7 @@ func (xplac *XplaClient) WithdrawRewards(withdrawRewardsMsg types.WithdrawReward
 
 // Withdraw all delegations rewards for a delegator.
 func (xplac *XplaClient) WithdrawAllRewards() *XplaClient {
-	msg, err := mdist.MakeWithdrawAllRewardsMsg(xplac.PrivateKey, xplac.Grpc, xplac.Context)
+	msg, err := mdist.MakeWithdrawAllRewardsMsg(xplac.Opts.PrivateKey, xplac.Grpc, xplac.Context)
 	if err != nil {
 		xplac.Err = err
 	}
@@ -135,7 +135,7 @@ func (xplac *XplaClient) WithdrawAllRewards() *XplaClient {
 
 // Change the default withdraw address for rewards associated with an address.
 func (xplac *XplaClient) SetWithdrawAddr(setWithdrawAddrMsg types.SetwithdrawAddrMsg) *XplaClient {
-	msg, err := mdist.MakeSetWithdrawAddrMsg(setWithdrawAddrMsg, xplac.PrivateKey)
+	msg, err := mdist.MakeSetWithdrawAddrMsg(setWithdrawAddrMsg, xplac.Opts.PrivateKey)
 	if err != nil {
 		xplac.Err = err
 	}
@@ -149,7 +149,7 @@ func (xplac *XplaClient) SetWithdrawAddr(setWithdrawAddrMsg types.SetwithdrawAdd
 
 // Send coind by using evm client.
 func (xplac *XplaClient) EvmSendCoin(sendCoinMsg types.SendCoinMsg) *XplaClient {
-	msg, err := mevm.MakeSendCoinMsg(sendCoinMsg, xplac.PrivateKey)
+	msg, err := mevm.MakeSendCoinMsg(sendCoinMsg, xplac.Opts.PrivateKey)
 	if err != nil {
 		xplac.Err = err
 	}
@@ -187,7 +187,7 @@ func (xplac *XplaClient) InvokeSolidityContract(invokeSolContractMsg types.Invok
 
 // Grant fee allowance to an address.
 func (xplac *XplaClient) Grant(grantMsg types.GrantMsg) *XplaClient {
-	msg, err := mfeegrant.MakeGrantMsg(grantMsg, xplac.PrivateKey)
+	msg, err := mfeegrant.MakeGrantMsg(grantMsg, xplac.Opts.PrivateKey)
 	if err != nil {
 		xplac.Err = err
 	}
@@ -199,7 +199,7 @@ func (xplac *XplaClient) Grant(grantMsg types.GrantMsg) *XplaClient {
 
 // Revoke fee-grant.
 func (xplac *XplaClient) RevokeGrant(revokeGrantMsg types.RevokeGrantMsg) *XplaClient {
-	msg, err := mfeegrant.MakeRevokeGrantMsg(revokeGrantMsg, xplac.PrivateKey)
+	msg, err := mfeegrant.MakeRevokeGrantMsg(revokeGrantMsg, xplac.Opts.PrivateKey)
 	if err != nil {
 		xplac.Err = err
 	}
@@ -213,7 +213,7 @@ func (xplac *XplaClient) RevokeGrant(revokeGrantMsg types.RevokeGrantMsg) *XplaC
 
 // Submit a proposal along with an initial deposit.
 func (xplac *XplaClient) SubmitProposal(submitProposalMsg types.SubmitProposalMsg) *XplaClient {
-	msg, err := mgov.MakeSubmitProposalMsg(submitProposalMsg, xplac.PrivateKey)
+	msg, err := mgov.MakeSubmitProposalMsg(submitProposalMsg, xplac.Opts.PrivateKey)
 	if err != nil {
 		xplac.Err = err
 	}
@@ -225,7 +225,7 @@ func (xplac *XplaClient) SubmitProposal(submitProposalMsg types.SubmitProposalMs
 
 // Deposit tokens for an active proposal.
 func (xplac *XplaClient) GovDeposit(govDepositMsg types.GovDepositMsg) *XplaClient {
-	msg, err := mgov.MakeGovDepositMsg(govDepositMsg, xplac.PrivateKey)
+	msg, err := mgov.MakeGovDepositMsg(govDepositMsg, xplac.Opts.PrivateKey)
 	if err != nil {
 		xplac.Err = err
 	}
@@ -237,7 +237,7 @@ func (xplac *XplaClient) GovDeposit(govDepositMsg types.GovDepositMsg) *XplaClie
 
 // Vote for an active proposal, options: yes/no/no_with_veto/abstain.
 func (xplac *XplaClient) Vote(voteMsg types.VoteMsg) *XplaClient {
-	msg, err := mgov.MakeVoteMsg(voteMsg, xplac.PrivateKey)
+	msg, err := mgov.MakeVoteMsg(voteMsg, xplac.Opts.PrivateKey)
 	if err != nil {
 		xplac.Err = err
 	}
@@ -249,7 +249,7 @@ func (xplac *XplaClient) Vote(voteMsg types.VoteMsg) *XplaClient {
 
 // Vote for an active proposal, options: yes/no/no_with_veto/abstain.
 func (xplac *XplaClient) WeightedVote(weightedVoteMsg types.WeightedVoteMsg) *XplaClient {
-	msg, err := mgov.MakeWeightedVoteMsg(weightedVoteMsg, xplac.PrivateKey)
+	msg, err := mgov.MakeWeightedVoteMsg(weightedVoteMsg, xplac.Opts.PrivateKey)
 	if err != nil {
 		xplac.Err = err
 	}
@@ -263,7 +263,7 @@ func (xplac *XplaClient) WeightedVote(weightedVoteMsg types.WeightedVoteMsg) *Xp
 
 // Submit a parameter change proposal.
 func (xplac *XplaClient) ParamChange(paramChangeMsg types.ParamChangeMsg) *XplaClient {
-	msg, err := mparams.MakeProposalParamChangeMsg(paramChangeMsg, xplac.PrivateKey, xplac.EncodingConfig)
+	msg, err := mparams.MakeProposalParamChangeMsg(paramChangeMsg, xplac.Opts.PrivateKey, xplac.EncodingConfig)
 	if err != nil {
 		xplac.Err = err
 	}
@@ -277,7 +277,7 @@ func (xplac *XplaClient) ParamChange(paramChangeMsg types.ParamChangeMsg) *XplaC
 
 // Unjail validator previously jailed for downtime.
 func (xplac *XplaClient) Unjail() *XplaClient {
-	msg, err := mslashing.MakeUnjailMsg(xplac.PrivateKey)
+	msg, err := mslashing.MakeUnjailMsg(xplac.Opts.PrivateKey)
 	if err != nil {
 		xplac.Err = err
 	}
@@ -291,7 +291,7 @@ func (xplac *XplaClient) Unjail() *XplaClient {
 
 // Create new validator initialized with a self-delegation to it.
 func (xplac *XplaClient) CreateValidator(createValidatorMsg types.CreateValidatorMsg) *XplaClient {
-	msg, err := mstaking.MakeCreateValidatorMsg(createValidatorMsg, xplac.PrivateKey, xplac.Opts.OutputDocument)
+	msg, err := mstaking.MakeCreateValidatorMsg(createValidatorMsg, xplac.Opts.PrivateKey, xplac.Opts.OutputDocument)
 	if err != nil {
 		xplac.Err = err
 	}
@@ -303,7 +303,7 @@ func (xplac *XplaClient) CreateValidator(createValidatorMsg types.CreateValidato
 
 // Edit an existing validator account.
 func (xplac *XplaClient) EditValidator(editValidatorMsg types.EditValidatorMsg) *XplaClient {
-	msg, err := mstaking.MakeEditValidatorMsg(editValidatorMsg, xplac.PrivateKey)
+	msg, err := mstaking.MakeEditValidatorMsg(editValidatorMsg, xplac.Opts.PrivateKey)
 	if err != nil {
 		xplac.Err = err
 	}
@@ -315,7 +315,7 @@ func (xplac *XplaClient) EditValidator(editValidatorMsg types.EditValidatorMsg) 
 
 // Delegate liquid tokens to a validator.
 func (xplac *XplaClient) Delegate(delegateMsg types.DelegateMsg) *XplaClient {
-	msg, err := mstaking.MakeDelegateMsg(delegateMsg, xplac.PrivateKey)
+	msg, err := mstaking.MakeDelegateMsg(delegateMsg, xplac.Opts.PrivateKey)
 	if err != nil {
 		xplac.Err = err
 	}
@@ -327,7 +327,7 @@ func (xplac *XplaClient) Delegate(delegateMsg types.DelegateMsg) *XplaClient {
 
 // Unbond shares from a validator.
 func (xplac *XplaClient) Unbond(unbondMsg types.UnbondMsg) *XplaClient {
-	msg, err := mstaking.MakeUnbondMsg(unbondMsg, xplac.PrivateKey)
+	msg, err := mstaking.MakeUnbondMsg(unbondMsg, xplac.Opts.PrivateKey)
 	if err != nil {
 		xplac.Err = err
 	}
@@ -339,7 +339,7 @@ func (xplac *XplaClient) Unbond(unbondMsg types.UnbondMsg) *XplaClient {
 
 // Redelegate illiquid tokens from one validator to another.
 func (xplac *XplaClient) Redelegate(redelegateMsg types.RedelegateMsg) *XplaClient {
-	msg, err := mstaking.MakeRedelegateMsg(redelegateMsg, xplac.PrivateKey)
+	msg, err := mstaking.MakeRedelegateMsg(redelegateMsg, xplac.Opts.PrivateKey)
 	if err != nil {
 		xplac.Err = err
 	}
@@ -353,7 +353,7 @@ func (xplac *XplaClient) Redelegate(redelegateMsg types.RedelegateMsg) *XplaClie
 
 // Submit a software upgrade proposal.
 func (xplac *XplaClient) SoftwareUpgrade(softwareUpgradeMsg types.SoftwareUpgradeMsg) *XplaClient {
-	msg, err := mupgrade.MakeProposalSoftwareUpgradeMsg(softwareUpgradeMsg, xplac.PrivateKey)
+	msg, err := mupgrade.MakeProposalSoftwareUpgradeMsg(softwareUpgradeMsg, xplac.Opts.PrivateKey)
 	if err != nil {
 		xplac.Err = err
 	}
@@ -365,7 +365,7 @@ func (xplac *XplaClient) SoftwareUpgrade(softwareUpgradeMsg types.SoftwareUpgrad
 
 // Cancel the current software upgrade proposal.
 func (xplac *XplaClient) CancelSoftwareUpgrade(cancelSoftwareUpgradeMsg types.CancelSoftwareUpgradeMsg) *XplaClient {
-	msg, err := mupgrade.MakeCancelSoftwareUpgradeMsg(cancelSoftwareUpgradeMsg, xplac.PrivateKey)
+	msg, err := mupgrade.MakeCancelSoftwareUpgradeMsg(cancelSoftwareUpgradeMsg, xplac.Opts.PrivateKey)
 	if err != nil {
 		xplac.Err = err
 	}
@@ -379,7 +379,7 @@ func (xplac *XplaClient) CancelSoftwareUpgrade(cancelSoftwareUpgradeMsg types.Ca
 
 // Upload a wasm binary.
 func (xplac *XplaClient) StoreCode(filePath string) *XplaClient {
-	addr := util.GetAddrByPrivKey(xplac.PrivateKey)
+	addr := util.GetAddrByPrivKey(xplac.Opts.PrivateKey)
 	msg, err := mwasm.MakeStoreCodeMsg(filePath, addr)
 	if err != nil {
 		xplac.Err = err
@@ -392,7 +392,7 @@ func (xplac *XplaClient) StoreCode(filePath string) *XplaClient {
 
 // Instantiate a wasm contract.
 func (xplac *XplaClient) InstantiateContract(instantiageMsg types.InstantiateMsg) *XplaClient {
-	addr := util.GetAddrByPrivKey(xplac.PrivateKey)
+	addr := util.GetAddrByPrivKey(xplac.Opts.PrivateKey)
 	msg, err := mwasm.MakeInstantiateMsg(instantiageMsg, addr)
 	if err != nil {
 		xplac.Err = err
@@ -405,7 +405,7 @@ func (xplac *XplaClient) InstantiateContract(instantiageMsg types.InstantiateMsg
 
 // Execute a wasm contract.
 func (xplac *XplaClient) ExecuteContract(executeMsg types.ExecuteMsg) *XplaClient {
-	addr := util.GetAddrByPrivKey(xplac.PrivateKey)
+	addr := util.GetAddrByPrivKey(xplac.Opts.PrivateKey)
 	msg, err := mwasm.MakeExecuteMsg(executeMsg, addr)
 	if err != nil {
 		xplac.Err = err
@@ -418,7 +418,7 @@ func (xplac *XplaClient) ExecuteContract(executeMsg types.ExecuteMsg) *XplaClien
 
 // Clears admin for a contract to prevent further migrations.
 func (xplac *XplaClient) ClearContractAdmin(clearContractAdminMsg types.ClearContractAdminMsg) *XplaClient {
-	msg, err := mwasm.MakeClearContractAdminMsg(clearContractAdminMsg, xplac.PrivateKey)
+	msg, err := mwasm.MakeClearContractAdminMsg(clearContractAdminMsg, xplac.Opts.PrivateKey)
 	if err != nil {
 		xplac.Err = err
 	}
@@ -430,7 +430,7 @@ func (xplac *XplaClient) ClearContractAdmin(clearContractAdminMsg types.ClearCon
 
 // Set new admin for a contract.
 func (xplac *XplaClient) SetContractAdmin(setContractAdminMsg types.SetContractAdminMsg) *XplaClient {
-	msg, err := mwasm.MakeSetContractAdmintMsg(setContractAdminMsg, xplac.PrivateKey)
+	msg, err := mwasm.MakeSetContractAdmintMsg(setContractAdminMsg, xplac.Opts.PrivateKey)
 	if err != nil {
 		xplac.Err = err
 	}
@@ -442,7 +442,7 @@ func (xplac *XplaClient) SetContractAdmin(setContractAdminMsg types.SetContractA
 
 // Migrate a wasm contract to a new code version.
 func (xplac *XplaClient) Migrate(migrateMsg types.MigrateMsg) *XplaClient {
-	msg, err := mwasm.MakeMigrateMsg(migrateMsg, xplac.PrivateKey)
+	msg, err := mwasm.MakeMigrateMsg(migrateMsg, xplac.Opts.PrivateKey)
 	if err != nil {
 		xplac.Err = err
 	}
