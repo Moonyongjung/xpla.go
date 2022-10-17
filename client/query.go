@@ -12,6 +12,7 @@ import (
 	mgov "github.com/Moonyongjung/xpla.go/core/gov"
 	mmint "github.com/Moonyongjung/xpla.go/core/mint"
 	mparams "github.com/Moonyongjung/xpla.go/core/params"
+	mreward "github.com/Moonyongjung/xpla.go/core/reward"
 	mslashing "github.com/Moonyongjung/xpla.go/core/slashing"
 	mstaking "github.com/Moonyongjung/xpla.go/core/staking"
 	mupgrade "github.com/Moonyongjung/xpla.go/core/upgrade"
@@ -62,6 +63,9 @@ func (xplac *XplaClient) Query() (string, error) {
 
 	} else if xplac.Module == mparams.ParamsModule {
 		return ixplaClient.QueryParams()
+
+	} else if xplac.Module == mreward.RewardModule {
+		return ixplaClient.QueryReward()
 
 	} else if xplac.Module == mslashing.SlashingModule {
 		return ixplaClient.QuerySlashing()

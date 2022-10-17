@@ -11,6 +11,7 @@ import (
 	mgov "github.com/Moonyongjung/xpla.go/core/gov"
 	mmint "github.com/Moonyongjung/xpla.go/core/mint"
 	mparams "github.com/Moonyongjung/xpla.go/core/params"
+	mreward "github.com/Moonyongjung/xpla.go/core/reward"
 	mslashing "github.com/Moonyongjung/xpla.go/core/slashing"
 	mstaking "github.com/Moonyongjung/xpla.go/core/staking"
 	mupgrade "github.com/Moonyongjung/xpla.go/core/upgrade"
@@ -581,6 +582,34 @@ func (xplac *XplaClient) QuerySubspace(subspaceMsg types.SubspaceMsg) *XplaClien
 	}
 	xplac.Module = mparams.ParamsModule
 	xplac.MsgType = mparams.ParamsQuerySubpsaceMsgType
+	xplac.Msg = msg
+
+	return xplac
+}
+
+// Reward module
+
+// Query reward params
+func (xplac *XplaClient) RewardParams() *XplaClient {
+	msg, err := mreward.MakeQueryRewardParamsMsg()
+	if err != nil {
+		xplac.Err = err
+	}
+	xplac.Module = mreward.RewardModule
+	xplac.MsgType = mreward.RewardQueryRewardParamsMsgType
+	xplac.Msg = msg
+
+	return xplac
+}
+
+// Query reward pool
+func (xplac *XplaClient) RewardPool() *XplaClient {
+	msg, err := mreward.MakeQueryRewardPoolMsg()
+	if err != nil {
+		xplac.Err = err
+	}
+	xplac.Module = mreward.RewardModule
+	xplac.MsgType = mreward.RewardQueryRewardPoolMsgType
 	xplac.Msg = msg
 
 	return xplac

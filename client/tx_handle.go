@@ -12,6 +12,7 @@ import (
 	mfeegrant "github.com/Moonyongjung/xpla.go/core/feegrant"
 	mgov "github.com/Moonyongjung/xpla.go/core/gov"
 	mparams "github.com/Moonyongjung/xpla.go/core/params"
+	mreward "github.com/Moonyongjung/xpla.go/core/reward"
 	mslashing "github.com/Moonyongjung/xpla.go/core/slashing"
 	mstaking "github.com/Moonyongjung/xpla.go/core/staking"
 	mupgrade "github.com/Moonyongjung/xpla.go/core/upgrade"
@@ -40,6 +41,7 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	evmtypes "github.com/ethereum/go-ethereum/core/types"
 	ethcrypto "github.com/ethereum/go-ethereum/crypto"
+	rewardtypes "github.com/xpladev/xpla/x/reward/types"
 )
 
 // Set message for transaction builder.
@@ -124,6 +126,11 @@ func setTxBuilderMsg(xplac *XplaClient) (cmclient.TxBuilder, error) {
 		// Params module
 	} else if xplac.MsgType == mparams.ParamsProposalParamChangeMsgType {
 		convertMsg, _ := xplac.Msg.(*govtypes.MsgSubmitProposal)
+		builder.SetMsgs(convertMsg)
+
+		// Reward module
+	} else if xplac.MsgType == mreward.RewardFundFeeCollectorMsgType {
+		convertMsg, _ := xplac.Msg.(*rewardtypes.MsgFundFeeCollector)
 		builder.SetMsgs(convertMsg)
 
 		// slashing module

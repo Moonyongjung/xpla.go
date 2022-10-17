@@ -18,6 +18,7 @@ Usage of modules and xpla client.
 |Gov|[README](./core/gov/README.md)||
 |Mint|[README](./core/mint/README.md)||
 |Params|[README](./core/params/README.md)||
+|Reward|[README](./core/reward/README.md)||
 |Slashing|[README](./core/slashing/README.md)||
 |Staking|[README](./core/staking/README.md)||
 |Upgrade|[README](./core/upgrade/README.md)||

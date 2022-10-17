@@ -9,6 +9,7 @@ import (
 	mfeegrant "github.com/Moonyongjung/xpla.go/core/feegrant"
 	mgov "github.com/Moonyongjung/xpla.go/core/gov"
 	mparams "github.com/Moonyongjung/xpla.go/core/params"
+	mreward "github.com/Moonyongjung/xpla.go/core/reward"
 	mslashing "github.com/Moonyongjung/xpla.go/core/slashing"
 	mstaking "github.com/Moonyongjung/xpla.go/core/staking"
 	mupgrade "github.com/Moonyongjung/xpla.go/core/upgrade"
@@ -269,6 +270,20 @@ func (xplac *XplaClient) ParamChange(paramChangeMsg types.ParamChangeMsg) *XplaC
 	}
 	xplac.Module = mparams.ParamsModule
 	xplac.MsgType = mparams.ParamsProposalParamChangeMsgType
+	xplac.Msg = msg
+	return xplac
+}
+
+// Reward module
+
+// Funds the fee collector with the specified amount
+func (xplac *XplaClient) FundFeeCollector(fundFeeCollectorMsg types.FundFeeCollectorMsg) *XplaClient {
+	msg, err := mreward.MakeFundFeeCollectorMsg(fundFeeCollectorMsg, xplac.Opts.PrivateKey)
+	if err != nil {
+		xplac.Err = err
+	}
+	xplac.Module = mreward.RewardModule
+	xplac.MsgType = mreward.RewardFundFeeCollectorMsgType
 	xplac.Msg = msg
 	return xplac
 }
