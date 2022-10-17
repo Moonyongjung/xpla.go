@@ -72,11 +72,6 @@ func parseWeightedVoteArgs(weightedVoteMsg types.WeightedVoteMsg, privKey key.Pr
 	if err != nil {
 		return nil, err
 	}
-	// options, err := govtypes.weight
-	// options, err := govtypes.WeightedVoteOptionsFromString(govutils.NormalizeWeightedVoteOptions(weightedOption))
-	// if err != nil {
-	// 	return nil, err
-	// }
 
 	msg := govtypes.NewMsgVoteWeighted(from, proposalId, options)
 	err = msg.ValidateBasic()
