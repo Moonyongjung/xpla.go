@@ -81,16 +81,22 @@ func MulUint64(val1 uint64, val2 uint64) uint64 {
 	return val1 * val2
 }
 
+func MulBigInt(val1 *big.Int, val2 *big.Int) *big.Int {
+	result := big.NewInt(0)
+	return result.Mul(val1, val2)
+}
+
 func FromBigIntToString(v *big.Int) string {
 	return v.String()
 }
 
 func FromStringToBigInt(v string) (*big.Int, error) {
-	n, err := strconv.Atoi(v)
-	if err != nil {
-		return nil, err
+	n := big.NewInt(0)
+	n, ok := n.SetString(v, 10)
+	if !ok {
+		return nil, LogErr("convert string to big int err")
 	}
-	return big.NewInt(int64(n)), nil
+	return n, nil
 }
 
 func FromStringToUint64(value string) uint64 {

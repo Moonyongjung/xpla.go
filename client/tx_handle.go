@@ -202,9 +202,9 @@ func setTxBuilderMsg(xplac *XplaClient) (cmclient.TxBuilder, error) {
 
 // Set information for transaction builder.
 func convertAndSetBuilder(xplac *XplaClient, builder cmclient.TxBuilder) cmclient.TxBuilder {
-	feeAmountDenomRemove := util.DenomRemove(xplac.Opts.FeeAmount)
+	feeAmountDenomRemove, _ := util.FromStringToBigInt(util.DenomRemove(xplac.Opts.FeeAmount))
 	feeAmountCoin := sdk.Coin{
-		Amount: sdk.NewInt(util.FromStringToInt64(feeAmountDenomRemove)),
+		Amount: sdk.NewIntFromBigInt(feeAmountDenomRemove),
 		Denom:  types.XplaDenom,
 	}
 	feeAmountCoins := sdk.NewCoins(feeAmountCoin)

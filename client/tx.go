@@ -76,7 +76,7 @@ func (xplac *XplaClient) CreateAndSignTx() ([]byte, error) {
 
 		if xplac.Opts.GasLimit == "" {
 			if xplac.Opts.LcdURL == "" && xplac.Opts.GrpcURL == "" {
-				xplac.WithGasLimit(types.DefaultGasAdjustment)
+				xplac.WithGasLimit(types.DefaultGasLimit)
 			} else {
 				simulate, err := xplac.Simulate(builder)
 				if err != nil {
@@ -91,8 +91,18 @@ func (xplac *XplaClient) CreateAndSignTx() ([]byte, error) {
 		}
 
 		if xplac.Opts.FeeAmount == "" {
-			feeAmount := util.MulUint64(util.FromStringToUint64(xplac.Opts.GasLimit), util.FromStringToUint64(xplac.Opts.GasPrice))
-			xplac.WithFeeAmount(util.FromUint64ToString(feeAmount))
+			gasLimitBigInt, err := util.FromStringToBigInt(xplac.Opts.GasLimit)
+			if err != nil {
+				return nil, err
+			}
+
+			gasPriceBigInt, err := util.FromStringToBigInt(xplac.Opts.GasPrice)
+			if err != nil {
+				return nil, err
+			}
+
+			feeAmount := util.MulBigInt(gasLimitBigInt, gasPriceBigInt)
+			xplac.WithFeeAmount(util.FromBigIntToString(feeAmount))
 		}
 
 		builder = convertAndSetBuilder(xplac, builder)
