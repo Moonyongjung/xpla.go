@@ -10,6 +10,7 @@ import (
 	mgov "github.com/Moonyongjung/xpla.go/core/gov"
 	"github.com/Moonyongjung/xpla.go/types"
 	"github.com/Moonyongjung/xpla.go/util"
+	"github.com/Moonyongjung/xpla.go/util/testutil"
 
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -269,11 +270,11 @@ func SimulateMsgSubmitProposal(
 		}
 
 		txGen := util.MakeEncodingConfig().TxConfig
-		tx, err := util.GenTx(
+		tx, err := testutil.GenTx(
 			txGen,
 			[]sdk.Msg{msg},
 			fees,
-			util.DefaultTestGenTxGas,
+			testutil.DefaultTestGenTxGas,
 			chainID,
 			[]uint64{account.GetAccountNumber()},
 			[]uint64{account.GetSequence()},
@@ -469,7 +470,7 @@ func SimulateMsgVoteWeighted(ak govtypes.AccountKeeper, bk govtypes.BankKeeper, 
 
 // returns context and an app with updated mint keeper
 func createTestApp(isCheckTx bool) (*xapp.XplaApp, sdk.Context) {
-	app := util.Setup(isCheckTx, 5)
+	app := testutil.Setup(isCheckTx, 5)
 
 	ctx := app.BaseApp.NewContext(isCheckTx, tmproto.Header{})
 
@@ -498,7 +499,7 @@ func getTestingAccounts(t *testing.T, r *rand.Rand, app *xapp.XplaApp, ctx sdk.C
 	for _, account := range accounts {
 		acc := app.AccountKeeper.NewAccountWithAddress(ctx, account.Address)
 		app.AccountKeeper.SetAccount(ctx, acc)
-		require.NoError(t, util.FundAccount(app.BankKeeper, ctx, account.Address, initCoins))
+		require.NoError(t, testutil.FundAccount(app.BankKeeper, ctx, account.Address, initCoins))
 	}
 
 	return accounts

@@ -11,6 +11,7 @@ import (
 	mdist "github.com/Moonyongjung/xpla.go/core/distribution"
 	"github.com/Moonyongjung/xpla.go/types"
 	"github.com/Moonyongjung/xpla.go/util"
+	"github.com/Moonyongjung/xpla.go/util/testutil"
 
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/crypto/keys/ed25519"
@@ -453,7 +454,7 @@ func (suite *TestSuite) TestGRPCCommunityPool() {
 			"valid request",
 			func() {
 				amount := sdk.NewCoins(sdk.NewInt64Coin("axpla", 100))
-				suite.Require().NoError(util.FundAccount(app.BankKeeper, ctx, addrs[0], amount))
+				suite.Require().NoError(testutil.FundAccount(app.BankKeeper, ctx, addrs[0], amount))
 
 				err := app.DistrKeeper.FundCommunityPool(ctx, amount, addrs[0])
 				suite.Require().Nil(err)

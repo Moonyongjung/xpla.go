@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	mmint "github.com/Moonyongjung/xpla.go/core/mint"
-	"github.com/Moonyongjung/xpla.go/util"
+	"github.com/Moonyongjung/xpla.go/util/testutil"
 
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -25,7 +25,7 @@ type TestSuite struct {
 
 func (suite *TestSuite) SetupTest() {
 	checkTx := false
-	app := util.Setup(checkTx, 5)
+	app := testutil.Setup(checkTx, 5)
 	ctx := app.BaseApp.NewContext(checkTx, tmproto.Header{})
 
 	queryHelper := baseapp.NewQueryServerTestHelper(ctx, app.InterfaceRegistry())

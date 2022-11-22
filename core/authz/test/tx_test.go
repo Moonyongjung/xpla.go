@@ -10,6 +10,7 @@ import (
 	"github.com/Moonyongjung/xpla.go/key"
 	"github.com/Moonyongjung/xpla.go/types"
 	"github.com/Moonyongjung/xpla.go/util"
+	"github.com/Moonyongjung/xpla.go/util/testutil"
 
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	cdctypes "github.com/cosmos/cosmos-sdk/codec/types"
@@ -41,7 +42,7 @@ var (
 
 func (suite *TestSuite) SetupTest() {
 	checkTx := false
-	app := util.Setup(checkTx, 5)
+	app := testutil.Setup(checkTx, 5)
 	ctx := app.BaseApp.NewContext(checkTx, tmproto.Header{})
 
 	queryHelper := baseapp.NewQueryServerTestHelper(ctx, app.InterfaceRegistry())
@@ -225,11 +226,11 @@ func SimulateMsgGrant(ak authz.AccountKeeper, bk authz.BankKeeper, _ keeper.Keep
 			return simtypes.NoOpMsg(authz.ModuleName, TypeMsgGrant, err.Error()), nil, err
 		}
 		txCfg := util.MakeEncodingConfig().TxConfig
-		tx, err := util.GenTx(
+		tx, err := testutil.GenTx(
 			txCfg,
 			[]sdk.Msg{msg},
 			fees,
-			util.DefaultTestGenTxGas,
+			testutil.DefaultTestGenTxGas,
 			chainID,
 			[]uint64{granterAcc.GetAccountNumber()},
 			[]uint64{granterAcc.GetSequence()},
@@ -295,11 +296,11 @@ func SimulateMsgRevoke(ak authz.AccountKeeper, bk authz.BankKeeper, k keeper.Kee
 		// msg := authz.NewMsgRevoke(granterAddr, granteeAddr, a.MsgTypeURL())
 		txCfg := util.MakeEncodingConfig().TxConfig
 		account := ak.GetAccount(ctx, granterAddr)
-		tx, err := util.GenTx(
+		tx, err := testutil.GenTx(
 			txCfg,
 			[]sdk.Msg{&msg},
 			fees,
-			util.DefaultTestGenTxGas,
+			testutil.DefaultTestGenTxGas,
 			chainID,
 			[]uint64{account.GetAccountNumber()},
 			[]uint64{account.GetSequence()},
@@ -360,6 +361,7 @@ func SimulateMsgExec(ak authz.AccountKeeper, bk authz.BankKeeper, k keeper.Keepe
 		}
 
 		xplac := client.NewXplaClient(chainID)
+		xplac.WithPrivateKey(grantee.PrivKey)
 		bankSendMsg := types.BankSendMsg{
 			FromAddress: granteeAddr.String(),
 			ToAddress:   granterAddr.String(),
@@ -398,11 +400,11 @@ func SimulateMsgExec(ak authz.AccountKeeper, bk authz.BankKeeper, k keeper.Keepe
 
 		txCfg := encodingConfig.TxConfig
 		granteeAcc := ak.GetAccount(ctx, granteeAddr)
-		tx, err := util.GenTx(
+		tx, err := testutil.GenTx(
 			txCfg,
 			[]sdk.Msg{&msgExec},
 			fees,
-			util.DefaultTestGenTxGas,
+			testutil.DefaultTestGenTxGas,
 			chainID,
 			[]uint64{granteeAcc.GetAccountNumber()},
 			[]uint64{granteeAcc.GetSequence()},
@@ -434,7 +436,7 @@ func generateRandomMsgType(r *rand.Rand, msgType []string) string {
 }
 
 func (suite *TestSuite) getTestingAccounts(r *rand.Rand, n int) []simtypes.Account {
-	accounts := simtypes.RandomAccounts(r, n)
+	accounts := testutil.RandomAccounts(r, n)
 
 	initAmt := suite.app.StakingKeeper.TokensFromConsensusPower(suite.ctx, 200000)
 	initCoins := sdk.NewCoins(sdk.NewCoin("axpla", initAmt))
@@ -443,7 +445,7 @@ func (suite *TestSuite) getTestingAccounts(r *rand.Rand, n int) []simtypes.Accou
 	for _, account := range accounts {
 		acc := suite.app.AccountKeeper.NewAccountWithAddress(suite.ctx, account.Address)
 		suite.app.AccountKeeper.SetAccount(suite.ctx, acc)
-		suite.Require().NoError(util.FundAccount(suite.app.BankKeeper, suite.ctx, account.Address, initCoins))
+		suite.Require().NoError(testutil.FundAccount(suite.app.BankKeeper, suite.ctx, account.Address, initCoins))
 	}
 
 	return accounts

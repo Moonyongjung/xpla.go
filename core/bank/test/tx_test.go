@@ -7,6 +7,7 @@ import (
 	mbank "github.com/Moonyongjung/xpla.go/core/bank"
 	"github.com/Moonyongjung/xpla.go/types"
 	"github.com/Moonyongjung/xpla.go/util"
+	"github.com/Moonyongjung/xpla.go/util/testutil"
 
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
@@ -28,10 +29,13 @@ type TestSuite struct {
 	queryClient banktypes.QueryClient
 }
 
-func (suite *TestSuite) SetupTest() {
+func init() {
 	util.SetChainConfig()
+}
+
+func (suite *TestSuite) SetupTest() {
 	checkTx := false
-	app := util.Setup(checkTx, 5)
+	app := testutil.Setup(checkTx, 5)
 	ctx := app.BaseApp.NewContext(checkTx, tmproto.Header{})
 
 	queryHelper := baseapp.NewQueryServerTestHelper(ctx, app.InterfaceRegistry())
@@ -118,7 +122,7 @@ func (suite *TestSuite) getTestingAccounts(r *rand.Rand, n int) []simtypes.Accou
 	for _, account := range accounts {
 		acc := suite.app.AccountKeeper.NewAccountWithAddress(suite.ctx, account.Address)
 		suite.app.AccountKeeper.SetAccount(suite.ctx, acc)
-		suite.Require().NoError(util.FundAccount(suite.app.BankKeeper, suite.ctx, account.Address, initCoins))
+		suite.Require().NoError(testutil.FundAccount(suite.app.BankKeeper, suite.ctx, account.Address, initCoins))
 	}
 
 	return accounts
@@ -179,11 +183,11 @@ func sendMsgSend(
 		}
 	}
 	txGen := util.MakeEncodingConfig().TxConfig
-	tx, err := util.GenTx(
+	tx, err := testutil.GenTx(
 		txGen,
 		[]sdk.Msg{msg},
 		fees,
-		util.DefaultTestGenTxGas,
+		testutil.DefaultTestGenTxGas,
 		chainID,
 		[]uint64{account.GetAccountNumber()},
 		[]uint64{account.GetSequence()},

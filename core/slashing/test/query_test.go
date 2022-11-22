@@ -9,6 +9,7 @@ import (
 	"github.com/Moonyongjung/xpla.go/key"
 	"github.com/Moonyongjung/xpla.go/types"
 	"github.com/Moonyongjung/xpla.go/util"
+	"github.com/Moonyongjung/xpla.go/util/testutil"
 
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -31,14 +32,14 @@ type TestSuite struct {
 }
 
 func (suite *TestSuite) SetupTest() {
-	app := util.Setup(false, 5)
+	app := testutil.Setup(false, 5)
 	ctx := app.BaseApp.NewContext(false, tmproto.Header{})
 
 	app.AccountKeeper.SetParams(ctx, authtypes.DefaultParams())
 	app.BankKeeper.SetParams(ctx, banktypes.DefaultParams())
 	app.SlashingKeeper.SetParams(ctx, testslashing.TestParams())
 
-	addrDels := util.AddTestAddrsIncremental(app, ctx, 2, app.StakingKeeper.TokensFromConsensusPower(ctx, 200))
+	addrDels := testutil.AddTestAddrsIncremental(app, ctx, 2, app.StakingKeeper.TokensFromConsensusPower(ctx, 200))
 
 	info1 := slashingtypes.NewValidatorSigningInfo(sdk.ConsAddress(addrDels[0]), int64(4), int64(3),
 		time.Unix(2, 0), false, int64(10))

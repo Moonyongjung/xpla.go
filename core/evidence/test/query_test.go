@@ -8,7 +8,7 @@ import (
 	"github.com/Moonyongjung/xpla.go/core"
 	mevidence "github.com/Moonyongjung/xpla.go/core/evidence"
 	"github.com/Moonyongjung/xpla.go/types"
-	"github.com/Moonyongjung/xpla.go/util"
+	"github.com/Moonyongjung/xpla.go/util/testutil"
 
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/crypto/keys/ed25519"
@@ -33,7 +33,7 @@ type TestSuite struct {
 
 func (suite *TestSuite) SetupTest() {
 	checkTx := false
-	app := util.Setup(checkTx, 5)
+	app := testutil.Setup(checkTx, 5)
 	ctx := app.BaseApp.NewContext(checkTx, tmproto.Header{})
 
 	evidenceKeeper := evidencekeeper.NewKeeper(

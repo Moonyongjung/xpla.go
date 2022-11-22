@@ -9,6 +9,7 @@ import (
 	mstaking "github.com/Moonyongjung/xpla.go/core/staking"
 	"github.com/Moonyongjung/xpla.go/types"
 	"github.com/Moonyongjung/xpla.go/util"
+	"github.com/Moonyongjung/xpla.go/util/testutil"
 
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/crypto/keys/ed25519"
@@ -644,7 +645,7 @@ func SimulateMsgBeginRedelegate(ak stakingtypes.AccountKeeper, bk stakingtypes.B
 
 // returns context and an app with updated mint keeper
 func createTestApp(isCheckTx bool) (*xapp.XplaApp, sdk.Context) {
-	app := util.Setup(isCheckTx, 5)
+	app := testutil.Setup(isCheckTx, 5)
 	mp := minttypes.Params{
 		MintDenom:           denom,
 		InflationRateChange: sdk.NewDecWithPrec(13, 2),
@@ -674,7 +675,7 @@ func getTestingAccounts(t *testing.T, r *rand.Rand, app *xapp.XplaApp, ctx sdk.C
 	for _, account := range accounts {
 		acc := app.AccountKeeper.NewAccountWithAddress(ctx, account.Address)
 		app.AccountKeeper.SetAccount(ctx, acc)
-		require.NoError(t, util.FundAccount(app.BankKeeper, ctx, account.Address, initCoins))
+		require.NoError(t, testutil.FundAccount(app.BankKeeper, ctx, account.Address, initCoins))
 	}
 
 	return accounts
@@ -708,7 +709,7 @@ func getValTargetAccount(t *testing.T, app *xapp.XplaApp, ctx sdk.Context, accou
 
 	acc := app.AccountKeeper.NewAccountWithAddress(ctx, specAccount.Address)
 	app.AccountKeeper.SetAccount(ctx, acc)
-	require.NoError(t, util.FundAccount(app.BankKeeper, ctx, specAccount.Address, initCoins))
+	require.NoError(t, testutil.FundAccount(app.BankKeeper, ctx, specAccount.Address, initCoins))
 
 	accounts = append(accounts, specAccount)
 
@@ -718,11 +719,11 @@ func getValTargetAccount(t *testing.T, app *xapp.XplaApp, ctx sdk.Context, accou
 // genAndDeliverTx generates a transactions and delivers it.
 func genAndDeliverTx(txCtx simulation.OperationInput, fees sdk.Coins) (simtypes.OperationMsg, []simtypes.FutureOperation, error) {
 	account := txCtx.AccountKeeper.GetAccount(txCtx.Context, txCtx.SimAccount.Address)
-	tx, err := util.GenTx(
+	tx, err := testutil.GenTx(
 		txCtx.TxGen,
 		[]sdk.Msg{txCtx.Msg},
 		fees,
-		util.DefaultTestGenTxGas,
+		testutil.DefaultTestGenTxGas,
 		txCtx.Context.ChainID(),
 		[]uint64{account.GetAccountNumber()},
 		[]uint64{account.GetSequence()},

@@ -9,6 +9,7 @@ import (
 	mstaking "github.com/Moonyongjung/xpla.go/core/staking"
 	"github.com/Moonyongjung/xpla.go/types"
 	"github.com/Moonyongjung/xpla.go/util"
+	"github.com/Moonyongjung/xpla.go/util/testutil"
 
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -33,7 +34,7 @@ type KeeperTestSuite struct {
 }
 
 func (suite *KeeperTestSuite) SetupTest() {
-	app := util.Setup(false, 5)
+	app := testutil.Setup(false, 5)
 	ctx := app.BaseApp.NewContext(false, tmproto.Header{})
 
 	querier := keeper.Querier{Keeper: app.StakingKeeper}
@@ -56,66 +57,6 @@ func (suite *KeeperTestSuite) SetupTest() {
 	app.StakingKeeper.SetHistoricalInfo(ctx, 5, &hi)
 
 	suite.app, suite.ctx, suite.queryClient, suite.addrs, suite.vals = app, ctx, queryClient, addrs, validators
-}
-
-func (suite *KeeperTestSuite) TestGRPCQueryValidators() {
-	queryClient, vals := suite.queryClient, suite.vals
-	var req *stakingtypes.QueryValidatorsRequest
-	testCases := []struct {
-		msg      string
-		malleate func()
-		expPass  bool
-		numVals  int
-		hasNext  bool
-	}{
-		{
-			"empty status returns all the validators",
-			func() {
-				msg, _ := mstaking.MakeQueryValidatorsMsg()
-				req = &msg
-			},
-			true,
-			len(vals),
-			false,
-		},
-		{
-			"valid request",
-			func() {
-				pagination := types.Pagination{
-					Limit:      1,
-					CountTotal: true,
-				}
-				pr, _ := core.ReadPageRequest(pagination)
-				core.PageRequest = pr
-
-				msg, _ := mstaking.MakeQueryValidatorsMsg()
-				req = &msg
-			},
-			true,
-			1,
-			true,
-		},
-	}
-	for _, tc := range testCases {
-		suite.Run(fmt.Sprintf("Case %s", tc.msg), func() {
-			tc.malleate()
-			valsResp, err := queryClient.Validators(context.Background(), req)
-			if tc.expPass {
-				suite.NoError(err)
-				suite.NotNil(valsResp)
-				suite.Equal(tc.numVals, len(valsResp.Validators))
-				suite.Equal(uint64(len(vals)), valsResp.Pagination.Total)
-
-				if tc.hasNext {
-					suite.NotNil(valsResp.Pagination.NextKey)
-				} else {
-					suite.Nil(valsResp.Pagination.NextKey)
-				}
-			} else {
-				suite.Require().Error(err)
-			}
-		})
-	}
 }
 
 func (suite *KeeperTestSuite) TestGRPCQueryValidator() {
@@ -287,7 +228,7 @@ func (suite *KeeperTestSuite) TestGRPCQueryValidatorDelegations() {
 	app, ctx, queryClient, addrs, vals := suite.app, suite.ctx, suite.queryClient, suite.addrs, suite.vals
 	addrAcc := addrs[0]
 	addrVal1 := vals[1].OperatorAddress
-	valAddrs := util.ConvertAddrsToValAddrs(addrs)
+	valAddrs := testutil.ConvertAddrsToValAddrs(addrs)
 	addrVal2 := valAddrs[4]
 	valAddr, err := sdk.ValAddressFromBech32(addrVal1)
 	suite.NoError(err)
@@ -596,7 +537,7 @@ func (suite *KeeperTestSuite) TestGRPCQueryRedelegations() {
 	app, ctx, queryClient, addrs, vals := suite.app, suite.ctx, suite.queryClient, suite.addrs, suite.vals
 
 	addrAcc, addrAcc1 := addrs[0], addrs[1]
-	valAddrs := util.ConvertAddrsToValAddrs(addrs)
+	valAddrs := testutil.ConvertAddrsToValAddrs(addrs)
 	val1, val2, val3, val4 := vals[0], vals[1], valAddrs[3], valAddrs[4]
 	delAmount := app.StakingKeeper.TokensFromConsensusPower(ctx, 1)
 	_, err := app.StakingKeeper.Delegate(ctx, addrAcc1, delAmount, stakingtypes.Unbonded, val1, true)
@@ -792,9 +733,9 @@ func (suite *KeeperTestSuite) TestGRPCQueryValidatorUnbondingDelegations() {
 }
 
 func createValidators(t *testing.T, ctx sdk.Context, app *xapp.XplaApp, powers []int64) ([]sdk.AccAddress, []sdk.ValAddress, []stakingtypes.Validator) {
-	addrs := util.AddTestAddrsIncremental(app, ctx, 5, app.StakingKeeper.TokensFromConsensusPower(ctx, 300))
-	valAddrs := util.ConvertAddrsToValAddrs(addrs)
-	pks := util.CreateTestPubKeys(5)
+	addrs := testutil.AddTestAddrsIncremental(app, ctx, 5, app.StakingKeeper.TokensFromConsensusPower(ctx, 300))
+	valAddrs := testutil.ConvertAddrsToValAddrs(addrs)
+	pks := testutil.CreateTestPubKeys(5)
 	cdc := util.MakeEncodingConfig().Marshaler
 	app.StakingKeeper = keeper.NewKeeper(
 		cdc,

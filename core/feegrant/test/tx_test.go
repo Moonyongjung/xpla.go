@@ -9,6 +9,7 @@ import (
 	mfeegrant "github.com/Moonyongjung/xpla.go/core/feegrant"
 	"github.com/Moonyongjung/xpla.go/types"
 	"github.com/Moonyongjung/xpla.go/util"
+	"github.com/Moonyongjung/xpla.go/util/testutil"
 
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -38,7 +39,7 @@ var (
 
 func (suite *TestSuite) SetupTest() {
 	checkTx := false
-	app := util.Setup(checkTx, 5)
+	app := testutil.Setup(checkTx, 5)
 	ctx := app.BaseApp.NewContext(checkTx, tmproto.Header{
 		Time: time.Now(),
 	})
@@ -243,7 +244,7 @@ func (suite *TestSuite) getTestingAccounts(r *rand.Rand, n int) []simtypes.Accou
 	for _, account := range accounts {
 		acc := suite.app.AccountKeeper.NewAccountWithAddress(suite.ctx, account.Address)
 		suite.app.AccountKeeper.SetAccount(suite.ctx, acc)
-		suite.Require().NoError(util.FundAccount(suite.app.BankKeeper, suite.ctx, account.Address, initCoins))
+		suite.Require().NoError(testutil.FundAccount(suite.app.BankKeeper, suite.ctx, account.Address, initCoins))
 	}
 
 	return accounts

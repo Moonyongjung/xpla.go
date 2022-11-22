@@ -7,7 +7,7 @@ import (
 
 	mupgrade "github.com/Moonyongjung/xpla.go/core/upgrade"
 	"github.com/Moonyongjung/xpla.go/types"
-	"github.com/Moonyongjung/xpla.go/util"
+	"github.com/Moonyongjung/xpla.go/util/testutil"
 
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -27,7 +27,7 @@ type UpgradeTestSuite struct {
 }
 
 func (suite *UpgradeTestSuite) SetupTest() {
-	suite.app = util.Setup(false, 5)
+	suite.app = testutil.Setup(false, 5)
 	suite.ctx = suite.app.BaseApp.NewContext(false, tmproto.Header{})
 
 	queryHelper := baseapp.NewQueryServerTestHelper(suite.ctx, suite.app.InterfaceRegistry())

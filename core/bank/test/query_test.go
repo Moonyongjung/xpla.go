@@ -8,6 +8,7 @@ import (
 	"github.com/Moonyongjung/xpla.go/key"
 	"github.com/Moonyongjung/xpla.go/types"
 	"github.com/Moonyongjung/xpla.go/util"
+	"github.com/Moonyongjung/xpla.go/util/testutil"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
@@ -33,7 +34,7 @@ func (suite *TestSuite) TestQueryBalance() {
 	account := app.AccountKeeper.NewAccountWithAddress(ctx, addr)
 
 	app.AccountKeeper.SetAccount(ctx, account)
-	suite.Require().NoError(util.FundAccount(app.BankKeeper, ctx, account.GetAddress(), xplaCoins))
+	suite.Require().NoError(testutil.FundAccount(app.BankKeeper, ctx, account.GetAddress(), xplaCoins))
 
 	bankBalancesMsg := types.BankBalancesMsg{}
 	msg, _ := mbank.MakeBankAllBalancesMsg(bankBalancesMsg)
@@ -63,7 +64,7 @@ func (suite *TestSuite) TestQueryBalance() {
 	acc := app.AccountKeeper.NewAccountWithAddress(ctx, addr)
 
 	app.AccountKeeper.SetAccount(ctx, acc)
-	suite.Require().NoError(util.FundAccount(app.BankKeeper, ctx, acc.GetAddress(), origCoins))
+	suite.Require().NoError(testutil.FundAccount(app.BankKeeper, ctx, acc.GetAddress(), origCoins))
 
 	res, err = queryClient.AllBalances(context.Background(), msg)
 	suite.Require().NoError(err)
