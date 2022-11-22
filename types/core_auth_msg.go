@@ -1,17 +1,5 @@
 package types
 
-type TxSignMsg struct {
-	FileName       string
-	SignatureOnly  bool
-	Multisig       string
-	FromAddress    string
-	GenerateOnly   bool
-	Overwrite      bool
-	Offline        bool
-	Amino          bool
-	OutputDocument string
-}
-
 type EncodeTxMsg struct {
 	FileName string
 }

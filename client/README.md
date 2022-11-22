@@ -135,12 +135,12 @@ txbytes, err := xplac.BankSend(bankSendMsg).CreateUnsignedTx()
 ```go
 addr, err := key.Bech32AddrString(priKey)
 // Sign transaction with local transaction file.
-txSignMsg := types.TxSignMsg{
+signTxMsg := types.SignTxMsg{
     FileName:    "./unsignedTx.json",    
     FromAddress: addr,
 }	
 
-txbytes, err := xplac.SignTx(txSignMsg)
+txbytes, err := xplac.SignTx(signTxMsg)
 ```
 
 ### Multisign tx
