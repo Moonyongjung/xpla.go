@@ -69,11 +69,6 @@ func (xplac *XplaClient) CreateAndSignTx() ([]byte, error) {
 			return nil, err
 		}
 
-		// Set default sign mode (DIRECT=1)
-		if xplac.Opts.SignMode == signing.SignMode_SIGN_MODE_UNSPECIFIED {
-			xplac.WithSignMode(signing.SignMode_SIGN_MODE_DIRECT)
-		}
-
 		if xplac.Opts.GasLimit == "" {
 			if xplac.Opts.LcdURL == "" && xplac.Opts.GrpcURL == "" {
 				xplac.WithGasLimit(types.DefaultGasLimit)
@@ -106,6 +101,11 @@ func (xplac *XplaClient) CreateAndSignTx() ([]byte, error) {
 		}
 
 		builder = convertAndSetBuilder(xplac, builder)
+
+		// Set default sign mode (DIRECT=1)
+		if xplac.Opts.SignMode == signing.SignMode_SIGN_MODE_UNSPECIFIED {
+			xplac.WithSignMode(signing.SignMode_SIGN_MODE_DIRECT)
+		}
 
 		privs := []cryptotypes.PrivKey{xplac.Opts.PrivateKey}
 		accNums := []uint64{util.FromStringToUint64(xplac.Opts.AccountNumber)}
@@ -151,6 +151,8 @@ func (xplac *XplaClient) CreateUnsignedTx() ([]byte, error) {
 		return nil, err
 	}
 
+	builder = convertAndSetBuilder(xplac, builder)
+
 	sdkTx := builder.GetTx()
 	txBytes, err := xplac.EncodingConfig.TxConfig.TxEncoder()(sdkTx)
 	if err != nil {
@@ -177,7 +179,7 @@ func (xplac *XplaClient) SignTx(signTxMsg types.SignTxMsg) ([]byte, error) {
 	}
 	var emptySignTxMsg types.SignTxMsg
 	if signTxMsg == emptySignTxMsg {
-		return nil, util.LogErr("need sign tx message of LCD client's option")
+		return nil, util.LogErr("need sign tx message of xpla client's option")
 	}
 
 	clientCtx, err := util.NewClient()
@@ -229,7 +231,21 @@ func (xplac *XplaClient) SignTx(signTxMsg types.SignTxMsg) ([]byte, error) {
 		}
 		signatureOnly = true
 	} else {
-		err = authclient.SignTx(txFactory, clientCtx, fromName, txBuilder, offline, signTxMsg.Overwrite)
+		// Set default sign mode (DIRECT=1)
+		if xplac.Opts.SignMode == signing.SignMode_SIGN_MODE_UNSPECIFIED {
+			xplac.WithSignMode(signing.SignMode_SIGN_MODE_DIRECT)
+		}
+
+		privs := []cryptotypes.PrivKey{xplac.Opts.PrivateKey}
+		accNums := []uint64{util.FromStringToUint64(xplac.Opts.AccountNumber)}
+		accSeqs := []uint64{util.FromStringToUint64(xplac.Opts.Sequence)}
+
+		var sigsV2 []signing.SignatureV2
+
+		err = txSignRound(xplac, sigsV2, privs, accSeqs, accNums, txBuilder)
+		if err != nil {
+			return nil, err
+		}
 	}
 	if err != nil {
 		return nil, err

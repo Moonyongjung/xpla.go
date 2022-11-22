@@ -202,17 +202,26 @@ func setTxBuilderMsg(xplac *XplaClient) (cmclient.TxBuilder, error) {
 
 // Set information for transaction builder.
 func convertAndSetBuilder(xplac *XplaClient, builder cmclient.TxBuilder) cmclient.TxBuilder {
-	feeAmountDenomRemove, _ := util.FromStringToBigInt(util.DenomRemove(xplac.Opts.FeeAmount))
-	feeAmountCoin := sdk.Coin{
-		Amount: sdk.NewIntFromBigInt(feeAmountDenomRemove),
-		Denom:  types.XplaDenom,
+	if xplac.Opts.FeeAmount != "" {
+		feeAmountDenomRemove, _ := util.FromStringToBigInt(util.DenomRemove(xplac.Opts.FeeAmount))
+		feeAmountCoin := sdk.Coin{
+			Amount: sdk.NewIntFromBigInt(feeAmountDenomRemove),
+			Denom:  types.XplaDenom,
+		}
+		feeAmountCoins := sdk.NewCoins(feeAmountCoin)
+		builder.SetFeeAmount(feeAmountCoins)
 	}
-	feeAmountCoins := sdk.NewCoins(feeAmountCoin)
 
-	builder.SetFeeAmount(feeAmountCoins)
+	if xplac.Opts.GasLimit != "" {
+		builder.SetGasLimit(util.FromStringToUint64(xplac.Opts.GasLimit))
+	}
+
+	if xplac.Opts.TimeoutHeight != "" {
+		builder.SetTimeoutHeight(util.FromStringToUint64(xplac.Opts.TimeoutHeight))
+	}
+
 	builder.SetFeeGranter(xplac.Opts.FeeGranter)
-	builder.SetGasLimit(util.FromStringToUint64(xplac.Opts.GasLimit))
-	builder.SetTimeoutHeight(util.FromStringToUint64(xplac.Opts.TimeoutHeight))
+
 	if types.Memo != "" {
 		builder.SetMemo(types.Memo)
 	}
