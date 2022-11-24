@@ -86,9 +86,9 @@ func parseInstantiateArgs(
 
 	noAdminBool := true
 	noAdminStr := instantiateMsgData.NoAdmin
-	if noAdminStr == "" || noAdminStr == "true" {
+	if noAdminStr == "true" {
 		noAdminBool = true
-	} else if noAdminStr == "false" {
+	} else if noAdminStr == "" || noAdminStr == "false" {
 		noAdminBool = false
 	} else {
 		return wasmtypes.MsgInstantiateContract{}, util.LogErr("noAdmin parameter must set \"true\" or \"false\"")
