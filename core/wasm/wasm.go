@@ -13,8 +13,8 @@ import (
 )
 
 // (Tx) make msg - store code
-func MakeStoreCodeMsg(filePath string, addr sdk.AccAddress) (wasm.MsgStoreCode, error) {
-	msg, err := parseStoreCodeArgs(filePath, addr)
+func MakeStoreCodeMsg(storeMsg types.StoreMsg, addr sdk.AccAddress) (wasm.MsgStoreCode, error) {
+	msg, err := parseStoreCodeArgs(storeMsg, addr)
 	if err != nil {
 		return wasm.MsgStoreCode{}, util.LogErr(err)
 	}

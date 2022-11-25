@@ -393,9 +393,9 @@ func (xplac *XplaClient) CancelSoftwareUpgrade(cancelSoftwareUpgradeMsg types.Ca
 // Wasm module
 
 // Upload a wasm binary.
-func (xplac *XplaClient) StoreCode(filePath string) *XplaClient {
+func (xplac *XplaClient) StoreCode(storeMsg types.StoreMsg) *XplaClient {
 	addr := util.GetAddrByPrivKey(xplac.Opts.PrivateKey)
-	msg, err := mwasm.MakeStoreCodeMsg(filePath, addr)
+	msg, err := mwasm.MakeStoreCodeMsg(storeMsg, addr)
 	if err != nil {
 		xplac.Err = err
 	}

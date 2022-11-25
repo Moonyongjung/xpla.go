@@ -3,6 +3,7 @@ package wasm
 import (
 	"io/ioutil"
 	"strconv"
+	"strings"
 
 	"github.com/Moonyongjung/xpla.go/core"
 	"github.com/Moonyongjung/xpla.go/key"
@@ -15,9 +16,20 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
+const (
+	instantiateByEverybody = "instantiate-everybody"
+	instantiateNobody      = "instantiate-nobody"
+	instantiateBySender    = "instantiate-only-sender"
+	instantiateByAddress   = "instantiate-only-address"
+)
+
 // Parsing - store code
-func parseStoreCodeArgs(file string, sender sdk.AccAddress) (wasmtypes.MsgStoreCode, error) {
-	wasm, err := ioutil.ReadFile(file)
+func parseStoreCodeArgs(storeMsg types.StoreMsg, sender sdk.AccAddress) (wasmtypes.MsgStoreCode, error) {
+	if storeMsg.FilePath == "" {
+		return wasmtypes.MsgStoreCode{}, util.LogErr("filepath is empty")
+	}
+
+	wasm, err := ioutil.ReadFile(storeMsg.FilePath)
 	if err != nil {
 		return wasmtypes.MsgStoreCode{}, err
 	}
@@ -33,18 +45,57 @@ func parseStoreCodeArgs(file string, sender sdk.AccAddress) (wasmtypes.MsgStoreC
 		return wasmtypes.MsgStoreCode{}, util.LogErr("invalid input file. Use wasm binary or gzip")
 	}
 
-	//-- Only sender is able to instantiate contract
-	//   Terminate everybody
-	var perm *wasmtypes.AccessConfig
-	x := wasmtypes.AccessTypeOnlyAddress.With(sender)
-	perm = &x
+	permission, err := instantiatePermission(storeMsg.InstantiatePermission, sender)
+	if err != nil {
+		return wasmtypes.MsgStoreCode{}, err
+	}
 
 	msg := wasmtypes.MsgStoreCode{
 		Sender:                sender.String(),
 		WASMByteCode:          wasm,
-		InstantiatePermission: perm,
+		InstantiatePermission: permission,
 	}
 	return msg, nil
+}
+
+func instantiatePermission(permission string, sender sdk.AccAddress) (*wasmtypes.AccessConfig, error) {
+	var permMethod string
+	var onlyAddr string
+
+	if strings.Contains(permission, ".") {
+		perm := strings.Split(permission, ".")
+		permMethod = perm[0]
+		onlyAddr = perm[1]
+	} else {
+		permMethod = permission
+		onlyAddr = ""
+	}
+
+	switch {
+	case permMethod == "" || permMethod == instantiateByEverybody:
+		return &wasmtypes.AllowEverybody, nil
+
+	case permMethod == instantiateBySender:
+		x := wasmtypes.AccessTypeOnlyAddress.With(sender)
+		return &x, nil
+
+	case permMethod == instantiateByAddress:
+		if onlyAddr == "" {
+			return nil, util.LogErr("invalid permission, empty address")
+		}
+		addr, err := sdk.AccAddressFromBech32(onlyAddr)
+		if err != nil {
+			return nil, err
+		}
+		x := wasmtypes.AccessTypeOnlyAddress.With(addr)
+		return &x, nil
+
+	case permMethod == instantiateNobody:
+		return &wasmtypes.AllowNobody, nil
+
+	default:
+		return nil, util.LogErr("invalid permission type")
+	}
 }
 
 // Parsing - instantiate

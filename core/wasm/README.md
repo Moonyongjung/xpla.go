@@ -2,8 +2,20 @@
 ## Usage
 ### (Tx) Store code
 ```go
-filePath := "./wasmcontract.wasm"
-txbytes, err := xplac.StoreCode(filePath).CreateAndSignTx()
+// can instantiate only store msg sender
+storeMsg := types.StoreMsg {
+    FilePath: "./wasmcontract.wasm",
+    InstantiatePermission: "instantiate-only-sender" //optional. if method is empty string, everybody
+}
+
+// can instantiate address
+// method and address must be seperated by "."
+storeMsg := types.StoreMsg {
+    FilePath: "./wasmcontract.wasm",
+    InstantiatePermission: "instantiate-only-address.xpla19w2r47nczglwlpfynqe5769cwkwq5fvmzu5pu7" 
+}
+
+txbytes, err := xplac.StoreCode(storeMsg).CreateAndSignTx()
 res, _ := xplac.Broadcast(txbytes)
 ```
 

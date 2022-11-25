@@ -1,5 +1,10 @@
 package types
 
+type StoreMsg struct {
+	FilePath              string
+	InstantiatePermission string
+}
+
 type InstantiateMsg struct {
 	CodeId  string
 	Amount  string
