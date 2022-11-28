@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"time"
 
+	"github.com/Moonyongjung/xpla.go/client/module"
 	mevm "github.com/Moonyongjung/xpla.go/core/evm"
 	"github.com/Moonyongjung/xpla.go/types"
 	"github.com/Moonyongjung/xpla.go/util"
@@ -28,7 +29,7 @@ func broadcastTx(xplac *XplaClient, txBytes []byte, mode txtypes.BroadcastMode) 
 			return nil, util.LogErr(err, "failed to marshal")
 		}
 
-		out, err := ctxHttpClient("POST", xplac.Opts.LcdURL+broadcastUrl, reqBytes, xplac.Context)
+		out, err := module.CtxHttpClient("POST", xplac.Opts.LcdURL+broadcastUrl, reqBytes, xplac.Context)
 		if err != nil {
 			return nil, err
 		}

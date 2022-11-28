@@ -234,6 +234,14 @@ func Bech32toValidatorAddress(validators []string) ([]sdk.ValAddress, error) {
 	return vals, nil
 }
 
+func MakeQueryLcdUrl(metadata string) string {
+	return "/" + strings.Replace(metadata, "query.proto", "", -1)
+}
+
+func MakeQueryLabels(labels ...string) string {
+	return strings.Join(labels, "/")
+}
+
 func LogInfo(log ...interface{}) {
 	fmt.Println(ToString(log, ""))
 }
