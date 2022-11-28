@@ -16,6 +16,7 @@ require (
 	github.com/xpladev/xpla v1.1.0
 	golang.org/x/net v0.0.0-20220624214902-1bab6f366d9e
 	google.golang.org/grpc v1.48.0
+	github.com/tendermint/tm-db v0.6.7
 )
 
 require (
@@ -136,7 +137,6 @@ require (
 	github.com/syndtr/goleveldb v1.0.1-0.20210819022825-2ae1ddf74ef7 // indirect
 	github.com/tendermint/btcd v0.1.1 // indirect
 	github.com/tendermint/go-amino v0.16.0 // indirect
-	github.com/tendermint/tm-db v0.6.7 // indirect
 	github.com/tklauser/go-sysconf v0.3.5 // indirect
 	github.com/tklauser/numcpus v0.2.2 // indirect
 	github.com/tyler-smith/go-bip39 v1.1.0 // indirect

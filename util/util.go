@@ -51,7 +51,6 @@ func AbiParsing(jsonFilePath string) (string, error) {
 }
 
 type bytecodeParsingStruct struct {
-	object string
 }
 
 func BytecodeParsing(jsonFilePath string) string {
@@ -152,7 +151,9 @@ func FromStringHexToHash(hashString string) common.Hash {
 }
 
 func ToString(value interface{}, defaultValue string) string {
-	str := strings.TrimSpace(fmt.Sprintf("%v", value))
+	s := fmt.Sprintf("%v", value)
+	s = s[1 : len(s)-1]
+	str := strings.TrimSpace(s)
 	if str == "" {
 		return defaultValue
 	} else {
