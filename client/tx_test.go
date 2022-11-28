@@ -1,8 +1,8 @@
 package client
 
 import (
-	"io/ioutil"
 	"math/rand"
+	"os"
 	"strings"
 	"testing"
 
@@ -274,7 +274,7 @@ func randomSendCoins(
 }
 
 func convertJson(filePath string) []byte {
-	bytes, _ := ioutil.ReadFile(filePath)
+	bytes, _ := os.ReadFile(filePath)
 	temp := strings.Replace(string(bytes), " ", "", -1)
 	temp = strings.Replace(temp, "\n", "", -1)
 	return []byte(temp)

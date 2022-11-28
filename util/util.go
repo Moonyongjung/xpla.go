@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"math/big"
 	"os"
 	"strconv"
@@ -43,7 +43,7 @@ func GrpcUrlParsing(normalUrl string) string {
 }
 
 func AbiParsing(jsonFilePath string) (string, error) {
-	f, err := ioutil.ReadFile(jsonFilePath)
+	f, err := os.ReadFile(jsonFilePath)
 	if err != nil {
 		return "", err
 	}
@@ -68,7 +68,7 @@ func SaveJsonPretty(jsonByte []byte, saveTxPath string) error {
 		LogErr(err)
 	}
 
-	err = ioutil.WriteFile(saveTxPath, prettyJson.Bytes(), 0660)
+	err = os.WriteFile(saveTxPath, prettyJson.Bytes(), 0660)
 	if err != nil {
 		LogErr(err)
 	}
@@ -189,7 +189,7 @@ func JsonUnmarshal(jsonStruct interface{}, jsonFilePath string) interface{} {
 	if err != nil {
 		LogErr(err)
 	}
-	byteValue, _ := ioutil.ReadAll(jsonData)
+	byteValue, _ := io.ReadAll(jsonData)
 	jsonStruct = JsonUnmarshalData(jsonStruct, byteValue)
 
 	return jsonStruct

@@ -1,7 +1,7 @@
 package module
 
 import (
-	"io/ioutil"
+	"os"
 	"strings"
 
 	mwasm "github.com/Moonyongjung/xpla.go/core/wasm"
@@ -62,7 +62,7 @@ func (i IXplaClient) QueryWasm() (string, error) {
 		if err != nil {
 			return "", err
 		}
-		ioutil.WriteFile(downloadFileName, res.Data, 0o600)
+		os.WriteFile(downloadFileName, res.Data, 0o600)
 
 	// Wasm code info
 	case i.Ixplac.GetMsgType() == mwasm.WasmCodeInfoMsgType:
