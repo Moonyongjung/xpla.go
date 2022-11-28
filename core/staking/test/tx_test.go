@@ -37,10 +37,6 @@ var validatorAddress = "xplavaloper10gv4zj9633v6cje6s2sc0a0xl52hjr6f9jp0q7"
 const NodeKey = `{"priv_key":{"type":"tendermint/PrivKeyEd25519","value":"F20DGZKfFFCqgXe2AxF6855KrzfqVasdunk2LMG/EBV+U3gf7GVokgm+X8JP0WG1dyzZ7UddnmC9LGpUMRRQmQ=="}}`
 const PrivValidatorKey = `{"address":"3C5042645BAD50A98F0A7D567F862E1A861C23C5","pub_key":{"type":"tendermint/PubKeyEd25519","value":"/0bCEBBwUIrjqYr+pKfzHly+SBMjkA/hcCR9oswxnrk="},"priv_key":{"type":"tendermint/PrivKeyEd25519","value":"iks74YM/Di06VI4JPZ3zOxrKfQ0iwwgXhNa6aIzaduf/RsIQEHBQiuOpiv6kp/MeXL5IEyOQD+FwJH2izDGeuQ=="}}`
 
-func init() {
-	util.SetChainConfig()
-}
-
 // TestSimulateMsgCreateValidator tests the normal scenario of a valid message of type TypeMsgCreateValidator.
 // Abonormal scenarios, where the message are created by an errors are not tested here.
 func TestSimulateMsgCreateValidator(t *testing.T) {

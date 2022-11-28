@@ -32,10 +32,6 @@ type TestSuite struct {
 	queryClient disttypes.QueryClient
 }
 
-func init() {
-	util.SetChainConfig()
-}
-
 func (suite *TestSuite) SetupTest() {
 	checkTx := false
 	app := testutil.Setup(checkTx, 5)

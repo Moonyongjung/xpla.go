@@ -291,7 +291,7 @@ func DefaultConfig() network.Config {
 		AppConstructor:    NewAppConstructor(encCfg),
 		GenesisState:      xapp.ModuleBasics.DefaultGenesis(encCfg.Marshaler),
 		TimeoutCommit:     2 * time.Second,
-		ChainID:           "cube_47-5",
+		ChainID:           TestChainId,
 		NumValidators:     4,
 		BondDenom:         types.XplaDenom,
 		MinGasPrices:      fmt.Sprintf("0.000006%s", types.XplaDenom),
@@ -330,7 +330,7 @@ func NewTestMnemonic(entropy []byte) (string, error) {
 
 func NewTestEthSecpPrivKey(mnemonic string) (cryptotypes.PrivKey, error) {
 	algo := evmhd.EthSecp256k1
-	derivedPri, err := algo.Derive()(mnemonic, keyring.DefaultBIP39Passphrase, types.XplaHdPath)
+	derivedPri, err := algo.Derive()(mnemonic, keyring.DefaultBIP39Passphrase, sdk.GetConfig().GetFullBIP44Path())
 	if err != nil {
 		return nil, err
 	}

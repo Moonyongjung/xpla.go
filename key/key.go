@@ -34,7 +34,7 @@ func NewMnemonic() (string, error) {
 // The private key generation algorithm uses eth-secp256k1 to use the evm module.
 func NewPrivKey(mnemonic string) (cryptotypes.PrivKey, error) {
 	algo := evmhd.EthSecp256k1
-	derivedPri, err := algo.Derive()(mnemonic, keyring.DefaultBIP39Passphrase, types.XplaHdPath)
+	derivedPri, err := algo.Derive()(mnemonic, keyring.DefaultBIP39Passphrase, sdk.GetConfig().GetFullBIP44Path())
 	if err != nil {
 		return nil, err
 	}

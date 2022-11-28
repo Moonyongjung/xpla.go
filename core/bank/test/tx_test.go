@@ -29,10 +29,6 @@ type TestSuite struct {
 	queryClient banktypes.QueryClient
 }
 
-func init() {
-	util.SetChainConfig()
-}
-
 func (suite *TestSuite) SetupTest() {
 	checkTx := false
 	app := testutil.Setup(checkTx, 5)

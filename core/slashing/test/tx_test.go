@@ -25,10 +25,6 @@ import (
 	xapp "github.com/xpladev/xpla/app"
 )
 
-func init() {
-	util.SetChainConfig()
-}
-
 // TestSimulateMsgUnjail tests the normal scenario of a valid message of type types.MsgUnjail.
 // Abonormal scenarios, where the message is created by an errors, are not tested here.
 func TestSimulateMsgUnjail(t *testing.T) {

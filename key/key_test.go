@@ -3,7 +3,6 @@ package key
 import (
 	"testing"
 
-	"github.com/Moonyongjung/xpla.go/util"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -25,7 +24,6 @@ func TestNewPrivKey(t *testing.T) {
 }
 
 func TestConvertPrivKeyToBech32Addr(t *testing.T) {
-	util.SetChainConfig()
 	addrMykey := "xpla1ww42aq5v6886w0aggpkrh9pcqudr7qggje32qf"
 
 	PrivateKey, err := NewPrivKey(mnemonicMykey)
@@ -37,7 +35,6 @@ func TestConvertPrivKeyToBech32Addr(t *testing.T) {
 }
 
 func TestConvertPrivKeyToHexAddr(t *testing.T) {
-	util.SetChainConfig()
 	addrMykey := "73AAAE828CD1CFA73FA8406C3B9438071A3F0108"
 
 	PrivateKey, err := NewPrivKey(mnemonicMykey)
@@ -48,7 +45,6 @@ func TestConvertPrivKeyToHexAddr(t *testing.T) {
 }
 
 func TestEncryptDecryptPrivKeyArmor(t *testing.T) {
-	util.SetChainConfig()
 	PrivateKey, err := NewPrivKey(mnemonicMykey)
 	assert.NoError(t, err)
 

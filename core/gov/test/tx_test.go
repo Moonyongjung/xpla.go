@@ -25,10 +25,6 @@ import (
 	xapp "github.com/xpladev/xpla/app"
 )
 
-func init() {
-	util.SetChainConfig()
-}
-
 type MockWeightedProposalContent struct {
 	n int
 }

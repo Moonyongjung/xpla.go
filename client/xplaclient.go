@@ -88,10 +88,6 @@ func (xplac *XplaClient) WithOptions(
 		WithOutputDocument(options.OutputDocument)
 }
 
-func init() {
-	util.SetChainConfig()
-}
-
 // Set chain ID
 func (xplac *XplaClient) WithChainId(chainId string) *XplaClient {
 	xplac.ChainId = chainId
