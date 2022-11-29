@@ -11,16 +11,15 @@ import (
 
 // Query client for bank module.
 func (i IXplaClient) QueryBank() (string, error) {
-
 	if i.QueryType == types.QueryGrpc {
-		return queryByGrpc(i)
+		return queryByGrpcBank(i)
 	} else {
-		return queryByLcd(i)
+		return queryByLcdBank(i)
 	}
 
 }
 
-func queryByGrpc(i IXplaClient) (string, error) {
+func queryByGrpcBank(i IXplaClient) (string, error) {
 	queryClient := banktypes.NewQueryClient(i.Ixplac.GetGrpcClient())
 
 	switch {
@@ -108,7 +107,7 @@ const (
 	bankSupplyLabel        = "supply"
 )
 
-func queryByLcd(i IXplaClient) (string, error) {
+func queryByLcdBank(i IXplaClient) (string, error) {
 	url := util.MakeQueryLcdUrl(bankv1beta1.Query_ServiceDesc.Metadata.(string))
 
 	switch {
