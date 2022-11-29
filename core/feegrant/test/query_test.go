@@ -33,11 +33,11 @@ func (suite *TestSuite) TestFeeAllowance() {
 		{
 			"fail: invalid granter",
 			func() {
-				QueryGrantMsg := types.QueryGrantMsg{
+				QueryFeeGrantMsg := types.QueryFeeGrantMsg{
 					Granter: "invalid_granter",
 					Grantee: grantee.String(),
 				}
-				msg, _ := mfeegrant.MakeQueryGrantMsg(QueryGrantMsg)
+				msg, _ := mfeegrant.MakeQueryFeeGrantMsg(QueryFeeGrantMsg)
 				req = &msg
 			},
 			true,
@@ -47,11 +47,11 @@ func (suite *TestSuite) TestFeeAllowance() {
 		{
 			"fail: invalid grantee",
 			func() {
-				QueryGrantMsg := types.QueryGrantMsg{
+				QueryFeeGrantMsg := types.QueryFeeGrantMsg{
 					Granter: granter.String(),
 					Grantee: "invalid_grantee",
 				}
-				msg, _ := mfeegrant.MakeQueryGrantMsg(QueryGrantMsg)
+				msg, _ := mfeegrant.MakeQueryFeeGrantMsg(QueryFeeGrantMsg)
 				req = &msg
 			},
 			true,
@@ -61,11 +61,11 @@ func (suite *TestSuite) TestFeeAllowance() {
 		{
 			"fail: no grants",
 			func() {
-				QueryGrantMsg := types.QueryGrantMsg{
+				QueryFeeGrantMsg := types.QueryFeeGrantMsg{
 					Granter: granter.String(),
 					Grantee: grantee.String(),
 				}
-				msg, _ := mfeegrant.MakeQueryGrantMsg(QueryGrantMsg)
+				msg, _ := mfeegrant.MakeQueryFeeGrantMsg(QueryFeeGrantMsg)
 				req = &msg
 			},
 			true,
@@ -75,11 +75,11 @@ func (suite *TestSuite) TestFeeAllowance() {
 		{
 			"valid query: expect single grant",
 			func() {
-				QueryGrantMsg := types.QueryGrantMsg{
+				QueryFeeGrantMsg := types.QueryFeeGrantMsg{
 					Granter: granter.String(),
 					Grantee: grantee.String(),
 				}
-				msg, _ := mfeegrant.MakeQueryGrantMsg(QueryGrantMsg)
+				msg, _ := mfeegrant.MakeQueryFeeGrantMsg(QueryFeeGrantMsg)
 				req = &msg
 			},
 			false,
@@ -131,10 +131,10 @@ func (suite *TestSuite) TestFeeAllowances() {
 		{
 			"fail: invalid granter",
 			func() {
-				QueryGrantMsg := types.QueryGrantMsg{
+				QueryFeeGrantMsg := types.QueryFeeGrantMsg{
 					Grantee: "invalid_grantee",
 				}
-				msg, _ := mfeegrant.MakeQueryGrantsByGranteeMsg(QueryGrantMsg)
+				msg, _ := mfeegrant.MakeQueryFeeGrantsByGranteeMsg(QueryFeeGrantMsg)
 				req = &msg
 			},
 			true,
@@ -144,10 +144,10 @@ func (suite *TestSuite) TestFeeAllowances() {
 		{
 			"fail: no grants",
 			func() {
-				QueryGrantMsg := types.QueryGrantMsg{
+				QueryFeeGrantMsg := types.QueryFeeGrantMsg{
 					Grantee: grantee.String(),
 				}
-				msg, _ := mfeegrant.MakeQueryGrantsByGranteeMsg(QueryGrantMsg)
+				msg, _ := mfeegrant.MakeQueryFeeGrantsByGranteeMsg(QueryFeeGrantMsg)
 				req = &msg
 			},
 			false,
@@ -159,10 +159,10 @@ func (suite *TestSuite) TestFeeAllowances() {
 		{
 			"valid query: expect single grant",
 			func() {
-				QueryGrantMsg := types.QueryGrantMsg{
+				QueryFeeGrantMsg := types.QueryFeeGrantMsg{
 					Grantee: grantee.String(),
 				}
-				msg, _ := mfeegrant.MakeQueryGrantsByGranteeMsg(QueryGrantMsg)
+				msg, _ := mfeegrant.MakeQueryFeeGrantsByGranteeMsg(QueryFeeGrantMsg)
 				req = &msg
 			},
 			false,
@@ -215,10 +215,10 @@ func (suite *TestSuite) TestFeeAllowancesByGranter() {
 		{
 			"fail: invalid granter",
 			func() {
-				QueryGrantMsg := types.QueryGrantMsg{
+				QueryFeeGrantMsg := types.QueryFeeGrantMsg{
 					Granter: "invalid_granter",
 				}
-				msg, _ := mfeegrant.MakeQueryGrantsByGranterMsg(QueryGrantMsg)
+				msg, _ := mfeegrant.MakeQueryFeeGrantsByGranterMsg(QueryFeeGrantMsg)
 				req = &msg
 			},
 			true,
@@ -228,10 +228,10 @@ func (suite *TestSuite) TestFeeAllowancesByGranter() {
 		{
 			"fail: no grants",
 			func() {
-				QueryGrantMsg := types.QueryGrantMsg{
+				QueryFeeGrantMsg := types.QueryFeeGrantMsg{
 					Granter: granter.String(),
 				}
-				msg, _ := mfeegrant.MakeQueryGrantsByGranterMsg(QueryGrantMsg)
+				msg, _ := mfeegrant.MakeQueryFeeGrantsByGranterMsg(QueryFeeGrantMsg)
 				req = &msg
 			},
 			false,
@@ -243,10 +243,10 @@ func (suite *TestSuite) TestFeeAllowancesByGranter() {
 		{
 			"valid query: expect single grant",
 			func() {
-				QueryGrantMsg := types.QueryGrantMsg{
+				QueryFeeGrantMsg := types.QueryFeeGrantMsg{
 					Granter: granter.String(),
 				}
-				msg, _ := mfeegrant.MakeQueryGrantsByGranterMsg(QueryGrantMsg)
+				msg, _ := mfeegrant.MakeQueryFeeGrantsByGranterMsg(QueryFeeGrantMsg)
 				req = &msg
 			},
 			false,

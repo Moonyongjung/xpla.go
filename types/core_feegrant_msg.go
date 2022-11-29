@@ -1,6 +1,6 @@
 package types
 
-type GrantMsg struct {
+type FeeGrantMsg struct {
 	Grantee     string
 	Granter     string
 	SpendLimit  string
@@ -10,12 +10,12 @@ type GrantMsg struct {
 	AllowedMsg  []string
 }
 
-type RevokeGrantMsg struct {
+type RevokeFeeGrantMsg struct {
 	Grantee string
 	Granter string
 }
 
-type QueryGrantMsg struct {
+type QueryFeeGrantMsg struct {
 	Grantee string
 	Granter string
 }

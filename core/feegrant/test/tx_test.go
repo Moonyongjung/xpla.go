@@ -141,14 +141,14 @@ func SimulateMsgGrantAllowance(ak feegrant.AccountKeeper, bk feegrant.BankKeeper
 
 		oneYear, _ := ctx.BlockTime().AddDate(1, 0, 0).MarshalText()
 
-		grantMsg := types.GrantMsg{
+		grantMsg := types.FeeGrantMsg{
 			Grantee:    grantee.Address.String(),
 			Granter:    granter.Address.String(),
 			SpendLimit: spendableCoins.String(),
 			Expiration: string(oneYear),
 		}
 
-		msg, err := mfeegrant.MakeGrantMsg(grantMsg, granter.PrivKey)
+		msg, err := mfeegrant.MakeFeeGrantMsg(grantMsg, granter.PrivKey)
 		if err != nil {
 			return simtypes.NoOpMsg(feegrant.ModuleName, TypeMsgGrantAllowance, "make msg err"), nil, err
 		}
@@ -205,12 +205,12 @@ func SimulateMsgRevokeAllowance(ak feegrant.AccountKeeper, bk feegrant.BankKeepe
 		account := ak.GetAccount(ctx, granter.Address)
 		spendableCoins := bk.SpendableCoins(ctx, account.GetAddress())
 
-		revokeGrantMsg := types.RevokeGrantMsg{
+		revokeGrantMsg := types.RevokeFeeGrantMsg{
 			Granter: granterAddr.String(),
 			Grantee: granteeAddr.String(),
 		}
 
-		msg, err := mfeegrant.MakeRevokeGrantMsg(revokeGrantMsg, granter.PrivKey)
+		msg, err := mfeegrant.MakeRevokeFeeGrantMsg(revokeGrantMsg, granter.PrivKey)
 		if err != nil {
 			return simtypes.NoOpMsg(feegrant.ModuleName, TypeMsgRevokeAllowance, "make msg err"), nil, err
 		}

@@ -408,9 +408,9 @@ func (xplac *XplaClient) EthBlockNumber() *XplaClient {
 // Feegrant module
 
 // Query details of fee grants.
-func (xplac *XplaClient) QueryGrants(queryGrantMsg types.QueryGrantMsg) *XplaClient {
-	if queryGrantMsg.Grantee != "" && queryGrantMsg.Granter != "" {
-		msg, err := mfeegrant.MakeQueryGrantMsg(queryGrantMsg)
+func (xplac *XplaClient) QueryFeeGrants(queryFeeGrantMsg types.QueryFeeGrantMsg) *XplaClient {
+	if queryFeeGrantMsg.Grantee != "" && queryFeeGrantMsg.Granter != "" {
+		msg, err := mfeegrant.MakeQueryFeeGrantMsg(queryFeeGrantMsg)
 		if err != nil {
 			xplac.Err = err
 			return xplac
@@ -418,8 +418,8 @@ func (xplac *XplaClient) QueryGrants(queryGrantMsg types.QueryGrantMsg) *XplaCli
 		xplac.Module = mfeegrant.FeegrantModule
 		xplac.MsgType = mfeegrant.FeegrantQueryGrantMsgType
 		xplac.Msg = msg
-	} else if queryGrantMsg.Grantee != "" && queryGrantMsg.Granter == "" {
-		msg, err := mfeegrant.MakeQueryGrantsByGranteeMsg(queryGrantMsg)
+	} else if queryFeeGrantMsg.Grantee != "" && queryFeeGrantMsg.Granter == "" {
+		msg, err := mfeegrant.MakeQueryFeeGrantsByGranteeMsg(queryFeeGrantMsg)
 		if err != nil {
 			xplac.Err = err
 			return xplac
@@ -427,8 +427,8 @@ func (xplac *XplaClient) QueryGrants(queryGrantMsg types.QueryGrantMsg) *XplaCli
 		xplac.Module = mfeegrant.FeegrantModule
 		xplac.MsgType = mfeegrant.FeegrantQueryGrantsByGranteeMsgType
 		xplac.Msg = msg
-	} else if queryGrantMsg.Grantee == "" && queryGrantMsg.Granter != "" {
-		msg, err := mfeegrant.MakeQueryGrantsByGranterMsg(queryGrantMsg)
+	} else if queryFeeGrantMsg.Grantee == "" && queryFeeGrantMsg.Granter != "" {
+		msg, err := mfeegrant.MakeQueryFeeGrantsByGranterMsg(queryFeeGrantMsg)
 		if err != nil {
 			xplac.Err = err
 			return xplac

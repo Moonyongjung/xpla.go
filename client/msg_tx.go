@@ -187,8 +187,8 @@ func (xplac *XplaClient) InvokeSolidityContract(invokeSolContractMsg types.Invok
 // Feegrant module
 
 // Grant fee allowance to an address.
-func (xplac *XplaClient) Grant(grantMsg types.GrantMsg) *XplaClient {
-	msg, err := mfeegrant.MakeGrantMsg(grantMsg, xplac.Opts.PrivateKey)
+func (xplac *XplaClient) FeeGrant(grantMsg types.FeeGrantMsg) *XplaClient {
+	msg, err := mfeegrant.MakeFeeGrantMsg(grantMsg, xplac.Opts.PrivateKey)
 	if err != nil {
 		xplac.Err = err
 	}
@@ -199,8 +199,8 @@ func (xplac *XplaClient) Grant(grantMsg types.GrantMsg) *XplaClient {
 }
 
 // Revoke fee-grant.
-func (xplac *XplaClient) RevokeGrant(revokeGrantMsg types.RevokeGrantMsg) *XplaClient {
-	msg, err := mfeegrant.MakeRevokeGrantMsg(revokeGrantMsg, xplac.Opts.PrivateKey)
+func (xplac *XplaClient) RevokeFeeGrant(revokeGrantMsg types.RevokeFeeGrantMsg) *XplaClient {
+	msg, err := mfeegrant.MakeRevokeFeeGrantMsg(revokeGrantMsg, xplac.Opts.PrivateKey)
 	if err != nil {
 		xplac.Err = err
 	}
