@@ -85,8 +85,14 @@ res, err := xplac.DistSlashes(queryDistSlashesMsg).Query()
 ```
 ### (Query) rewards
 ```go
+// reward for a validator
 queryDistRewardsMsg := types.QueryDistRewardsMsg{
     ValidatorAddr: "xplavaloper19yq7kjcgse7x672faptju0lxmy4cvdlcsx9ftw",
+    DelegatorAddr: "xpla1e4f6k98es55vxxv2pcfzpsjrf3mvazeyqpw8g9",
+}
+
+// total rewards
+queryDistRewardsMsg := types.QueryDistRewardsMsg{
     DelegatorAddr: "xpla1e4f6k98es55vxxv2pcfzpsjrf3mvazeyqpw8g9",
 }
 res, err := xplac.DistRewards(queryDistRewardsMsg).Query()
