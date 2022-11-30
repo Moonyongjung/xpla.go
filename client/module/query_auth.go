@@ -135,7 +135,6 @@ func queryByLcdAuth(i IXplaClient) (string, error) {
 	case i.Ixplac.GetMsgType() == mauth.AuthQueryAccAddressMsgType:
 		convertMsg, _ := i.Ixplac.GetMsg().(authtypes.QueryAccountRequest)
 		url = url + util.MakeQueryLabels(authAccountsLabel, convertMsg.Address)
-		util.LogInfo(url)
 
 	// Auth accounts
 	case i.Ixplac.GetMsgType() == mauth.AuthQueryAccountsMsgType:

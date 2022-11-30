@@ -133,7 +133,6 @@ func parseQueryDepositArgs(queryDepositMsg types.QueryDepositMsg, grpcConn grpc.
 	var propStatus govtypes.ProposalStatus
 
 	proposalId := util.FromStringToUint64(queryDepositMsg.ProposalID)
-	util.LogInfo(proposalId)
 	depositorAddr, err := sdk.AccAddressFromBech32(queryDepositMsg.Depositor)
 	if err != nil {
 		return nil, "", err

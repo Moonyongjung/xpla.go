@@ -322,8 +322,6 @@ func queryByLcdGov(i IXplaClient) (string, error) {
 
 		url = url + util.MakeQueryLabels(govProposalsLabel, util.FromUint64ToString(convertMsg.ProposalId))
 
-		util.LogInfo(convertMsg)
-
 	// Gov proposals
 	case i.Ixplac.GetMsgType() == mgov.GovQueryProposalsMsgType:
 		url = url + govProposalsLabel
