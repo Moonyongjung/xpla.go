@@ -2,13 +2,23 @@ package module
 
 import (
 	mmint "github.com/Moonyongjung/xpla.go/core/mint"
+	"github.com/Moonyongjung/xpla.go/types"
 	"github.com/Moonyongjung/xpla.go/util"
 
+	mintv1beta1 "cosmossdk.io/api/cosmos/mint/v1beta1"
 	minttypes "github.com/cosmos/cosmos-sdk/x/mint/types"
 )
 
 // Query client for mint module.
 func (i IXplaClient) QueryMint() (string, error) {
+	if i.QueryType == types.QueryGrpc {
+		return queryByGrpcMint(i)
+	} else {
+		return queryByLcdMint(i)
+	}
+}
+
+func queryByGrpcMint(i IXplaClient) (string, error) {
 	queryClient := minttypes.NewQueryClient(i.Ixplac.GetGrpcClient())
 
 	switch {
@@ -50,6 +60,40 @@ func (i IXplaClient) QueryMint() (string, error) {
 	}
 
 	out, err = printProto(i, res)
+	if err != nil {
+		return "", err
+	}
+
+	return string(out), nil
+}
+
+const (
+	mintParamsLabel           = "params"
+	mintInflationLabel        = "inflation"
+	mintAnnualProvisionsLabel = "annual_provisions"
+)
+
+func queryByLcdMint(i IXplaClient) (string, error) {
+	url := util.MakeQueryLcdUrl(mintv1beta1.Query_ServiceDesc.Metadata.(string))
+
+	switch {
+	// Mint parameters
+	case i.Ixplac.GetMsgType() == mmint.MintQueryMintParamsMsgType:
+		url = url + mintParamsLabel
+
+	// Mint inflation
+	case i.Ixplac.GetMsgType() == mmint.MintQueryInflationMsgType:
+		url = url + mintInflationLabel
+
+	// Mint annual provisions
+	case i.Ixplac.GetMsgType() == mmint.MintQueryAnnualProvisionsMsgType:
+		url = url + mintAnnualProvisionsLabel
+
+	default:
+		return "", util.LogErr("invalid msg type")
+	}
+
+	out, err := util.CtxHttpClient("GET", i.Ixplac.GetLcdURL()+url, nil, i.Ixplac.GetContext())
 	if err != nil {
 		return "", err
 	}
