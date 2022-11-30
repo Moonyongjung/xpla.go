@@ -1,11 +1,7 @@
 package module
 
 import (
-	"bytes"
 	"context"
-	"io"
-	"net/http"
-	"time"
 
 	mevm "github.com/Moonyongjung/xpla.go/core/evm"
 	"github.com/Moonyongjung/xpla.go/key"
@@ -17,7 +13,6 @@ import (
 	"github.com/gogo/protobuf/grpc"
 	"github.com/gogo/protobuf/proto"
 	"github.com/xpladev/xpla/app/params"
-	"golang.org/x/net/context/ctxhttp"
 )
 
 var out []byte
@@ -134,39 +129,4 @@ func clientForQuery(i IXplaClient) (cmclient.Context, error) {
 		WithClient(client)
 
 	return clientCtx, nil
-}
-
-// Make new http client for inquiring several information.
-func CtxHttpClient(methodType string, url string, reqBody []byte, ctx context.Context) ([]byte, error) {
-	var resp *http.Response
-	var err error
-
-	httpClient := &http.Client{Timeout: 30 * time.Second}
-
-	if methodType == "GET" {
-		resp, err = ctxhttp.Get(ctx, httpClient, url)
-		if err != nil {
-			return nil, util.LogErr(err, "failed GET method")
-		}
-	} else if methodType == "POST" {
-		resp, err = ctxhttp.Post(ctx, httpClient, url, "application/json", bytes.NewBuffer(reqBody))
-		if err != nil {
-			return nil, util.LogErr(err, "failed POST method")
-		}
-	} else {
-		return nil, util.LogErr(err, "not correct method")
-	}
-
-	defer resp.Body.Close()
-
-	out, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return nil, util.LogErr(err, "failed to read response")
-	}
-
-	if resp.StatusCode != 200 {
-		return nil, util.LogErr(resp.StatusCode, ":", string(out))
-	}
-
-	return out, nil
 }

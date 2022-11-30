@@ -78,7 +78,7 @@ func queryByLcdEvidence(i IXplaClient) (string, error) {
 		return "", util.LogErr("invalid msg type")
 	}
 
-	out, err := CtxHttpClient("GET", i.Ixplac.GetLcdURL()+url, nil, i.Ixplac.GetContext())
+	out, err := util.CtxHttpClient("GET", i.Ixplac.GetLcdURL()+url, nil, i.Ixplac.GetContext())
 	if err != nil {
 		return "", err
 	}

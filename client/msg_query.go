@@ -473,8 +473,15 @@ func (xplac *XplaClient) QueryProposals(queryProposals types.QueryProposalsMsg) 
 
 // Query details of a deposit or deposits on a proposal.
 func (xplac *XplaClient) QueryDeposit(queryDepositMsg types.QueryDepositMsg) *XplaClient {
+	var queryType int
+	if xplac.Opts.GrpcURL != "" {
+		queryType = types.QueryGrpc
+	} else {
+		queryType = types.QueryLcd
+	}
+
 	if queryDepositMsg.Depositor != "" {
-		msg, argsType, err := mgov.MakeQueryDepositMsg(queryDepositMsg, xplac.Grpc, xplac.Context)
+		msg, argsType, err := mgov.MakeQueryDepositMsg(queryDepositMsg, xplac.Grpc, xplac.Context, xplac.Opts.LcdURL, queryType)
 		if err != nil {
 			xplac.Err = err
 			return xplac
@@ -489,7 +496,7 @@ func (xplac *XplaClient) QueryDeposit(queryDepositMsg types.QueryDepositMsg) *Xp
 			xplac.Msg = msg
 		}
 	} else {
-		msg, argsType, err := mgov.MakeQueryDepositsMsg(queryDepositMsg, xplac.Grpc, xplac.Context)
+		msg, argsType, err := mgov.MakeQueryDepositsMsg(queryDepositMsg, xplac.Grpc, xplac.Context, xplac.Opts.LcdURL, queryType)
 		if err != nil {
 			xplac.Err = err
 			return xplac
@@ -509,8 +516,15 @@ func (xplac *XplaClient) QueryDeposit(queryDepositMsg types.QueryDepositMsg) *Xp
 
 // Query details of a single vote or votes on a proposal.
 func (xplac *XplaClient) QueryVote(queryVoteMsg types.QueryVoteMsg) *XplaClient {
+	var queryType int
+	if xplac.Opts.GrpcURL != "" {
+		queryType = types.QueryGrpc
+	} else {
+		queryType = types.QueryLcd
+	}
+
 	if queryVoteMsg.VoterAddr != "" {
-		msg, err := mgov.MakeQueryVoteMsg(queryVoteMsg, xplac.Grpc, xplac.Context)
+		msg, err := mgov.MakeQueryVoteMsg(queryVoteMsg, xplac.Grpc, xplac.Context, xplac.Opts.LcdURL, queryType)
 		if err != nil {
 			xplac.Err = err
 			return xplac
@@ -520,7 +534,7 @@ func (xplac *XplaClient) QueryVote(queryVoteMsg types.QueryVoteMsg) *XplaClient 
 		xplac.Msg = msg
 
 	} else {
-		msg, status, err := mgov.MakeQueryVotesMsg(queryVoteMsg, xplac.Grpc, xplac.Context)
+		msg, status, err := mgov.MakeQueryVotesMsg(queryVoteMsg, xplac.Grpc, xplac.Context, xplac.Opts.LcdURL, queryType)
 		if err != nil {
 			xplac.Err = err
 			return xplac
@@ -540,7 +554,14 @@ func (xplac *XplaClient) QueryVote(queryVoteMsg types.QueryVoteMsg) *XplaClient 
 
 // Query the tally of a proposal vote.
 func (xplac *XplaClient) Tally(tallyMsg types.TallyMsg) *XplaClient {
-	msg, err := mgov.MakeGovTallyMsg(tallyMsg, xplac.Grpc, xplac.Context)
+	var queryType int
+	if xplac.Opts.GrpcURL != "" {
+		queryType = types.QueryGrpc
+	} else {
+		queryType = types.QueryLcd
+	}
+
+	msg, err := mgov.MakeGovTallyMsg(tallyMsg, xplac.Grpc, xplac.Context, xplac.Opts.LcdURL, queryType)
 	if err != nil {
 		xplac.Err = err
 		return xplac

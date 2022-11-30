@@ -1,7 +1,6 @@
 package client
 
 import (
-	"github.com/Moonyongjung/xpla.go/client/module"
 	"github.com/Moonyongjung/xpla.go/util"
 
 	cmclient "github.com/cosmos/cosmos-sdk/client"
@@ -23,7 +22,7 @@ func (xplac *XplaClient) LoadAccount(address sdk.AccAddress) (res authtypes.Acco
 
 	if xplac.Opts.GrpcURL == "" {
 
-		out, err := module.CtxHttpClient("GET", xplac.Opts.LcdURL+userInfoUrl+address.String(), nil, xplac.Context)
+		out, err := util.CtxHttpClient("GET", xplac.Opts.LcdURL+userInfoUrl+address.String(), nil, xplac.Context)
 		if err != nil {
 			return nil, err
 		}
@@ -84,7 +83,7 @@ func (xplac *XplaClient) Simulate(txbuilder cmclient.TxBuilder) (*sdktx.Simulate
 			return nil, err
 		}
 
-		out, err := module.CtxHttpClient("POST", xplac.Opts.LcdURL+simulateUrl, reqBytes, xplac.Context)
+		out, err := util.CtxHttpClient("POST", xplac.Opts.LcdURL+simulateUrl, reqBytes, xplac.Context)
 		if err != nil {
 			return nil, err
 		}

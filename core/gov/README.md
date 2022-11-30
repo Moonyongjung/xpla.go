@@ -58,6 +58,10 @@ res, err := xplac.QueryProposal(queryProposalMsg).Query()
 
 ### (Query) proposals
 ```go
+// Query all proposals
+queryProposalsMsg := types.QueryProposalsMsg{}
+
+// Set options
 queryProposalsMsg := types.QueryProposalsMsg{
     Status: "DepositPeriod",
     Voter: "xpla1e4f6k98es55vxxv2pcfzpsjrf3mvazeyqpw8g9",
@@ -94,7 +98,7 @@ res, err := xplac.Tally(tallyMsg).Query()
 
 ### (Query) gov params
 ```go
-// Query the parameters of the gov process
+// Query all parameters of the gov process
 res, err := xplac.GovParams().Query()
 
 // Query the parameters (voting|tallying|deposit) of the governance process
