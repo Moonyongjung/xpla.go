@@ -112,6 +112,10 @@ func FromStringToInt64(value string) int64 {
 	return number
 }
 
+func FromInt64ToString(value int64) string {
+	return strconv.FormatInt(value, 10)
+}
+
 func FromStringToInt(value string) int {
 	number, _ := strconv.Atoi(value)
 	return number
