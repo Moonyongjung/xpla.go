@@ -4,14 +4,24 @@ import (
 	"context"
 
 	mupgrade "github.com/Moonyongjung/xpla.go/core/upgrade"
+	"github.com/Moonyongjung/xpla.go/types"
 	"github.com/Moonyongjung/xpla.go/util"
 
+	upgradev1beta1 "cosmossdk.io/api/cosmos/upgrade/v1beta1"
 	cmclient "github.com/cosmos/cosmos-sdk/client"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 )
 
 // Query client for upgrade module.
 func (i IXplaClient) QueryUpgrade() (string, error) {
+	if i.QueryType == types.QueryGrpc {
+		return queryByGrpcUpgrade(i)
+	} else {
+		return queryByLcdUpgrade(i)
+	}
+}
+
+func queryByGrpcUpgrade(i IXplaClient) (string, error) {
 	queryClient := upgradetypes.NewQueryClient(i.Ixplac.GetGrpcClient())
 
 	switch {
@@ -64,6 +74,45 @@ func (i IXplaClient) QueryUpgrade() (string, error) {
 	}
 
 	out, err = printProto(i, res)
+	if err != nil {
+		return "", err
+	}
+
+	return string(out), nil
+}
+
+const (
+	upgradeAppliedPlanLabel    = "applied_plan"
+	upgradeModuleVersionsLabel = "module_versions"
+	upgradeCurrentPlanLabel    = "current_plan"
+)
+
+func queryByLcdUpgrade(i IXplaClient) (string, error) {
+	url := util.MakeQueryLcdUrl(upgradev1beta1.Query_ServiceDesc.Metadata.(string))
+
+	switch {
+	// Upgrade applied
+	case i.Ixplac.GetMsgType() == mupgrade.UpgradeAppliedMsgType:
+		convertMsg, _ := i.Ixplac.GetMsg().(upgradetypes.QueryAppliedPlanRequest)
+
+		url = url + util.MakeQueryLabels(upgradeAppliedPlanLabel, convertMsg.Name)
+
+	// Upgrade all module versions
+	case i.Ixplac.GetMsgType() == mupgrade.UpgradeQueryAllModuleVersionsMsgType ||
+		i.Ixplac.GetMsgType() == mupgrade.UpgradeQueryModuleVersionsMsgType:
+
+		url = url + upgradeModuleVersionsLabel
+
+	// Upgrade plan
+	case i.Ixplac.GetMsgType() == mupgrade.UpgradePlanMsgType:
+		url = url + upgradeCurrentPlanLabel
+
+	default:
+		return "", util.LogErr("invalid msg type")
+
+	}
+
+	out, err := util.CtxHttpClient("GET", i.Ixplac.GetLcdURL()+url, nil, i.Ixplac.GetContext())
 	if err != nil {
 		return "", err
 	}
