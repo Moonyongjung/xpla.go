@@ -173,7 +173,7 @@ func parseEditValidatorArgs(editValidatorMsg types.EditValidatorMsg, privKey key
 
 // Parsing - delegate
 func parseDelegateArgs(delegateMsg types.DelegateMsg, privKey key.PrivateKey) (*stakingtypes.MsgDelegate, error) {
-	amount, err := sdk.ParseCoinNormalized(delegateMsg.Amount)
+	amount, err := sdk.ParseCoinNormalized(util.DenomAdd(delegateMsg.Amount))
 	if err != nil {
 		return nil, err
 	}
@@ -190,7 +190,7 @@ func parseDelegateArgs(delegateMsg types.DelegateMsg, privKey key.PrivateKey) (*
 
 // Parsing - redelegate
 func parseRedelegateArgs(redelegateMsg types.RedelegateMsg, privKey key.PrivateKey) (*stakingtypes.MsgBeginRedelegate, error) {
-	amount, err := sdk.ParseCoinNormalized(redelegateMsg.Amount)
+	amount, err := sdk.ParseCoinNormalized(util.DenomAdd(redelegateMsg.Amount))
 	if err != nil {
 		return nil, err
 	}
@@ -210,7 +210,7 @@ func parseRedelegateArgs(redelegateMsg types.RedelegateMsg, privKey key.PrivateK
 
 // Parsing - unbond
 func parseUnbondArgs(unbondMsg types.UnbondMsg, privKey key.PrivateKey) (*stakingtypes.MsgUndelegate, error) {
-	amount, err := sdk.ParseCoinNormalized(unbondMsg.Amount)
+	amount, err := sdk.ParseCoinNormalized(util.DenomAdd(unbondMsg.Amount))
 	if err != nil {
 		return nil, err
 	}

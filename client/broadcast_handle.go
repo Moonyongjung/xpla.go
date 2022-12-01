@@ -28,7 +28,7 @@ func broadcastTx(xplac *XplaClient, txBytes []byte, mode txtypes.BroadcastMode) 
 			return nil, util.LogErr(err, "failed to marshal")
 		}
 
-		out, err := ctxHttpClient("POST", xplac.Opts.LcdURL+broadcastUrl, reqBytes, xplac.Context)
+		out, err := util.CtxHttpClient("POST", xplac.Opts.LcdURL+broadcastUrl, reqBytes, xplac.Context)
 		if err != nil {
 			return nil, err
 		}

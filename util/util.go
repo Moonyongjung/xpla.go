@@ -112,6 +112,10 @@ func FromStringToInt64(value string) int64 {
 	return number
 }
 
+func FromInt64ToString(value int64) string {
+	return strconv.FormatInt(value, 10)
+}
+
 func FromStringToInt(value string) int {
 	number, _ := strconv.Atoi(value)
 	return number
@@ -232,6 +236,14 @@ func Bech32toValidatorAddress(validators []string) ([]sdk.ValAddress, error) {
 		vals[i] = addr
 	}
 	return vals, nil
+}
+
+func MakeQueryLcdUrl(metadata string) string {
+	return "/" + strings.Replace(metadata, "query.proto", "", -1)
+}
+
+func MakeQueryLabels(labels ...string) string {
+	return strings.Join(labels, "/")
 }
 
 func LogInfo(log ...interface{}) {

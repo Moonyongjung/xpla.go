@@ -20,7 +20,7 @@ signingInfoMsg := types.SigningInfoMsg{
 
 // Query a validator's signing information by using bech32 address
 signingInfoMsg := types.SigningInfoMsg{
-    ConsPubKey: `{"@type": "/cosmos.crypto.ed25519.PubKey","key": "6RBPm24ckoWhRt8mArcSCnEKvt0FMGvcaMwchfZ3ue8="}`,
+    ConsAddr: "xplavalcons1v9jz99h7dsf50fgwr3wr2v8d73dfc3m8qvuaah",
 }
 
 res, err := xplac.SigningInfos(signingInfoMsg).Query()

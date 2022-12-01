@@ -12,5 +12,6 @@ const (
 	DistributionQueryDistCommissionMsgType         = "dist-query-commission"
 	DistributionQuerySlashesMsgType                = "dist-slashes"
 	DistributionQueryRewardsMsgType                = "dist-rewards"
+	DistributionQueryTotalRewardsMsgType           = "dist-total-rewards"
 	DistributionQueryCommunityPoolMsgType          = "query-community-pool"
 )

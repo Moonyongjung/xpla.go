@@ -39,7 +39,7 @@ res, err := xplac.UpgradeApplied(appliedMsg).Query()
 ### (Query) Modules version
 ```go
 // Query specific module name
-queryModulesVersionMsg := QueryModulesVersionMsg{
+queryModulesVersionMsg := types.QueryModulesVersionMsg{
     ModuleName: "auth",
 }
 

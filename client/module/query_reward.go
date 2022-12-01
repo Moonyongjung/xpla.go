@@ -2,6 +2,7 @@ package module
 
 import (
 	mreward "github.com/Moonyongjung/xpla.go/core/reward"
+	"github.com/Moonyongjung/xpla.go/types"
 	"github.com/Moonyongjung/xpla.go/util"
 
 	rewardtypes "github.com/xpladev/xpla/x/reward/types"
@@ -9,6 +10,14 @@ import (
 
 // Query client for reward module.
 func (i IXplaClient) QueryReward() (string, error) {
+	if i.QueryType == types.QueryGrpc {
+		return queryByGrpcReward(i)
+	} else {
+		return queryByLcdReward(i)
+	}
+}
+
+func queryByGrpcReward(i IXplaClient) (string, error) {
 	queryClient := rewardtypes.NewQueryClient(i.Ixplac.GetGrpcClient())
 
 	switch {
@@ -44,4 +53,34 @@ func (i IXplaClient) QueryReward() (string, error) {
 	}
 
 	return string(out), nil
+}
+
+const (
+	rewardParamsLabel = "params"
+	rewardPoolLabel   = "pool"
+)
+
+func queryByLcdReward(i IXplaClient) (string, error) {
+	url := "/xpla/reward/v1beta1/"
+
+	switch {
+	// Reward params
+	case i.Ixplac.GetMsgType() == mreward.RewardQueryRewardParamsMsgType:
+		url = url + rewardParamsLabel
+
+	// Reward pool
+	case i.Ixplac.GetMsgType() == mreward.RewardQueryRewardPoolMsgType:
+		url = url + rewardPoolLabel
+
+	default:
+		return "", util.LogErr("invalid msg type")
+	}
+
+	out, err := util.CtxHttpClient("GET", i.Ixplac.GetLcdURL()+url, nil, i.Ixplac.GetContext())
+	if err != nil {
+		return "", err
+	}
+
+	return string(out), nil
+
 }

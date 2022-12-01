@@ -112,6 +112,16 @@ func MakeyQueryDistRewardsMsg(queryDistRewardsMsg types.QueryDistRewardsMsg) (di
 	return msg, nil
 }
 
+// (Query) make msg - distribution all rewards
+func MakeyQueryDistTotalRewardsMsg(queryDistRewardsMsg types.QueryDistRewardsMsg) (disttypes.QueryDelegationTotalRewardsRequest, error) {
+	msg, err := parseQueryDistTotalRewardsArgs(queryDistRewardsMsg)
+	if err != nil {
+		return disttypes.QueryDelegationTotalRewardsRequest{}, err
+	}
+
+	return msg, nil
+}
+
 // (Query) make msg - community pool
 func MakeQueryCommunityPoolMsg() (disttypes.QueryCommunityPoolRequest, error) {
 	msg, err := parseQueryCommunityPoolArgs()

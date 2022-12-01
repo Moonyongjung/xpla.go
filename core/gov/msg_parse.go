@@ -8,6 +8,7 @@ import (
 	"github.com/Moonyongjung/xpla.go/types"
 	"github.com/Moonyongjung/xpla.go/util"
 
+	govv1beta1 "cosmossdk.io/api/cosmos/gov/v1beta1"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	govutils "github.com/cosmos/cosmos-sdk/x/gov/client/utils"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
@@ -128,24 +129,44 @@ func parseQueryProposalsArgs(queryProposalsMsg types.QueryProposalsMsg) (govtype
 }
 
 // Parsing - query deposit
-func parseQueryDepositArgs(queryDepositMsg types.QueryDepositMsg, grpcConn grpc.ClientConn, ctx context.Context) (interface{}, string, error) {
-	queryClient := govtypes.NewQueryClient(grpcConn)
+func parseQueryDepositArgs(queryDepositMsg types.QueryDepositMsg, grpcConn grpc.ClientConn, ctx context.Context, lcdUrl string, queryType int) (interface{}, string, error) {
+	var propStatus govtypes.ProposalStatus
+
 	proposalId := util.FromStringToUint64(queryDepositMsg.ProposalID)
-
-	proposalRes, err := queryClient.Proposal(
-		ctx,
-		&govtypes.QueryProposalRequest{ProposalId: proposalId},
-	)
-	if err != nil {
-		return nil, "", err
-	}
-
 	depositorAddr, err := sdk.AccAddressFromBech32(queryDepositMsg.Depositor)
 	if err != nil {
 		return nil, "", err
 	}
 
-	propStatus := proposalRes.Proposal.Status
+	if queryType == types.QueryGrpc {
+		queryClient := govtypes.NewQueryClient(grpcConn)
+
+		proposalRes, err := queryClient.Proposal(
+			ctx,
+			&govtypes.QueryProposalRequest{ProposalId: proposalId},
+		)
+		if err != nil {
+			return nil, "", err
+		}
+
+		propStatus = proposalRes.Proposal.Status
+
+	} else {
+		url := util.MakeQueryLcdUrl(govv1beta1.Query_ServiceDesc.Metadata.(string))
+		url = url + util.MakeQueryLabels("proposals", queryDepositMsg.ProposalID)
+
+		out, err := util.CtxHttpClient("GET", lcdUrl+url, nil, ctx)
+		if err != nil {
+			return nil, "", err
+		}
+
+		var response govtypes.QueryProposalResponse
+		responseData := util.JsonUnmarshalData(response, out)
+		propStatusString := responseData.(map[string]interface{})["proposal"].(map[string]interface{})["status"].(string)
+
+		propStatus = govtypes.ProposalStatus(govtypes.ProposalStatus_value[propStatusString])
+	}
+
 	if !(propStatus == govtypes.StatusVotingPeriod || propStatus == govtypes.StatusDepositPeriod) {
 		params := govtypes.NewQueryDepositParams(proposalId, depositorAddr)
 		return params, "params", nil
@@ -158,19 +179,39 @@ func parseQueryDepositArgs(queryDepositMsg types.QueryDepositMsg, grpcConn grpc.
 }
 
 // Parsing - query deposits
-func parseQueryDepositsArgs(queryDepositMsg types.QueryDepositMsg, grpcConn grpc.ClientConn, ctx context.Context) (interface{}, string, error) {
-	queryClient := govtypes.NewQueryClient(grpcConn)
+func parseQueryDepositsArgs(queryDepositMsg types.QueryDepositMsg, grpcConn grpc.ClientConn, ctx context.Context, lcdUrl string, queryType int) (interface{}, string, error) {
+	var propStatus govtypes.ProposalStatus
 	proposalId := util.FromStringToUint64(queryDepositMsg.ProposalID)
 
-	proposalRes, err := queryClient.Proposal(
-		ctx,
-		&govtypes.QueryProposalRequest{ProposalId: proposalId},
-	)
-	if err != nil {
-		return nil, "", err
+	if queryType == types.QueryGrpc {
+		queryClient := govtypes.NewQueryClient(grpcConn)
+
+		proposalRes, err := queryClient.Proposal(
+			ctx,
+			&govtypes.QueryProposalRequest{ProposalId: proposalId},
+		)
+		if err != nil {
+			return nil, "", err
+		}
+
+		propStatus = proposalRes.Proposal.Status
+
+	} else {
+		url := util.MakeQueryLcdUrl(govv1beta1.Query_ServiceDesc.Metadata.(string))
+		url = url + util.MakeQueryLabels("proposals", queryDepositMsg.ProposalID)
+
+		out, err := util.CtxHttpClient("GET", lcdUrl+url, nil, ctx)
+		if err != nil {
+			return nil, "", err
+		}
+
+		var response govtypes.QueryProposalResponse
+		responseData := util.JsonUnmarshalData(response, out)
+		propStatusString := responseData.(map[string]interface{})["proposal"].(map[string]interface{})["status"].(string)
+
+		propStatus = govtypes.ProposalStatus(govtypes.ProposalStatus_value[propStatusString])
 	}
 
-	propStatus := proposalRes.GetProposal().Status
 	if !(propStatus == govtypes.StatusVotingPeriod || propStatus == govtypes.StatusDepositPeriod) {
 		params := govtypes.NewQueryProposalParams(proposalId)
 		return params, "params", nil
@@ -183,16 +224,28 @@ func parseQueryDepositsArgs(queryDepositMsg types.QueryDepositMsg, grpcConn grpc
 }
 
 // Parsing - tally
-func parseGovTallyArgs(tallyMsg types.TallyMsg, grpcConn grpc.ClientConn, ctx context.Context) (govtypes.QueryTallyResultRequest, error) {
-	queryClient := govtypes.NewQueryClient(grpcConn)
+func parseGovTallyArgs(tallyMsg types.TallyMsg, grpcConn grpc.ClientConn, ctx context.Context, lcdUrl string, queryType int) (govtypes.QueryTallyResultRequest, error) {
 	proposalId := util.FromStringToUint64(tallyMsg.ProposalID)
 
-	_, err := queryClient.Proposal(
-		ctx,
-		&govtypes.QueryProposalRequest{ProposalId: proposalId},
-	)
-	if err != nil {
-		return govtypes.QueryTallyResultRequest{}, util.LogErr("failed to fetch proposal-id", proposalId, " : ", err)
+	if queryType == types.QueryGrpc {
+		queryClient := govtypes.NewQueryClient(grpcConn)
+
+		_, err := queryClient.Proposal(
+			ctx,
+			&govtypes.QueryProposalRequest{ProposalId: proposalId},
+		)
+		if err != nil {
+			return govtypes.QueryTallyResultRequest{}, util.LogErr("failed to fetch proposal-id", proposalId, " : ", err)
+		}
+
+	} else {
+		url := util.MakeQueryLcdUrl(govv1beta1.Query_ServiceDesc.Metadata.(string))
+		url = url + util.MakeQueryLabels("proposals", tallyMsg.ProposalID)
+
+		_, err := util.CtxHttpClient("GET", lcdUrl+url, nil, ctx)
+		if err != nil {
+			return govtypes.QueryTallyResultRequest{}, err
+		}
 	}
 
 	return govtypes.QueryTallyResultRequest{
@@ -214,16 +267,28 @@ func parseGovParamArgs(govParamsMsg types.GovParamsMsg) (govtypes.QueryParamsReq
 }
 
 // Parsing - query vote
-func parseQueryVoteArgs(queryVoteMsg types.QueryVoteMsg, grpcConn grpc.ClientConn, ctx context.Context) (govtypes.QueryVoteRequest, error) {
-	queryClient := govtypes.NewQueryClient(grpcConn)
+func parseQueryVoteArgs(queryVoteMsg types.QueryVoteMsg, grpcConn grpc.ClientConn, ctx context.Context, lcdUrl string, queryType int) (govtypes.QueryVoteRequest, error) {
 	proposalId := util.FromStringToUint64(queryVoteMsg.ProposalID)
 
-	_, err := queryClient.Proposal(
-		ctx,
-		&govtypes.QueryProposalRequest{ProposalId: proposalId},
-	)
-	if err != nil {
-		return govtypes.QueryVoteRequest{}, err
+	if queryType == types.QueryGrpc {
+		queryClient := govtypes.NewQueryClient(grpcConn)
+
+		_, err := queryClient.Proposal(
+			ctx,
+			&govtypes.QueryProposalRequest{ProposalId: proposalId},
+		)
+		if err != nil {
+			return govtypes.QueryVoteRequest{}, err
+		}
+
+	} else {
+		url := util.MakeQueryLcdUrl(govv1beta1.Query_ServiceDesc.Metadata.(string))
+		url = url + util.MakeQueryLabels("proposals", queryVoteMsg.ProposalID)
+
+		_, err := util.CtxHttpClient("GET", lcdUrl+url, nil, ctx)
+		if err != nil {
+			return govtypes.QueryVoteRequest{}, err
+		}
 	}
 
 	return govtypes.QueryVoteRequest{
@@ -233,20 +298,49 @@ func parseQueryVoteArgs(queryVoteMsg types.QueryVoteMsg, grpcConn grpc.ClientCon
 }
 
 // Parsing - query votes
-func parseQueryVotesArgs(queryVoteMsg types.QueryVoteMsg, grpcConn grpc.ClientConn, ctx context.Context) (interface{}, string, error) {
-	queryClient := govtypes.NewQueryClient(grpcConn)
+func parseQueryVotesArgs(queryVoteMsg types.QueryVoteMsg, grpcConn grpc.ClientConn, ctx context.Context, lcdUrl string, queryType int) (interface{}, string, error) {
+	var propStatus govtypes.ProposalStatus
 	proposalId := util.FromStringToUint64(queryVoteMsg.ProposalID)
 
-	res, err := queryClient.Proposal(
-		ctx,
-		&govtypes.QueryProposalRequest{ProposalId: proposalId},
-	)
-	if err != nil {
-		return govtypes.QueryVoteRequest{}, "", err
+	if queryType == types.QueryGrpc {
+		queryClient := govtypes.NewQueryClient(grpcConn)
+
+		proposalRes, err := queryClient.Proposal(
+			ctx,
+			&govtypes.QueryProposalRequest{ProposalId: proposalId},
+		)
+		if err != nil {
+			return nil, "", err
+		}
+
+		propStatus = proposalRes.Proposal.Status
+
+	} else {
+		url := util.MakeQueryLcdUrl(govv1beta1.Query_ServiceDesc.Metadata.(string))
+		url = url + util.MakeQueryLabels("proposals", queryVoteMsg.ProposalID)
+
+		out, err := util.CtxHttpClient("GET", lcdUrl+url, nil, ctx)
+		if err != nil {
+			return nil, "", err
+		}
+
+		var response govtypes.QueryProposalResponse
+		responseData := util.JsonUnmarshalData(response, out)
+		propStatusString := responseData.(map[string]interface{})["proposal"].(map[string]interface{})["status"].(string)
+
+		propStatus = govtypes.ProposalStatus(govtypes.ProposalStatus_value[propStatusString])
 	}
 
-	status := res.GetProposal().Status
-	if !(status == govtypes.StatusVotingPeriod || status == govtypes.StatusDepositPeriod) {
+	// res, err := queryClient.Proposal(
+	// 	ctx,
+	// 	&govtypes.QueryProposalRequest{ProposalId: proposalId},
+	// )
+	// if err != nil {
+	// 	return govtypes.QueryVoteRequest{}, "", err
+	// }
+
+	// status := res.GetProposal().Status
+	if !(propStatus == govtypes.StatusVotingPeriod || propStatus == govtypes.StatusDepositPeriod) {
 		params := govtypes.NewQueryProposalVotesParams(proposalId, 0, 0)
 		return params, "notPassed", nil
 	}

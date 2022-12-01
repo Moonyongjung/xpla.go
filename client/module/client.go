@@ -20,7 +20,8 @@ var res proto.Message
 var err error
 
 type IXplaClient struct {
-	Ixplac ModuleClient
+	Ixplac    ModuleClient
+	QueryType uint8
 }
 
 type ModuleClient interface {
@@ -28,7 +29,7 @@ type ModuleClient interface {
 	GetPrivateKey() key.PrivateKey
 	GetEncoding() params.EncodingConfig
 	GetContext() context.Context
-	GetURL() string
+	GetLcdURL() string
 	GetGrpcUrl() string
 	GetGrpcClient() grpc.ClientConn
 	GetRpc() string
@@ -50,8 +51,8 @@ type ModuleClient interface {
 	GetMsgType() string
 }
 
-func NewIXplaClient(moduleClient ModuleClient) *IXplaClient {
-	return &IXplaClient{Ixplac: moduleClient}
+func NewIXplaClient(moduleClient ModuleClient, qt uint8) *IXplaClient {
+	return &IXplaClient{Ixplac: moduleClient, QueryType: qt}
 }
 
 // For invoke(as execute) contract, parameters are packed by using ABI.
