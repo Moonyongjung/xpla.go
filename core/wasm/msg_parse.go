@@ -1,7 +1,7 @@
 package wasm
 
 import (
-	"io/ioutil"
+	"os"
 	"strconv"
 	"strings"
 
@@ -29,7 +29,7 @@ func parseStoreCodeArgs(storeMsg types.StoreMsg, sender sdk.AccAddress) (wasmtyp
 		return wasmtypes.MsgStoreCode{}, util.LogErr("filepath is empty")
 	}
 
-	wasm, err := ioutil.ReadFile(storeMsg.FilePath)
+	wasm, err := os.ReadFile(storeMsg.FilePath)
 	if err != nil {
 		return wasmtypes.MsgStoreCode{}, err
 	}
