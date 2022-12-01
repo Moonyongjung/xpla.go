@@ -1,15 +1,8 @@
 package client
 
 import (
-	"bytes"
-	"context"
-	"io"
-	"net/http"
-	"time"
-
-	"golang.org/x/net/context/ctxhttp"
-
 	"github.com/Moonyongjung/xpla.go/util"
+
 	cmclient "github.com/cosmos/cosmos-sdk/client"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdktx "github.com/cosmos/cosmos-sdk/types/tx"
@@ -28,7 +21,8 @@ const (
 func (xplac *XplaClient) LoadAccount(address sdk.AccAddress) (res authtypes.AccountI, err error) {
 
 	if xplac.Opts.GrpcURL == "" {
-		out, err := ctxHttpClient("GET", xplac.Opts.LcdURL+userInfoUrl+address.String(), nil, xplac.Context)
+
+		out, err := util.CtxHttpClient("GET", xplac.Opts.LcdURL+userInfoUrl+address.String(), nil, xplac.Context)
 		if err != nil {
 			return nil, err
 		}
@@ -89,7 +83,7 @@ func (xplac *XplaClient) Simulate(txbuilder cmclient.TxBuilder) (*sdktx.Simulate
 			return nil, err
 		}
 
-		out, err := ctxHttpClient("POST", xplac.Opts.LcdURL+simulateUrl, reqBytes, xplac.Context)
+		out, err := util.CtxHttpClient("POST", xplac.Opts.LcdURL+simulateUrl, reqBytes, xplac.Context)
 		if err != nil {
 			return nil, err
 		}
@@ -114,39 +108,4 @@ func (xplac *XplaClient) Simulate(txbuilder cmclient.TxBuilder) (*sdktx.Simulate
 
 		return response, nil
 	}
-}
-
-// Make new http client for inquiring several information.
-func ctxHttpClient(methodType string, url string, reqBody []byte, ctx context.Context) ([]byte, error) {
-	var resp *http.Response
-	var err error
-
-	httpClient := &http.Client{Timeout: 30 * time.Second}
-
-	if methodType == "GET" {
-		resp, err = ctxhttp.Get(ctx, httpClient, url)
-		if err != nil {
-			return nil, util.LogErr(err, "failed GET method")
-		}
-	} else if methodType == "POST" {
-		resp, err = ctxhttp.Post(ctx, httpClient, url, "application/json", bytes.NewBuffer(reqBody))
-		if err != nil {
-			return nil, util.LogErr(err, "failed POST method")
-		}
-	} else {
-		return nil, util.LogErr(err, "not correct method")
-	}
-
-	defer resp.Body.Close()
-
-	out, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return nil, util.LogErr(err, "failed to read response")
-	}
-
-	if resp.StatusCode != 200 {
-		return nil, util.LogErr(resp.StatusCode, ":", string(out))
-	}
-
-	return out, nil
 }

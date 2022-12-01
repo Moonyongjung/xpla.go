@@ -87,7 +87,7 @@ func parseQueryTxArgs(queryTxMsg types.QueryTxMsg) ([]string, error) {
 		return []string{queryTxMsg.Value, "hash"}, nil
 
 	} else if queryTxMsg.Type == "signature" {
-		if len(queryTxMsg.Value) != 1 || queryTxMsg.Value == "" {
+		if queryTxMsg.Value == "" {
 			return nil, fmt.Errorf("argument should be comma-separated signatures")
 		}
 		sigParts := strings.Split(queryTxMsg.Value, ",")

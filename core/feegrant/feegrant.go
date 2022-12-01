@@ -7,8 +7,8 @@ import (
 )
 
 // (Tx) make msg - fee grant
-func MakeGrantMsg(grantMsg types.GrantMsg, privKey key.PrivateKey) (*feegrant.MsgGrantAllowance, error) {
-	msg, err := parseGrantArgs(grantMsg, privKey)
+func MakeFeeGrantMsg(feeGrantMsg types.FeeGrantMsg, privKey key.PrivateKey) (*feegrant.MsgGrantAllowance, error) {
+	msg, err := parseFeeGrantArgs(feeGrantMsg, privKey)
 	if err != nil {
 		return nil, err
 	}
@@ -17,8 +17,8 @@ func MakeGrantMsg(grantMsg types.GrantMsg, privKey key.PrivateKey) (*feegrant.Ms
 }
 
 // (Tx) make msg - fee grant revoke
-func MakeRevokeGrantMsg(revokeGrantMsg types.RevokeGrantMsg, privKey key.PrivateKey) (feegrant.MsgRevokeAllowance, error) {
-	msg, err := parseRevokeGrantArgs(revokeGrantMsg, privKey)
+func MakeRevokeFeeGrantMsg(revokeFeeGrantMsg types.RevokeFeeGrantMsg, privKey key.PrivateKey) (feegrant.MsgRevokeAllowance, error) {
+	msg, err := parseRevokeFeeGrantArgs(revokeFeeGrantMsg, privKey)
 	if err != nil {
 		return feegrant.MsgRevokeAllowance{}, err
 	}
@@ -27,8 +27,8 @@ func MakeRevokeGrantMsg(revokeGrantMsg types.RevokeGrantMsg, privKey key.Private
 }
 
 // (Query) make msg - query fee grants
-func MakeQueryGrantMsg(queryGrantMsg types.QueryGrantMsg) (feegrant.QueryAllowanceRequest, error) {
-	msg, err := parseQueryGrantArgs(queryGrantMsg)
+func MakeQueryFeeGrantMsg(queryFeeGrantMsg types.QueryFeeGrantMsg) (feegrant.QueryAllowanceRequest, error) {
+	msg, err := parseQueryFeeGrantArgs(queryFeeGrantMsg)
 	if err != nil {
 		return feegrant.QueryAllowanceRequest{}, err
 	}
@@ -37,8 +37,8 @@ func MakeQueryGrantMsg(queryGrantMsg types.QueryGrantMsg) (feegrant.QueryAllowan
 }
 
 // (Query) make msg - fee grants by grantee
-func MakeQueryGrantsByGranteeMsg(queryGrantMsg types.QueryGrantMsg) (feegrant.QueryAllowancesRequest, error) {
-	msg, err := parseQueryGrantsByGranteeArgs(queryGrantMsg)
+func MakeQueryFeeGrantsByGranteeMsg(queryFeeGrantMsg types.QueryFeeGrantMsg) (feegrant.QueryAllowancesRequest, error) {
+	msg, err := parseQueryFeeGrantsByGranteeArgs(queryFeeGrantMsg)
 	if err != nil {
 		return feegrant.QueryAllowancesRequest{}, err
 	}
@@ -47,8 +47,8 @@ func MakeQueryGrantsByGranteeMsg(queryGrantMsg types.QueryGrantMsg) (feegrant.Qu
 }
 
 // (Query) make msg - fee grants by granter
-func MakeQueryGrantsByGranterMsg(queryGrantMsg types.QueryGrantMsg) (feegrant.QueryAllowancesByGranterRequest, error) {
-	msg, err := parseQueryGrantsByGranterArgs(queryGrantMsg)
+func MakeQueryFeeGrantsByGranterMsg(queryFeeGrantMsg types.QueryFeeGrantMsg) (feegrant.QueryAllowancesByGranterRequest, error) {
+	msg, err := parseQueryFeeGrantsByGranterArgs(queryFeeGrantMsg)
 	if err != nil {
 		return feegrant.QueryAllowancesByGranterRequest{}, err
 	}

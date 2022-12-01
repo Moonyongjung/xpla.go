@@ -17,6 +17,7 @@ import (
 	mstaking "github.com/Moonyongjung/xpla.go/core/staking"
 	mupgrade "github.com/Moonyongjung/xpla.go/core/upgrade"
 	mwasm "github.com/Moonyongjung/xpla.go/core/wasm"
+	"github.com/Moonyongjung/xpla.go/types"
 	"github.com/Moonyongjung/xpla.go/util"
 )
 
@@ -28,11 +29,12 @@ func (xplac *XplaClient) Query() (string, error) {
 		return "", xplac.Err
 	}
 
-	if xplac.Grpc == nil {
-		return "", util.LogErr("error: Need GRPC URL when query methods")
+	if xplac.Opts.GrpcURL == "" && xplac.Opts.LcdURL == "" {
+		return "", util.LogErr("at least one of the gRPC URL & LCD URL must exist for query")
 	}
 
-	ixplaClient := module.NewIXplaClient(xplac)
+	qt := setQueryType(xplac)
+	ixplaClient := module.NewIXplaClient(xplac, qt)
 
 	if xplac.Module == mauth.AuthModule {
 		return ixplaClient.QueryAuth()
@@ -81,5 +83,14 @@ func (xplac *XplaClient) Query() (string, error) {
 
 	} else {
 		return "", util.LogErr("invalid module")
+	}
+}
+
+func setQueryType(xplac *XplaClient) uint8 {
+	// Default query type is gRPC, not LCD.
+	if xplac.Opts.GrpcURL != "" {
+		return types.QueryGrpc
+	} else {
+		return types.QueryLcd
 	}
 }

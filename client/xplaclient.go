@@ -244,7 +244,7 @@ func (xplac *XplaClient) GetContext() context.Context {
 }
 
 // Get LCD URL
-func (xplac *XplaClient) GetURL() string {
+func (xplac *XplaClient) GetLcdURL() string {
 	return xplac.Opts.LcdURL
 }
 

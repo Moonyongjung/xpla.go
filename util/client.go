@@ -1,8 +1,11 @@
 package util
 
 import (
+	"bytes"
 	"context"
+	"io"
 	"net/http"
+	"time"
 
 	"github.com/Moonyongjung/xpla.go/types"
 	cmclient "github.com/cosmos/cosmos-sdk/client"
@@ -12,6 +15,7 @@ import (
 	"github.com/ethereum/go-ethereum/ethclient"
 	erpc "github.com/ethereum/go-ethereum/rpc"
 	"github.com/evmos/ethermint/crypto/hd"
+	"golang.org/x/net/context/ctxhttp"
 )
 
 const (
@@ -116,4 +120,39 @@ func NewFactory(clientCtx cmclient.Context) tx.Factory {
 		WithAccountRetriever(clientCtx.AccountRetriever)
 
 	return txFactory
+}
+
+// Make new http client for inquiring several information.
+func CtxHttpClient(methodType string, url string, reqBody []byte, ctx context.Context) ([]byte, error) {
+	var resp *http.Response
+	var err error
+
+	httpClient := &http.Client{Timeout: 30 * time.Second}
+
+	if methodType == "GET" {
+		resp, err = ctxhttp.Get(ctx, httpClient, url)
+		if err != nil {
+			return nil, LogErr(err, "failed GET method")
+		}
+	} else if methodType == "POST" {
+		resp, err = ctxhttp.Post(ctx, httpClient, url, "application/json", bytes.NewBuffer(reqBody))
+		if err != nil {
+			return nil, LogErr(err, "failed POST method")
+		}
+	} else {
+		return nil, LogErr(err, "not correct method")
+	}
+
+	defer resp.Body.Close()
+
+	out, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, LogErr(err, "failed to read response")
+	}
+
+	if resp.StatusCode != 200 {
+		return nil, LogErr(resp.StatusCode, ":", string(out))
+	}
+
+	return out, nil
 }

@@ -71,8 +71,8 @@ func MakeQueryProposalsMsg(queryProposalsMsg types.QueryProposalsMsg) (govtypes.
 }
 
 // (Query) make msg - query deposit
-func MakeQueryDepositMsg(queryDepositMsg types.QueryDepositMsg, grpcConn grpc.ClientConn, ctx context.Context) (interface{}, string, error) {
-	msg, argsType, err := parseQueryDepositArgs(queryDepositMsg, grpcConn, ctx)
+func MakeQueryDepositMsg(queryDepositMsg types.QueryDepositMsg, grpcConn grpc.ClientConn, ctx context.Context, lcdUrl string, queryType int) (interface{}, string, error) {
+	msg, argsType, err := parseQueryDepositArgs(queryDepositMsg, grpcConn, ctx, lcdUrl, queryType)
 	if err != nil {
 		return nil, "", err
 	}
@@ -81,8 +81,8 @@ func MakeQueryDepositMsg(queryDepositMsg types.QueryDepositMsg, grpcConn grpc.Cl
 }
 
 // (Query) make msg - query deposits
-func MakeQueryDepositsMsg(queryDepositMsg types.QueryDepositMsg, grpcConn grpc.ClientConn, ctx context.Context) (interface{}, string, error) {
-	msg, argsType, err := parseQueryDepositsArgs(queryDepositMsg, grpcConn, ctx)
+func MakeQueryDepositsMsg(queryDepositMsg types.QueryDepositMsg, grpcConn grpc.ClientConn, ctx context.Context, lcdUrl string, queryType int) (interface{}, string, error) {
+	msg, argsType, err := parseQueryDepositsArgs(queryDepositMsg, grpcConn, ctx, lcdUrl, queryType)
 	if err != nil {
 		return nil, "", err
 	}
@@ -91,8 +91,8 @@ func MakeQueryDepositsMsg(queryDepositMsg types.QueryDepositMsg, grpcConn grpc.C
 }
 
 // (Query) make msg - tally
-func MakeGovTallyMsg(tallyMsg types.TallyMsg, grpcConn grpc.ClientConn, ctx context.Context) (interface{}, error) {
-	msg, err := parseGovTallyArgs(tallyMsg, grpcConn, ctx)
+func MakeGovTallyMsg(tallyMsg types.TallyMsg, grpcConn grpc.ClientConn, ctx context.Context, lcdUrl string, queryType int) (interface{}, error) {
+	msg, err := parseGovTallyArgs(tallyMsg, grpcConn, ctx, lcdUrl, queryType)
 	if err != nil {
 		return nil, err
 	}
@@ -111,8 +111,8 @@ func MakeGovParamsMsg(govParamsMsg types.GovParamsMsg) (govtypes.QueryParamsRequ
 }
 
 // (Query) make msg - query vote
-func MakeQueryVoteMsg(queryVoteMsg types.QueryVoteMsg, grpcConn grpc.ClientConn, ctx context.Context) (govtypes.QueryVoteRequest, error) {
-	msg, err := parseQueryVoteArgs(queryVoteMsg, grpcConn, ctx)
+func MakeQueryVoteMsg(queryVoteMsg types.QueryVoteMsg, grpcConn grpc.ClientConn, ctx context.Context, lcdUrl string, queryType int) (govtypes.QueryVoteRequest, error) {
+	msg, err := parseQueryVoteArgs(queryVoteMsg, grpcConn, ctx, lcdUrl, queryType)
 	if err != nil {
 		return govtypes.QueryVoteRequest{}, err
 	}
@@ -121,8 +121,8 @@ func MakeQueryVoteMsg(queryVoteMsg types.QueryVoteMsg, grpcConn grpc.ClientConn,
 }
 
 // (Query) make msg - query votes
-func MakeQueryVotesMsg(queryVoteMsg types.QueryVoteMsg, grpcConn grpc.ClientConn, ctx context.Context) (interface{}, string, error) {
-	msg, status, err := parseQueryVotesArgs(queryVoteMsg, grpcConn, ctx)
+func MakeQueryVotesMsg(queryVoteMsg types.QueryVoteMsg, grpcConn grpc.ClientConn, ctx context.Context, lcdUrl string, queryType int) (interface{}, string, error) {
+	msg, status, err := parseQueryVotesArgs(queryVoteMsg, grpcConn, ctx, lcdUrl, queryType)
 	if err != nil {
 		return nil, "", err
 	}
