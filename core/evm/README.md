@@ -110,3 +110,32 @@ res, err := xplac.EthChainID().Query()
 ```go
 res, err := xplac.EthBlockNumber().Query()
 ```
+
+### (Query) Web3 client version
+```go
+res, err = xplac.Web3ClientVersion().Query()
+```
+
+### (Query) Web3 SHA3 (return Keccak-256)
+```go
+web3Sha3Msg := types.Web3Sha3Msg{
+    InputParam: "web3-sha3-test",
+}
+
+res, err = xplac.Web3Sha3(web3Sha3Msg).Query()
+```
+
+### (Query) Network ID
+```go
+res, err = xplac.NetVersion().Query()
+```
+
+### (Query) Network peer count
+```go
+res, err = xplac.NetPeerCount().Query()
+```
+
+### (Query) Network listening
+```go
+res, err = xplac.NetListening().Query()
+```

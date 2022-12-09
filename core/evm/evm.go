@@ -74,3 +74,13 @@ func MakeQueryAccountInfoMsg(accountInfoMsg types.AccountInfoMsg) (types.Account
 
 	return msg, nil
 }
+
+// (Query) make msg - web3 sha3
+func MakeWeb3Sha3Msg(web3Sha3Msg types.Web3Sha3Msg) (types.Web3Sha3Msg, error) {
+	msg, err := parseWeb3Sha3Args(web3Sha3Msg)
+	if err != nil {
+		return types.Web3Sha3Msg{}, err
+	}
+
+	return msg, nil
+}

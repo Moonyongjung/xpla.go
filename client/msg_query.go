@@ -405,6 +405,51 @@ func (xplac *XplaClient) EthBlockNumber() *XplaClient {
 	return xplac
 }
 
+// Query web3 client version.
+func (xplac *XplaClient) Web3ClientVersion() *XplaClient {
+	xplac.Module = mevm.EvmModule
+	xplac.MsgType = mevm.EvmWeb3ClientVersionMsgType
+	xplac.Msg = nil
+	return xplac
+}
+
+// Query web3 sha3.
+func (xplac *XplaClient) Web3Sha3(web3Sha3Msg types.Web3Sha3Msg) *XplaClient {
+	msg, err := mevm.MakeWeb3Sha3Msg(web3Sha3Msg)
+	if err != nil {
+		xplac.Err = err
+		return xplac
+	}
+	xplac.Module = mevm.EvmModule
+	xplac.MsgType = mevm.EvmWeb3Sha3MsgType
+	xplac.Msg = msg
+	return xplac
+}
+
+// Query current network ID.
+func (xplac *XplaClient) NetVersion() *XplaClient {
+	xplac.Module = mevm.EvmModule
+	xplac.MsgType = mevm.EvmNetVersionMsgType
+	xplac.Msg = nil
+	return xplac
+}
+
+// Query the number of peers currently connected to the client.
+func (xplac *XplaClient) NetPeerCount() *XplaClient {
+	xplac.Module = mevm.EvmModule
+	xplac.MsgType = mevm.EvmNetPeerCountMsgType
+	xplac.Msg = nil
+	return xplac
+}
+
+// actively listening for network connections.
+func (xplac *XplaClient) NetListening() *XplaClient {
+	xplac.Module = mevm.EvmModule
+	xplac.MsgType = mevm.EvmNetListeningMsgType
+	xplac.Msg = nil
+	return xplac
+}
+
 // Feegrant module
 
 // Query details of fee grants.

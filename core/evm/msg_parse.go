@@ -4,6 +4,7 @@ import (
 	"github.com/Moonyongjung/xpla.go/key"
 	"github.com/Moonyongjung/xpla.go/types"
 	"github.com/Moonyongjung/xpla.go/util"
+
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 )
 
@@ -111,4 +112,9 @@ func parseGetBlockByHashHeightArgs(getBlockByHashHeightMsg types.GetBlockByHashH
 // Parsing - account info
 func parseQueryAccountInfoArgs(accountInfoMsg types.AccountInfoMsg) (types.AccountInfoMsg, error) {
 	return accountInfoMsg, nil
+}
+
+// Parsing - web3 sha3
+func parseWeb3Sha3Args(web3Sha3Msg types.Web3Sha3Msg) (types.Web3Sha3Msg, error) {
+	return web3Sha3Msg, nil
 }

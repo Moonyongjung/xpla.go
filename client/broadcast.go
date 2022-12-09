@@ -53,6 +53,9 @@ func (xplac *XplaClient) BroadcastAsync(txBytes []byte) (*types.TxRes, error) {
 
 // Broadcast the transaction which is evm transaction by using ethclient of go-ethereum.
 func (xplac *XplaClient) broadcastEvm(txBytes []byte) (*types.TxRes, error) {
+	if xplac.GetEvmRpc() == "" {
+		return nil, util.LogErr("evm JSON-RPC URL must exist")
+	}
 	evmClient, err := util.NewEvmClient(xplac.Opts.EvmRpcURL, xplac.Context)
 	if err != nil {
 		return nil, err

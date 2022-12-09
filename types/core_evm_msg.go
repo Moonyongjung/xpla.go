@@ -52,6 +52,11 @@ type AccountInfoMsg struct {
 	Account string
 }
 
+type Web3Sha3Msg struct {
+	InputParam string
+}
+
+// Responses
 type CallSolContractResponse struct {
 	ContractResponse []string `json:"contract_response"`
 }
@@ -87,4 +92,24 @@ type EthChainIdResponse struct {
 
 type EthBlockNumberResponse struct {
 	BlockNumber uint64 `json:"block_number"`
+}
+
+type Web3ClientVersionResponse struct {
+	Web3ClientVersion string `json:"web3_client_version"`
+}
+
+type Web3Sha3Response struct {
+	Web3Sha3 string `json:"web3_sha3"`
+}
+
+type NetVersionResponse struct {
+	NetVersion string `json:"net_version"`
+}
+
+type NetPeerCountResponse struct {
+	NetPeerCount int `json:"net_peerCount"`
+}
+
+type NetListeningResponse struct {
+	NetListening bool `json:"net_listening"`
 }

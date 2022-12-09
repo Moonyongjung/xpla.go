@@ -51,8 +51,9 @@ const (
 )
 
 type EvmClient struct {
-	Ctx    context.Context
-	Client *ethclient.Client
+	Ctx       context.Context
+	Client    *ethclient.Client
+	RpcClient *erpc.Client
 }
 
 // Make new evm client using RPC URL which normally TCP port number is 8545.
@@ -75,7 +76,7 @@ func NewEvmClient(evmRpcUrl string, ctx context.Context) (*EvmClient, error) {
 
 	ethClient := ethclient.NewClient(rpcClient)
 
-	return &EvmClient{ctx, ethClient}, nil
+	return &EvmClient{ctx, ethClient, rpcClient}, nil
 }
 
 // Provide cosmos sdk keyring

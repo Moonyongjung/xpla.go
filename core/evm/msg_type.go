@@ -12,4 +12,9 @@ const (
 	EvmSuggestGasPriceMsgType         = "suggest-gas-price"
 	EvmQueryChainIdMsgType            = "evm-chain-id"
 	EvmQueryCurrentBlockNumberMsgType = "current-block-number"
+	EvmWeb3ClientVersionMsgType       = "web3-client-version"
+	EvmWeb3Sha3MsgType                = "web3-sha"
+	EvmNetVersionMsgType              = "net-version"
+	EvmNetPeerCountMsgType            = "net-peer-count"
+	EvmNetListeningMsgType            = "net-listening"
 )

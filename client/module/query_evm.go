@@ -240,6 +240,73 @@ func (i IXplaClient) QueryEvm() (string, error) {
 
 		return jsonReturn(ethBlockNumberResponse)
 
+	// Web3 client version
+	case i.Ixplac.GetMsgType() == mevm.EvmWeb3ClientVersionMsgType:
+		var result string
+		err := evmClient.RpcClient.CallContext(evmClient.Ctx, &result, "web3_clientVersion")
+		if err != nil {
+			return "", err
+		}
+
+		var web3ClientVersionResponse types.Web3ClientVersionResponse
+		web3ClientVersionResponse.Web3ClientVersion = result
+
+		return jsonReturn(web3ClientVersionResponse)
+
+	// Web3 sha
+	case i.Ixplac.GetMsgType() == mevm.EvmWeb3Sha3MsgType:
+		convertMsg, _ := i.Ixplac.GetMsg().(types.Web3Sha3Msg)
+
+		var result string
+		err := evmClient.RpcClient.CallContext(evmClient.Ctx, &result, "web3_sha3", convertMsg.InputParam)
+		if err != nil {
+			return "", err
+		}
+
+		var web3Sha3Response types.Web3Sha3Response
+		web3Sha3Response.Web3Sha3 = result
+
+		return jsonReturn(web3Sha3Response)
+
+	// network ID
+	case i.Ixplac.GetMsgType() == mevm.EvmNetVersionMsgType:
+		var result string
+		err := evmClient.RpcClient.CallContext(evmClient.Ctx, &result, "net_version")
+		if err != nil {
+			return "", err
+		}
+
+		var netVersionResponse types.NetVersionResponse
+		netVersionResponse.NetVersion = result
+
+		return jsonReturn(netVersionResponse)
+
+	// the number of peers
+	case i.Ixplac.GetMsgType() == mevm.EvmNetPeerCountMsgType:
+		var result int
+		err := evmClient.RpcClient.CallContext(evmClient.Ctx, &result, "net_peerCount")
+		if err != nil {
+			return "", err
+		}
+
+		var netPeerCountResponse types.NetPeerCountResponse
+		netPeerCountResponse.NetPeerCount = result
+
+		return jsonReturn(netPeerCountResponse)
+
+	// actively listening for network connections
+	case i.Ixplac.GetMsgType() == mevm.EvmNetListeningMsgType:
+		var result bool
+		err := evmClient.RpcClient.CallContext(evmClient.Ctx, &result, "net_listening")
+		if err != nil {
+			return "", err
+		}
+
+		var netListeningResponse types.NetListeningResponse
+		netListeningResponse.NetListening = result
+
+		return jsonReturn(netListeningResponse)
+
 	default:
 		return "", util.LogErr("invalid evm msg type")
 	}
