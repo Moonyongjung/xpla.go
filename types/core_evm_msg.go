@@ -56,6 +56,11 @@ type Web3Sha3Msg struct {
 	InputParam string
 }
 
+type EthGetBlockTransactionCountMsg struct {
+	BlockHash   string
+	BlockHeight string
+}
+
 // Responses
 type CallSolContractResponse struct {
 	ContractResponse []string `json:"contract_response"`
@@ -95,7 +100,7 @@ type EthBlockNumberResponse struct {
 }
 
 type Web3ClientVersionResponse struct {
-	Web3ClientVersion string `json:"web3_client_version"`
+	Web3ClientVersion string `json:"web3_clientVersion"`
 }
 
 type Web3Sha3Response struct {
@@ -112,4 +117,22 @@ type NetPeerCountResponse struct {
 
 type NetListeningResponse struct {
 	NetListening bool `json:"net_listening"`
+}
+
+type EthProtocolVersionResponse struct {
+	EthProtocolVersionHex string   `json:"eth_protocolVersion_hex"`
+	EthProtocolVersion    *big.Int `json:"eth_protocolVersion"`
+}
+
+type EthSyncingResponse struct {
+	EthSyncing bool `json:"eth_syncing"`
+}
+
+type EthAccountsResponse struct {
+	EthAccounts []string `json:"eth_accounts"`
+}
+
+type EthGetBlockTransactionCountResponse struct {
+	EthGetBlockTransactionCountHex string   `json:"eth_getBlockTransactionCount_hex"`
+	EthGetBlockTransactionCount    *big.Int `json:"eth_getBlockTransactionCount"`
 }

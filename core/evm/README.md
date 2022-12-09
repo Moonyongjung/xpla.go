@@ -89,6 +89,21 @@ res, err := xplac.GetBlockByHashOrHeight(getBlockByHashHeightMsg).Query()
 ```go
 // Query account info of user account or contract
 // Response of query includes account address(Hex and Bech32), balances and etc. 
+// Including Info list
+//   - "account" : account address
+//   - "bech32_account" : account address of Bech32
+//   - "balance" : balances of the account (eth_getBalance)
+//   - "nonce" : account nonce as sequence of tendermint based blockchain (eth_getTransactionCount)
+//   - "storage" : the storage address for a given account (eth_getStorageAt)
+//   - "code" : the contract code of the given account (eth_getCode)
+//   - "pending_balance" : the axpla balance of the given account in the pending state (eth_getBalance of the pending state)
+//   - "pending_nonce" : the account nonce of the given account in the pending state (eth_getTransactionCount of the pending state)
+//   - "pending_storage" : the value of key in the contract storage of the given account in the pending state (eth_getStorageAt of the pending state)
+//   - "pending_code" : the contract code of the given account in the pending state (eth_getCode of the pending state)
+//   - "pending_transaction_count" : the total number of transactions in the pending state (eth_getBlockTransactionCountByNumber of the pending state)
+
+// so, the xpla.go would not support some RPC APIs as "eth_getBalance", "eth_getTransactionCount", "eth_getStorageAt" and "eth_getCode" because the function is AccountInfo includes these.
+
 accountInfoMsg := types.AccountInfoMsg{
     Account: "0xCa8582862B82867C4Bb9E926682dD75820dE6013",
 }
@@ -138,4 +153,34 @@ res, err = xplac.NetPeerCount().Query()
 ### (Query) Network listening
 ```go
 res, err = xplac.NetListening().Query()
+```
+
+### (Query) Ethereum protocol version
+```go
+res, err = xplac.EthProtocolVersion().Query()
+```
+
+### (Query) Ethereum syncing
+```go
+res, err = xplac.EthSyncing().Query()
+```
+
+### (Query) Eth accounts
+```go
+res, err = xplac.EthAccounts().Query()
+```
+
+### (Query) the number of transactions in a given block 
+```go
+// using block height(=number)
+e := types.EthGetBlockTransactionCountMsg{
+    BlockHeight: "5440", // not hex
+}
+
+// using block hash
+e := types.EthGetBlockTransactionCountMsg{
+    BlockHeight: "0x46b3031b22f065f933331dc032ccd34404282ccf7e4fcd54e02d1f808abc112c"
+}
+
+res, err = xplac.EthGetBlockTransactionCount(e).Query()
 ```

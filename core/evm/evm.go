@@ -84,3 +84,13 @@ func MakeWeb3Sha3Msg(web3Sha3Msg types.Web3Sha3Msg) (types.Web3Sha3Msg, error) {
 
 	return msg, nil
 }
+
+// (Query) make msg - get transaction count of the block number
+func MakeEthGetBlockTransactionCountMsg(ethGetBlockTransactionCountMsg types.EthGetBlockTransactionCountMsg) (types.EthGetBlockTransactionCountMsg, error) {
+	msg, err := parseEthGetBlockTransactionCountArgs(ethGetBlockTransactionCountMsg)
+	if err != nil {
+		return types.EthGetBlockTransactionCountMsg{}, err
+	}
+
+	return msg, nil
+}

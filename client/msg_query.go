@@ -450,6 +450,52 @@ func (xplac *XplaClient) NetListening() *XplaClient {
 	return xplac
 }
 
+// ethereum protocol version.
+func (xplac *XplaClient) EthProtocolVersion() *XplaClient {
+	xplac.Module = mevm.EvmModule
+	xplac.MsgType = mevm.EvmEthProtocolVersionMsgType
+	xplac.Msg = nil
+	return xplac
+}
+
+// Query the sync status object depending on the details of tendermint's sync protocol.
+func (xplac *XplaClient) EthSyncing() *XplaClient {
+	xplac.Module = mevm.EvmModule
+	xplac.MsgType = mevm.EvmEthSyncingMsgType
+	xplac.Msg = nil
+	return xplac
+}
+
+// Query all eth accounts.
+func (xplac *XplaClient) EthAccounts() *XplaClient {
+	xplac.Module = mevm.EvmModule
+	xplac.MsgType = mevm.EvmEthAccountsMsgType
+	xplac.Msg = nil
+	return xplac
+}
+
+// Query the number of transaction a given block.
+func (xplac *XplaClient) EthGetBlockTransactionCount(ethGetBlockTransactionCountMsg types.EthGetBlockTransactionCountMsg) *XplaClient {
+	if ethGetBlockTransactionCountMsg.BlockHash == "" && ethGetBlockTransactionCountMsg.BlockHeight == "" {
+		xplac.Err = util.LogErr("cannot query without block hash or height parameter")
+	}
+
+	if ethGetBlockTransactionCountMsg.BlockHash != "" && ethGetBlockTransactionCountMsg.BlockHeight != "" {
+		xplac.Err = util.LogErr("select only one parameter, block hash or height")
+	}
+
+	msg, err := mevm.MakeEthGetBlockTransactionCountMsg(ethGetBlockTransactionCountMsg)
+	if err != nil {
+		xplac.Err = err
+		return xplac
+	}
+	xplac.Module = mevm.EvmModule
+	xplac.MsgType = mevm.EvmEthGetBlockTransactionCountMsgType
+	xplac.Msg = msg
+
+	return xplac
+}
+
 // Feegrant module
 
 // Query details of fee grants.

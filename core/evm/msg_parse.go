@@ -118,3 +118,8 @@ func parseQueryAccountInfoArgs(accountInfoMsg types.AccountInfoMsg) (types.Accou
 func parseWeb3Sha3Args(web3Sha3Msg types.Web3Sha3Msg) (types.Web3Sha3Msg, error) {
 	return web3Sha3Msg, nil
 }
+
+// Parsing - get transaction count of the block
+func parseEthGetBlockTransactionCountArgs(ethGetBlockTransactionCountMsg types.EthGetBlockTransactionCountMsg) (types.EthGetBlockTransactionCountMsg, error) {
+	return ethGetBlockTransactionCountMsg, nil
+}

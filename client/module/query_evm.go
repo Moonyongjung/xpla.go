@@ -1,6 +1,8 @@
 package module
 
 import (
+	"math/big"
+
 	mevm "github.com/Moonyongjung/xpla.go/core/evm"
 	"github.com/Moonyongjung/xpla.go/types"
 	"github.com/Moonyongjung/xpla.go/util"
@@ -307,13 +309,93 @@ func (i IXplaClient) QueryEvm() (string, error) {
 
 		return jsonReturn(netListeningResponse)
 
+	// eth protocol version
+	case i.Ixplac.GetMsgType() == mevm.EvmEthProtocolVersionMsgType:
+		resultBigInt := big.NewInt(0)
+
+		var result string
+		err := evmClient.RpcClient.CallContext(evmClient.Ctx, &result, "eth_protocolVersion")
+		if err != nil {
+			return "", err
+		}
+
+		if result != "" {
+			resultBigInt = util.From0xHexStringToIBignt(result)
+		}
+
+		var ethProtocolVersionResponse types.EthProtocolVersionResponse
+		ethProtocolVersionResponse.EthProtocolVersionHex = result
+		ethProtocolVersionResponse.EthProtocolVersion = resultBigInt
+
+		return jsonReturn(ethProtocolVersionResponse)
+
+	// eth syncing status
+	case i.Ixplac.GetMsgType() == mevm.EvmEthSyncingMsgType:
+		var result bool
+		err := evmClient.RpcClient.CallContext(evmClient.Ctx, &result, "eth_syncing")
+		if err != nil {
+			return "", err
+		}
+
+		var ethSyncingResponse types.EthSyncingResponse
+		ethSyncingResponse.EthSyncing = result
+
+		return jsonReturn(ethSyncingResponse)
+
+	// eth all accounts
+	case i.Ixplac.GetMsgType() == mevm.EvmEthAccountsMsgType:
+		var result []string
+		err := evmClient.RpcClient.CallContext(evmClient.Ctx, &result, "eth_accounts")
+		if err != nil {
+			return "", err
+		}
+
+		var ethAccountsResponse types.EthAccountsResponse
+		ethAccountsResponse.EthAccounts = result
+
+		return jsonReturn(ethAccountsResponse)
+
+	// the number of transaction a given block
+	case i.Ixplac.GetMsgType() == mevm.EvmEthGetBlockTransactionCountMsgType:
+		convertMsg, _ := i.Ixplac.GetMsg().(types.EthGetBlockTransactionCountMsg)
+		resultBigInt := big.NewInt(0)
+
+		util.LogInfo(convertMsg)
+
+		var result string
+		if convertMsg.BlockHash != "" {
+			err := evmClient.RpcClient.CallContext(evmClient.Ctx, &result, "eth_getBlockTransactionCountByHash", convertMsg.BlockHash)
+			if err != nil {
+				return "", err
+			}
+		}
+
+		if convertMsg.BlockHeight != "" {
+			err := evmClient.RpcClient.CallContext(evmClient.Ctx, &result, "eth_getBlockTransactionCountByNumber", convertMsg.BlockHeight)
+			if err != nil {
+				return "", err
+			}
+		}
+
+		if result != "" {
+			resultBigInt = util.From0xHexStringToIBignt(result)
+		} else {
+			result = "not found"
+		}
+
+		var ethGetBlockTransactionCountResponse types.EthGetBlockTransactionCountResponse
+		ethGetBlockTransactionCountResponse.EthGetBlockTransactionCountHex = result
+		ethGetBlockTransactionCountResponse.EthGetBlockTransactionCount = resultBigInt
+
+		return jsonReturn(ethGetBlockTransactionCountResponse)
+
 	default:
 		return "", util.LogErr("invalid evm msg type")
 	}
 }
 
 func jsonReturn(value interface{}) (string, error) {
-	json, err := util.JsonMarshalData(value)
+	json, err := util.JsonMarshalDataIndent(value)
 	if err != nil {
 		return "", err
 	}
