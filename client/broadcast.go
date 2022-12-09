@@ -36,12 +36,18 @@ func (xplac *XplaClient) Broadcast(txBytes []byte) (*types.TxRes, error) {
 // Broadcast the transaction with mode "block".
 // It takes precedence over the option of the xpla client.
 func (xplac *XplaClient) BroadcastBlock(txBytes []byte) (*types.TxRes, error) {
+	if xplac.Module == mevm.EvmModule {
+		return xplac.broadcastEvm(txBytes)
+	}
 	return broadcastTx(xplac, txBytes, txtypes.BroadcastMode_BROADCAST_MODE_BLOCK)
 }
 
 // Broadcast the transaction with mode "Async".
 // It takes precedence over the option of the xpla client.
 func (xplac *XplaClient) BroadcastAsync(txBytes []byte) (*types.TxRes, error) {
+	if xplac.Module == mevm.EvmModule {
+		return xplac.broadcastEvm(txBytes)
+	}
 	return broadcastTx(xplac, txBytes, txtypes.BroadcastMode_BROADCAST_MODE_ASYNC)
 }
 

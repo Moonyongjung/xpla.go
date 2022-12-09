@@ -156,6 +156,15 @@ func FromStringHexToHash(hashString string) common.Hash {
 
 func ToString(value interface{}, defaultValue string) string {
 	s := fmt.Sprintf("%v", value)
+	if s == "" {
+		return defaultValue
+	} else {
+		return s
+	}
+}
+
+func ToStringTrim(value interface{}, defaultValue string) string {
+	s := fmt.Sprintf("%v", value)
 	s = s[1 : len(s)-1]
 	str := strings.TrimSpace(s)
 	if str == "" {
@@ -247,9 +256,9 @@ func MakeQueryLabels(labels ...string) string {
 }
 
 func LogInfo(log ...interface{}) {
-	fmt.Println(ToString(log, ""))
+	fmt.Println(ToStringTrim(log, ""))
 }
 
 func LogErr(log ...interface{}) error {
-	return errors.New(ToString(log, ""))
+	return errors.New(ToStringTrim(log, ""))
 }
