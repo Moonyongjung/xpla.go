@@ -496,6 +496,45 @@ func (xplac *XplaClient) EthGetBlockTransactionCount(ethGetBlockTransactionCount
 	return xplac
 }
 
+// Query estimate gas.
+func (xplac *XplaClient) EstimateGas(invokeSolContractMsg types.InvokeSolContractMsg) *XplaClient {
+	msg, err := mevm.MakeEstimateGasSolMsg(invokeSolContractMsg)
+	if err != nil {
+		xplac.Err = err
+		return xplac
+	}
+	xplac.Module = mevm.EvmModule
+	xplac.MsgType = mevm.EvmEthEstimateGasMsgType
+	xplac.Msg = msg
+	return xplac
+}
+
+// Query transaction by block hash and index.
+func (xplac *XplaClient) EthGetTransactionByBlockHashAndIndex(getTransactionByBlockHashAndIndexMsg types.GetTransactionByBlockHashAndIndexMsg) *XplaClient {
+	msg, err := mevm.MakeGetTransactionByBlockHashAndIndexMsg(getTransactionByBlockHashAndIndexMsg)
+	if err != nil {
+		xplac.Err = err
+		return xplac
+	}
+	xplac.Module = mevm.EvmModule
+	xplac.MsgType = mevm.EvmGetTransactionByBlockHashAndIndexMsgType
+	xplac.Msg = msg
+	return xplac
+}
+
+// Query transaction receipt.
+func (xplac *XplaClient) EthGetTransactionReceipt(getTransactionReceiptMsg types.GetTransactionReceiptMsg) *XplaClient {
+	msg, err := mevm.MakeGetTransactionReceiptMsg(getTransactionReceiptMsg)
+	if err != nil {
+		xplac.Err = err
+		return xplac
+	}
+	xplac.Module = mevm.EvmModule
+	xplac.MsgType = mevm.EvmGetTransactionReceiptMsgType
+	xplac.Msg = msg
+	return xplac
+}
+
 // Feegrant module
 
 // Query details of fee grants.

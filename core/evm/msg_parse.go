@@ -123,3 +123,37 @@ func parseWeb3Sha3Args(web3Sha3Msg types.Web3Sha3Msg) (types.Web3Sha3Msg, error)
 func parseEthGetBlockTransactionCountArgs(ethGetBlockTransactionCountMsg types.EthGetBlockTransactionCountMsg) (types.EthGetBlockTransactionCountMsg, error) {
 	return ethGetBlockTransactionCountMsg, nil
 }
+
+// Parsing - sol contract estimate gas
+func parseEstimateGasSolArgs(invokeSolContractMsg types.InvokeSolContractMsg) (types.InvokeSolContractMsg, error) {
+	var err error
+	bytecode := invokeSolContractMsg.Bytecode
+	if invokeSolContractMsg.BytecodeJsonFilePath != "" {
+		bytecode = util.BytecodeParsing(invokeSolContractMsg.BytecodeJsonFilePath)
+	}
+
+	abi := invokeSolContractMsg.ABI
+	if invokeSolContractMsg.ABIJsonFilePath != "" {
+		abi, err = util.AbiParsing(invokeSolContractMsg.ABIJsonFilePath)
+		if err != nil {
+			return types.InvokeSolContractMsg{}, err
+		}
+	}
+	invokeSolContractMsg.ContractAddress = util.ToTypeHexString(invokeSolContractMsg.ContractAddress)
+	XplaSolContractMetaData = &bind.MetaData{
+		ABI: abi,
+		Bin: bytecode,
+	}
+
+	return invokeSolContractMsg, nil
+}
+
+// Parsing - get transaction by block hash and index
+func parseGetTransactionByBlockHashAndIndexArgs(getTransactionByBlockHashAndIndexMsg types.GetTransactionByBlockHashAndIndexMsg) (types.GetTransactionByBlockHashAndIndexMsg, error) {
+	return getTransactionByBlockHashAndIndexMsg, nil
+}
+
+// Parsing - get transaction receipt
+func parseGetTransactionReceiptArgs(getTransactionReceiptMsg types.GetTransactionReceiptMsg) (types.GetTransactionReceiptMsg, error) {
+	return getTransactionReceiptMsg, nil
+}

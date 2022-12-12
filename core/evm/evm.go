@@ -94,3 +94,33 @@ func MakeEthGetBlockTransactionCountMsg(ethGetBlockTransactionCountMsg types.Eth
 
 	return msg, nil
 }
+
+// (Query) make msg - sol contract estimate gas
+func MakeEstimateGasSolMsg(invokeSolContractMsg types.InvokeSolContractMsg) (types.InvokeSolContractMsg, error) {
+	msg, err := parseEstimateGasSolArgs(invokeSolContractMsg)
+	if err != nil {
+		return types.InvokeSolContractMsg{}, err
+	}
+
+	return msg, nil
+}
+
+// (Query) make msg - get transaction by block hash and index
+func MakeGetTransactionByBlockHashAndIndexMsg(getTransactionByBlockHashAndIndexMsg types.GetTransactionByBlockHashAndIndexMsg) (types.GetTransactionByBlockHashAndIndexMsg, error) {
+	msg, err := parseGetTransactionByBlockHashAndIndexArgs(getTransactionByBlockHashAndIndexMsg)
+	if err != nil {
+		return types.GetTransactionByBlockHashAndIndexMsg{}, err
+	}
+
+	return msg, nil
+}
+
+// (Query) make msg - get transaction receipt
+func MakeGetTransactionReceiptMsg(getTransactionReceiptMsg types.GetTransactionReceiptMsg) (types.GetTransactionReceiptMsg, error) {
+	msg, err := parseGetTransactionReceiptArgs(getTransactionReceiptMsg)
+	if err != nil {
+		return types.GetTransactionReceiptMsg{}, err
+	}
+
+	return msg, nil
+}

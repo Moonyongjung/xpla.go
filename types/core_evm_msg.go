@@ -61,6 +61,15 @@ type EthGetBlockTransactionCountMsg struct {
 	BlockHeight string
 }
 
+type GetTransactionByBlockHashAndIndexMsg struct {
+	BlockHash string
+	Index     string
+}
+
+type GetTransactionReceiptMsg struct {
+	TransactionHash string
+}
+
 // Responses
 type CallSolContractResponse struct {
 	ContractResponse []string `json:"contract_response"`
@@ -135,4 +144,8 @@ type EthAccountsResponse struct {
 type EthGetBlockTransactionCountResponse struct {
 	EthGetBlockTransactionCountHex string   `json:"eth_getBlockTransactionCount_hex"`
 	EthGetBlockTransactionCount    *big.Int `json:"eth_getBlockTransactionCount"`
+}
+
+type EstimateGasResponse struct {
+	EstimateGas uint64 `json:"eth_estimateGas"`
 }

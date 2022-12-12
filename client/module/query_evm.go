@@ -97,12 +97,7 @@ func (i IXplaClient) QueryEvm() (string, error) {
 			return "", err
 		}
 
-		json, err := tx.MarshalJSON()
-		if err != nil {
-			return "", err
-		}
-
-		return string(json), nil
+		return jsonReturn(tx)
 
 	// Evm block by hash or height
 	case i.Ixplac.GetMsgType() == mevm.EvmGetBlockByHashHeightMsgType:
@@ -388,6 +383,68 @@ func (i IXplaClient) QueryEvm() (string, error) {
 		ethGetBlockTransactionCountResponse.EthGetBlockTransactionCount = resultBigInt
 
 		return jsonReturn(ethGetBlockTransactionCountResponse)
+
+	// Evm call contract
+	case i.Ixplac.GetMsgType() == mevm.EvmEthEstimateGasMsgType:
+		convertMsg, _ := i.Ixplac.GetMsg().(types.InvokeSolContractMsg)
+
+		callByteData, err := GetAbiPack(convertMsg.ContractFuncCallName, convertMsg.Args...)
+		if err != nil {
+			return "", err
+		}
+
+		fromAddr := util.FromStringToByte20Address(i.Ixplac.GetPrivateKey().PubKey().Address().String())
+		toAddr := util.FromStringToByte20Address(convertMsg.ContractAddress)
+		value, err := util.FromStringToBigInt("0")
+		if err != nil {
+			return "", err
+		}
+
+		msg := ethereum.CallMsg{
+			From:     fromAddr,
+			To:       &toAddr,
+			Gas:      util.FromStringToUint64(gasLimit),
+			GasPrice: gasPriceBigInt,
+			Value:    value,
+			Data:     callByteData,
+		}
+
+		res, err := evmClient.Client.EstimateGas(evmClient.Ctx, msg)
+		if err != nil {
+			return "", err
+		}
+
+		var estimateGasResponse types.EstimateGasResponse
+		estimateGasResponse.EstimateGas = res
+
+		return jsonReturn(estimateGasResponse)
+
+	// get transaction by block hash and index
+	case i.Ixplac.GetMsgType() == mevm.EvmGetTransactionByBlockHashAndIndexMsgType:
+		convertMsg, _ := i.Ixplac.GetMsg().(types.GetTransactionByBlockHashAndIndexMsg)
+
+		blockHash := util.FromStringHexToHash(convertMsg.BlockHash)
+		index := util.FromStringToUint64(convertMsg.Index)
+
+		res, err := evmClient.Client.TransactionInBlock(evmClient.Ctx, blockHash, uint(index))
+		if err != nil {
+			return "", err
+		}
+
+		return jsonReturn(res)
+
+	// get transaction receipt
+	case i.Ixplac.GetMsgType() == mevm.EvmGetTransactionReceiptMsgType:
+		convertMsg, _ := i.Ixplac.GetMsg().(types.GetTransactionReceiptMsg)
+
+		transactionHash := util.FromStringHexToHash(convertMsg.TransactionHash)
+
+		res, err := evmClient.Client.TransactionReceipt(evmClient.Ctx, transactionHash)
+		if err != nil {
+			return "", err
+		}
+
+		return jsonReturn(res)
 
 	default:
 		return "", util.LogErr("invalid evm msg type")

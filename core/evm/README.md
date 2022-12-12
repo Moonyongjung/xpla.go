@@ -170,11 +170,11 @@ res, err = xplac.EthSyncing().Query()
 res, err = xplac.EthAccounts().Query()
 ```
 
-### (Query) the number of transactions in a given block 
+### (Query) The number of transactions in a given block 
 ```go
 // using block height(=number)
 e := types.EthGetBlockTransactionCountMsg{
-    BlockHeight: "5440", // not hex
+    BlockHeight: "5440",
 }
 
 // using block hash
@@ -183,4 +183,40 @@ e := types.EthGetBlockTransactionCountMsg{
 }
 
 res, err = xplac.EthGetBlockTransactionCount(e).Query()
+```
+
+### (Query) Estimate gas to contract
+```go
+var args []interface{}
+args = append(args, big.NewInt(6151212))
+
+// invoke message to estimate
+invokeSolContractMsg := types.InvokeSolContractMsg{
+    ContractAddress:      c.ContractAddress,
+    ContractFuncCallName: "store",
+    Args:                 args,
+    ABIJsonFilePath:      "./testfiles/abi.json",
+    BytecodeJsonFilePath: "./testfiles/bytecode.json",
+}
+
+res, err = xplac.EstimateGas(invokeSolContractMsg).Query()
+```
+
+### (Query) Get transaction by block hash and index
+```go
+getTransactionByBlockHashAndIndexMsg := types.GetTransactionByBlockHashAndIndexMsg{
+    BlockHash: "0x7f562573c1b0ca6fc3a83246372a5d57f917a4c654c91b65ebd756dec4989d0f",
+    Index:     "0",
+}
+
+res, err = xplac.EthGetTransactionByBlockHashAndIndex(getTransactionByBlockHashAndIndexMsg).Query()
+```
+
+### (Query) Get transaction receipt
+```go
+getTransactionReceiptMsg := types.GetTransactionReceiptMsg{
+    TransactionHash: "0x20ec56d16231c4d7f761c2533885619489fface85cf6c478868ef1d531b93177",
+}
+
+res, err = xplac.EthGetTransactionReceipt(getTransactionReceiptMsg).Query()
 ```
