@@ -70,6 +70,33 @@ type GetTransactionReceiptMsg struct {
 	TransactionHash string
 }
 
+type EthNewFilterMsg struct {
+	FromBlock string
+	ToBlock   string
+	Address   []string
+	Topics    []string
+}
+
+type EthGetLogsMsg struct {
+	BlockHash string
+	FromBlock string
+	ToBlock   string
+	Address   []string
+	Topics    []string
+}
+
+type EthUninsatllFilterMsg struct {
+	FilterId string
+}
+
+type EthGetFilterChangesMsg struct {
+	FilterId string
+}
+
+type EthGetFilterLogsMsg struct {
+	FilterId string
+}
+
 // Responses
 type CallSolContractResponse struct {
 	ContractResponse []string `json:"contract_response"`
@@ -148,4 +175,36 @@ type EthGetBlockTransactionCountResponse struct {
 
 type EstimateGasResponse struct {
 	EstimateGas uint64 `json:"eth_estimateGas"`
+}
+
+type EthNewFilterResponse struct {
+	NewFilter interface{} `json:"eth_newFilter"`
+}
+
+type EthNewBlockFilterResponse struct {
+	NewBlockFilter interface{} `json:"eth_newBlockFilter"`
+}
+
+type EthNewPendingTransactionFilterResponse struct {
+	NewPendingTransactionFilter interface{} `json:"eth_newPendingTransactionFilter"`
+}
+
+type EthUninstallFilterResponse struct {
+	UninstallFilter bool `json:"eth_uninstallFilter"`
+}
+
+type EthGetFilterChangesResponse struct {
+	GetFilterChanges []string `json:"eth_getFilterChanges"`
+}
+
+type EthGetFilterLogsResponse struct {
+	GetFilterLogs []string `json:"eth_getFilterLogs"`
+}
+
+type EthGetLogsResponse struct {
+	GetLogs interface{} `json:"eth_getLogs"`
+}
+
+type EthCoinbaseResponse struct {
+	Coinbase string `json:"eth_coinbase"`
 }

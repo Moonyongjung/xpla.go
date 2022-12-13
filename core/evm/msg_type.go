@@ -1,5 +1,10 @@
 package evm
 
+import (
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/rpc"
+)
+
 const (
 	EvmModule                                   = "evm"
 	EvmSendCoinMsgType                          = "evm-send-coin"
@@ -24,4 +29,20 @@ const (
 	EvmEthEstimateGasMsgType                    = "eth-estimate-gas"
 	EvmGetTransactionByBlockHashAndIndexMsgType = "eth-get-transaction-by-block-hash-and-index"
 	EvmGetTransactionReceiptMsgType             = "eth-get-transaction-receipt"
+	EvmEthNewFilterMsgType                      = "eth-new-filter"
+	EvmEthNewBlockFilterMsgType                 = "eth-new-block-filter"
+	EvmEthNewPendingTransactionFilterMsgType    = "eth-new-pending-transaction-filter"
+	EvmEthUninsatllFilterMsgType                = "eth-uninstall-filter"
+	EvmEthGetFilterChangesMsgType               = "eth-get-filter-changes"
+	EvmEthGetFilterLogsMsgType                  = "eth-get-filter-logs"
+	EvmEthGetLogsMsgType                        = "eth-get-logs"
+	EvmEthCoinbaseMsgType                       = "eth-coinbase"
 )
+
+type EthNewFilterParseMsg struct {
+	BlockHash *common.Hash     `json:"blockHash,omitempty"`
+	FromBlock *rpc.BlockNumber `json:"fromBlock"`
+	ToBlock   *rpc.BlockNumber `json:"toBlock"`
+	Addresses interface{}      `json:"address"`
+	Topics    []interface{}    `json:"topics"`
+}

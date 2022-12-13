@@ -124,3 +124,53 @@ func MakeGetTransactionReceiptMsg(getTransactionReceiptMsg types.GetTransactionR
 
 	return msg, nil
 }
+
+// (Query) make msg - eth new filter
+func MakeEthNewFilterMsg(ethNewFilterMsg types.EthNewFilterMsg) (EthNewFilterParseMsg, error) {
+	msg, err := parseEthNewFilterArgs(ethNewFilterMsg)
+	if err != nil {
+		return EthNewFilterParseMsg{}, err
+	}
+
+	return msg, nil
+}
+
+// (Query) make msg - eth uninstall filter
+func MakeEthUninstallFilterMsg(ethUninsatllFilter types.EthUninsatllFilterMsg) (types.EthUninsatllFilterMsg, error) {
+	msg, err := parseEthUninsatllFilterArgs(ethUninsatllFilter)
+	if err != nil {
+		return types.EthUninsatllFilterMsg{}, err
+	}
+
+	return msg, nil
+}
+
+// (Query) make msg - eth get filter changes
+func MakeEthGetFilterChangesMsg(ethGetFilterChangesMsg types.EthGetFilterChangesMsg) (types.EthGetFilterChangesMsg, error) {
+	msg, err := parseEthGetFilterChangesArgs(ethGetFilterChangesMsg)
+	if err != nil {
+		return types.EthGetFilterChangesMsg{}, err
+	}
+
+	return msg, nil
+}
+
+// (Query) make msg - eth get filter logs
+func MakeEthGetFilterLogsMsg(ethGetFilterLogsMsg types.EthGetFilterLogsMsg) (types.EthGetFilterLogsMsg, error) {
+	msg, err := parseEthGetFilterLogsArgs(ethGetFilterLogsMsg)
+	if err != nil {
+		return types.EthGetFilterLogsMsg{}, err
+	}
+
+	return msg, nil
+}
+
+// (Query) make msg - eth get logs
+func MakeEthGetLogsMsg(ethGetLogsMsg types.EthGetLogsMsg) (EthNewFilterParseMsg, error) {
+	msg, err := parseEthGetLogsArgs(ethGetLogsMsg)
+	if err != nil {
+		return EthNewFilterParseMsg{}, err
+	}
+
+	return msg, nil
+}

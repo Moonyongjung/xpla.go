@@ -220,3 +220,61 @@ getTransactionReceiptMsg := types.GetTransactionReceiptMsg{
 
 res, err = xplac.EthGetTransactionReceipt(getTransactionReceiptMsg).Query()
 ```
+
+### (Query) New filter
+```go
+ethNewFilterMsg := types.EthNewFilterMsg{
+    Topics:    []string{"0x20ec56d16231c4d7f761c2533885619489fface85cf6c478868ef1d531b93177"},
+    Address:   []string{"0xf7777b36a51fb0b33dd0c5118361AfC94ff7f967"},
+    ToBlock:   "latest",
+    FromBlock: "earliest",
+}
+
+res, err = xplac.EthNewFilter(ethNewFilterMsg).Query()
+```
+ 
+### (Query) New block filter
+```go
+res, err = xplac.EthNewBlockFilter().Query()
+```
+
+### (Query) New pending transaction filter
+```go
+res, err = xplac.EthNewPendingTransactionFilter().Query()
+```
+
+### (Query) Uninstall filter
+```go
+ethUninsatllFilterMsg := types.EthUninsatllFilterMsg{
+    FilterId: "0x168b9d421ecbffa1ac706926c2203454",
+}
+
+res, err = xplac.EthUnistallFilter(ethUninsatllFilterMsg).Query()
+```
+
+### (Query) Get filter changes
+```go
+ethGetFilterChangesMsg := types.EthGetFilterChangesMsg{
+    FilterId: "0x9852d91813fb44da471436722e02965e",
+}
+
+res, err = xplac.EthGetFilterChanges(ethGetFilterChangesMsg).Query()
+```
+
+### (Query) Get logs
+```go
+ethGetLogsMsg := types.EthGetLogsMsg{
+    Topics:  []string{"0x20ec56d16231c4d7f761c2533885619489fface85cf6c478868ef1d531b93177"},
+    Address: []string{"0xf7777b36a51fb0b33dd0c5118361AfC94ff7f967"},
+    ToBlock: "latest",
+    FromBlock: "latest",
+    // BlockHash: "0x46b3031b22f065f933331dc032ccd34404282ccf7e4fcd54e02d1f808abc112c",
+}
+
+res, err = xplac.EthGetLogs(ethGetLogsMsg).Query()
+```
+
+### (Query) Coinbase
+```go
+res, err = xplac.EthCoinbase().Query()
+```

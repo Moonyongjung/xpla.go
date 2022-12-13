@@ -446,6 +446,130 @@ func (i IXplaClient) QueryEvm() (string, error) {
 
 		return jsonReturn(res)
 
+	// get filter ID by eth new filter
+	case i.Ixplac.GetMsgType() == mevm.EvmEthNewFilterMsgType:
+		convertMsg, _ := i.Ixplac.GetMsg().(mevm.EthNewFilterParseMsg)
+
+		var result interface{}
+		err = evmClient.RpcClient.CallContext(evmClient.Ctx, &result, "eth_newFilter", convertMsg)
+		if err != nil {
+			return "", err
+		}
+
+		var ethNewFilterResponse types.EthNewFilterResponse
+		ethNewFilterResponse.NewFilter = result
+
+		return jsonReturn(ethNewFilterResponse)
+
+	// get transaction receipt
+	case i.Ixplac.GetMsgType() == mevm.EvmEthNewBlockFilterMsgType:
+
+		var result interface{}
+		err := evmClient.RpcClient.CallContext(evmClient.Ctx, &result, "eth_newBlockFilter")
+		if err != nil {
+			return "", err
+		}
+
+		ethNewBlockFilterResponse := types.EthNewBlockFilterResponse{
+			NewBlockFilter: result,
+		}
+
+		return jsonReturn(ethNewBlockFilterResponse)
+
+	// get transaction receipt
+	case i.Ixplac.GetMsgType() == mevm.EvmEthNewPendingTransactionFilterMsgType:
+
+		var result interface{}
+		err := evmClient.RpcClient.CallContext(evmClient.Ctx, &result, "eth_newPendingTransactionFilter")
+		if err != nil {
+			return "", err
+		}
+
+		ethNewPendingTransactionFilterResponse := types.EthNewPendingTransactionFilterResponse{
+			NewPendingTransactionFilter: result,
+		}
+
+		return jsonReturn(ethNewPendingTransactionFilterResponse)
+
+	// uninstall filter
+	case i.Ixplac.GetMsgType() == mevm.EvmEthUninsatllFilterMsgType:
+		convertMsg, _ := i.Ixplac.GetMsg().(types.EthUninsatllFilterMsg)
+
+		var result bool
+		err := evmClient.RpcClient.CallContext(evmClient.Ctx, &result, "eth_uninstallFilter", convertMsg.FilterId)
+		if err != nil {
+			return "", err
+		}
+
+		ethUninstallFilterResponse := types.EthUninstallFilterResponse{
+			UninstallFilter: result,
+		}
+
+		return jsonReturn(ethUninstallFilterResponse)
+
+	// get filter changes
+	case i.Ixplac.GetMsgType() == mevm.EvmEthGetFilterChangesMsgType:
+		convertMsg, _ := i.Ixplac.GetMsg().(types.EthGetFilterChangesMsg)
+
+		var result []string
+		err := evmClient.RpcClient.CallContext(evmClient.Ctx, &result, "eth_getFilterChanges", convertMsg.FilterId)
+		if err != nil {
+			return "", err
+		}
+
+		ethGetFilterChangesResponse := types.EthGetFilterChangesResponse{
+			GetFilterChanges: result,
+		}
+
+		return jsonReturn(ethGetFilterChangesResponse)
+
+	// get filter logs
+	case i.Ixplac.GetMsgType() == mevm.EvmEthGetFilterLogsMsgType:
+		convertMsg, _ := i.Ixplac.GetMsg().(types.EthGetFilterLogsMsg)
+
+		var result []string
+		err := evmClient.RpcClient.CallContext(evmClient.Ctx, &result, "eth_getFilterLogs", convertMsg.FilterId)
+		if err != nil {
+			return "", err
+		}
+
+		ethGetFilterLogsResponse := types.EthGetFilterLogsResponse{
+			GetFilterLogs: result,
+		}
+
+		return jsonReturn(ethGetFilterLogsResponse)
+
+	// get logs
+	case i.Ixplac.GetMsgType() == mevm.EvmEthGetLogsMsgType:
+		convertMsg, _ := i.Ixplac.GetMsg().(mevm.EthNewFilterParseMsg)
+
+		var result interface{}
+		err := evmClient.RpcClient.CallContext(evmClient.Ctx, &result, "eth_getLogs", convertMsg)
+		if err != nil {
+			return "", err
+		}
+
+		ethGetLogsResponse := types.EthGetLogsResponse{
+			GetLogs: result,
+		}
+
+		return jsonReturn(ethGetLogsResponse)
+
+	// get coinbase
+	case i.Ixplac.GetMsgType() == mevm.EvmEthCoinbaseMsgType:
+
+		var result string
+		err := evmClient.RpcClient.CallContext(evmClient.Ctx, &result, "eth_coinbase")
+		if err != nil {
+			return "", err
+		}
+
+		ethCoinbaseResponse := types.EthCoinbaseResponse{
+			Coinbase: result,
+		}
+
+		return jsonReturn(ethCoinbaseResponse)
+
 	default:
 		return "", util.LogErr("invalid evm msg type")
 	}
