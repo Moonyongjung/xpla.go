@@ -29,8 +29,15 @@ func (xplac *XplaClient) Query() (string, error) {
 		return "", xplac.Err
 	}
 
-	if xplac.Opts.GrpcURL == "" && xplac.Opts.LcdURL == "" {
-		return "", util.LogErr("at least one of the gRPC URL & LCD URL must exist for query")
+	if xplac.GetGrpcUrl() == "" && xplac.GetLcdURL() == "" {
+		if xplac.Module == mevm.EvmModule {
+			if xplac.GetEvmRpc() == "" {
+				return "", util.LogErr("evm JSON-RPC URL must exist")
+			}
+
+		} else {
+			return "", util.LogErr("at least one of the gRPC URL & LCD URL must exist for query")
+		}
 	}
 
 	qt := setQueryType(xplac)

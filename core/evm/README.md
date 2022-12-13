@@ -89,6 +89,21 @@ res, err := xplac.GetBlockByHashOrHeight(getBlockByHashHeightMsg).Query()
 ```go
 // Query account info of user account or contract
 // Response of query includes account address(Hex and Bech32), balances and etc. 
+// Including Info list
+//   - "account" : account address
+//   - "bech32_account" : account address of Bech32
+//   - "balance" : balances of the account (eth_getBalance)
+//   - "nonce" : account nonce as sequence of tendermint based blockchain (eth_getTransactionCount)
+//   - "storage" : the storage address for a given account (eth_getStorageAt)
+//   - "code" : the contract code of the given account (eth_getCode)
+//   - "pending_balance" : the axpla balance of the given account in the pending state (eth_getBalance of the pending state)
+//   - "pending_nonce" : the account nonce of the given account in the pending state (eth_getTransactionCount of the pending state)
+//   - "pending_storage" : the value of key in the contract storage of the given account in the pending state (eth_getStorageAt of the pending state)
+//   - "pending_code" : the contract code of the given account in the pending state (eth_getCode of the pending state)
+//   - "pending_transaction_count" : the total number of transactions in the pending state (eth_getBlockTransactionCountByNumber of the pending state)
+
+// so, the xpla.go would not support some RPC APIs as "eth_getBalance", "eth_getTransactionCount", "eth_getStorageAt" and "eth_getCode" because the function is AccountInfo includes these.
+
 accountInfoMsg := types.AccountInfoMsg{
     Account: "0xCa8582862B82867C4Bb9E926682dD75820dE6013",
 }
@@ -109,4 +124,157 @@ res, err := xplac.EthChainID().Query()
 ### (Query) Latest block number
 ```go
 res, err := xplac.EthBlockNumber().Query()
+```
+
+### (Query) Web3 client version
+```go
+res, err = xplac.Web3ClientVersion().Query()
+```
+
+### (Query) Web3 SHA3 (return Keccak-256)
+```go
+web3Sha3Msg := types.Web3Sha3Msg{
+    InputParam: "web3-sha3-test",
+}
+
+res, err = xplac.Web3Sha3(web3Sha3Msg).Query()
+```
+
+### (Query) Network ID
+```go
+res, err = xplac.NetVersion().Query()
+```
+
+### (Query) Network peer count
+```go
+res, err = xplac.NetPeerCount().Query()
+```
+
+### (Query) Network listening
+```go
+res, err = xplac.NetListening().Query()
+```
+
+### (Query) Ethereum protocol version
+```go
+res, err = xplac.EthProtocolVersion().Query()
+```
+
+### (Query) Ethereum syncing
+```go
+res, err = xplac.EthSyncing().Query()
+```
+
+### (Query) Eth accounts
+```go
+res, err = xplac.EthAccounts().Query()
+```
+
+### (Query) The number of transactions in a given block 
+```go
+// using block height(=number)
+e := types.EthGetBlockTransactionCountMsg{
+    BlockHeight: "5440",
+}
+
+// using block hash
+e := types.EthGetBlockTransactionCountMsg{
+    BlockHeight: "0x46b3031b22f065f933331dc032ccd34404282ccf7e4fcd54e02d1f808abc112c"
+}
+
+res, err = xplac.EthGetBlockTransactionCount(e).Query()
+```
+
+### (Query) Estimate gas to contract
+```go
+var args []interface{}
+args = append(args, big.NewInt(6151212))
+
+// invoke message to estimate
+invokeSolContractMsg := types.InvokeSolContractMsg{
+    ContractAddress:      c.ContractAddress,
+    ContractFuncCallName: "store",
+    Args:                 args,
+    ABIJsonFilePath:      "./testfiles/abi.json",
+    BytecodeJsonFilePath: "./testfiles/bytecode.json",
+}
+
+res, err = xplac.EstimateGas(invokeSolContractMsg).Query()
+```
+
+### (Query) Get transaction by block hash and index
+```go
+getTransactionByBlockHashAndIndexMsg := types.GetTransactionByBlockHashAndIndexMsg{
+    BlockHash: "0x7f562573c1b0ca6fc3a83246372a5d57f917a4c654c91b65ebd756dec4989d0f",
+    Index:     "0",
+}
+
+res, err = xplac.EthGetTransactionByBlockHashAndIndex(getTransactionByBlockHashAndIndexMsg).Query()
+```
+
+### (Query) Get transaction receipt
+```go
+getTransactionReceiptMsg := types.GetTransactionReceiptMsg{
+    TransactionHash: "0x20ec56d16231c4d7f761c2533885619489fface85cf6c478868ef1d531b93177",
+}
+
+res, err = xplac.EthGetTransactionReceipt(getTransactionReceiptMsg).Query()
+```
+
+### (Query) New filter
+```go
+ethNewFilterMsg := types.EthNewFilterMsg{
+    Topics:    []string{"0x20ec56d16231c4d7f761c2533885619489fface85cf6c478868ef1d531b93177"},
+    Address:   []string{"0xf7777b36a51fb0b33dd0c5118361AfC94ff7f967"},
+    ToBlock:   "latest",
+    FromBlock: "earliest",
+}
+
+res, err = xplac.EthNewFilter(ethNewFilterMsg).Query()
+```
+ 
+### (Query) New block filter
+```go
+res, err = xplac.EthNewBlockFilter().Query()
+```
+
+### (Query) New pending transaction filter
+```go
+res, err = xplac.EthNewPendingTransactionFilter().Query()
+```
+
+### (Query) Uninstall filter
+```go
+ethUninsatllFilterMsg := types.EthUninsatllFilterMsg{
+    FilterId: "0x168b9d421ecbffa1ac706926c2203454",
+}
+
+res, err = xplac.EthUnistallFilter(ethUninsatllFilterMsg).Query()
+```
+
+### (Query) Get filter changes
+```go
+ethGetFilterChangesMsg := types.EthGetFilterChangesMsg{
+    FilterId: "0x9852d91813fb44da471436722e02965e",
+}
+
+res, err = xplac.EthGetFilterChanges(ethGetFilterChangesMsg).Query()
+```
+
+### (Query) Get logs
+```go
+ethGetLogsMsg := types.EthGetLogsMsg{
+    Topics:  []string{"0x20ec56d16231c4d7f761c2533885619489fface85cf6c478868ef1d531b93177"},
+    Address: []string{"0xf7777b36a51fb0b33dd0c5118361AfC94ff7f967"},
+    ToBlock: "latest",
+    FromBlock: "latest",
+    // BlockHash: "0x46b3031b22f065f933331dc032ccd34404282ccf7e4fcd54e02d1f808abc112c",
+}
+
+res, err = xplac.EthGetLogs(ethGetLogsMsg).Query()
+```
+
+### (Query) Coinbase
+```go
+res, err = xplac.EthCoinbase().Query()
 ```

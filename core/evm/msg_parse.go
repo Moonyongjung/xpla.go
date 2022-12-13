@@ -4,7 +4,10 @@ import (
 	"github.com/Moonyongjung/xpla.go/key"
 	"github.com/Moonyongjung/xpla.go/types"
 	"github.com/Moonyongjung/xpla.go/util"
+
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/rpc"
 )
 
 // Parsing - send coin
@@ -111,4 +114,214 @@ func parseGetBlockByHashHeightArgs(getBlockByHashHeightMsg types.GetBlockByHashH
 // Parsing - account info
 func parseQueryAccountInfoArgs(accountInfoMsg types.AccountInfoMsg) (types.AccountInfoMsg, error) {
 	return accountInfoMsg, nil
+}
+
+// Parsing - web3 sha3
+func parseWeb3Sha3Args(web3Sha3Msg types.Web3Sha3Msg) (types.Web3Sha3Msg, error) {
+	return web3Sha3Msg, nil
+}
+
+// Parsing - get transaction count of the block
+func parseEthGetBlockTransactionCountArgs(ethGetBlockTransactionCountMsg types.EthGetBlockTransactionCountMsg) (types.EthGetBlockTransactionCountMsg, error) {
+	return ethGetBlockTransactionCountMsg, nil
+}
+
+// Parsing - sol contract estimate gas
+func parseEstimateGasSolArgs(invokeSolContractMsg types.InvokeSolContractMsg) (types.InvokeSolContractMsg, error) {
+	var err error
+	bytecode := invokeSolContractMsg.Bytecode
+	if invokeSolContractMsg.BytecodeJsonFilePath != "" {
+		bytecode = util.BytecodeParsing(invokeSolContractMsg.BytecodeJsonFilePath)
+	}
+
+	abi := invokeSolContractMsg.ABI
+	if invokeSolContractMsg.ABIJsonFilePath != "" {
+		abi, err = util.AbiParsing(invokeSolContractMsg.ABIJsonFilePath)
+		if err != nil {
+			return types.InvokeSolContractMsg{}, err
+		}
+	}
+	invokeSolContractMsg.ContractAddress = util.ToTypeHexString(invokeSolContractMsg.ContractAddress)
+	XplaSolContractMetaData = &bind.MetaData{
+		ABI: abi,
+		Bin: bytecode,
+	}
+
+	return invokeSolContractMsg, nil
+}
+
+// Parsing - get transaction by block hash and index
+func parseGetTransactionByBlockHashAndIndexArgs(getTransactionByBlockHashAndIndexMsg types.GetTransactionByBlockHashAndIndexMsg) (types.GetTransactionByBlockHashAndIndexMsg, error) {
+	return getTransactionByBlockHashAndIndexMsg, nil
+}
+
+// Parsing - get transaction receipt
+func parseGetTransactionReceiptArgs(getTransactionReceiptMsg types.GetTransactionReceiptMsg) (types.GetTransactionReceiptMsg, error) {
+	return getTransactionReceiptMsg, nil
+}
+
+// Parsing - get transaction receipt
+func parseEthNewFilterArgs(ethNewFilterMsg types.EthNewFilterMsg) (EthNewFilterParseMsg, error) {
+	var fromBlock rpc.BlockNumber
+	var toBlock rpc.BlockNumber
+	var addresses []common.Address
+	var topicsHash []common.Hash
+	var topics []interface{}
+
+	if ethNewFilterMsg.FromBlock == "latest" ||
+		ethNewFilterMsg.FromBlock == "" {
+		fromBlock = rpc.LatestBlockNumber
+
+	} else if ethNewFilterMsg.FromBlock == "earliest" {
+		fromBlock = rpc.EarliestBlockNumber
+
+	} else if ethNewFilterMsg.FromBlock == "pending" {
+		fromBlock = rpc.PendingBlockNumber
+
+	} else {
+		return EthNewFilterParseMsg{}, util.LogErr("invalid from/to block type, (latest/earliest/pending)")
+	}
+
+	if ethNewFilterMsg.ToBlock == "latest" ||
+		ethNewFilterMsg.ToBlock == "" {
+		toBlock = rpc.LatestBlockNumber
+
+	} else if ethNewFilterMsg.ToBlock == "earliest" {
+		toBlock = rpc.EarliestBlockNumber
+
+	} else if ethNewFilterMsg.ToBlock == "pending" {
+		toBlock = rpc.PendingBlockNumber
+
+	} else {
+		return EthNewFilterParseMsg{}, util.LogErr("invalid from/to block type, (latest/earliest/pending)")
+	}
+
+	if len(ethNewFilterMsg.Address) != 0 {
+		for _, address := range ethNewFilterMsg.Address {
+			byte20Addr := util.FromStringToByte20Address(address)
+			addresses = append(addresses, byte20Addr)
+		}
+	} else {
+		addresses = []common.Address{util.FromStringToByte20Address("0x0")}
+	}
+
+	if len(ethNewFilterMsg.Topics) != 0 {
+		for _, topic := range ethNewFilterMsg.Topics {
+			commonHashTopic := util.FromStringHexToHash(topic)
+			topicsHash = append(topicsHash, commonHashTopic)
+		}
+		topics = append(topics, topicsHash)
+	} else {
+		topics = append(topics, []common.Hash{})
+	}
+
+	varInput := EthNewFilterParseMsg{
+		FromBlock: &fromBlock,
+		ToBlock:   &toBlock,
+		Addresses: addresses,
+		Topics:    topics,
+	}
+
+	return varInput, nil
+}
+
+// Parsing - uninstall filter
+func parseEthUninsatllFilterArgs(ethUninsatllFilter types.EthUninsatllFilterMsg) (types.EthUninsatllFilterMsg, error) {
+	return ethUninsatllFilter, nil
+}
+
+// Parsing - get filter changes
+func parseEthGetFilterChangesArgs(ethGetFilterChangesMsg types.EthGetFilterChangesMsg) (types.EthGetFilterChangesMsg, error) {
+	return ethGetFilterChangesMsg, nil
+}
+
+// Parsing - get filter logs
+func parseEthGetFilterLogsArgs(ethGetFilterLogsMsg types.EthGetFilterLogsMsg) (types.EthGetFilterLogsMsg, error) {
+	return ethGetFilterLogsMsg, nil
+}
+
+// Parsing - get logs
+func parseEthGetLogsArgs(ethGetLogsMsg types.EthGetLogsMsg) (EthNewFilterParseMsg, error) {
+	var blockHash common.Hash
+	var fromBlock rpc.BlockNumber
+	var toBlock rpc.BlockNumber
+	var addresses []common.Address
+	var topicsHash []common.Hash
+	var topics []interface{}
+
+	if (ethGetLogsMsg.FromBlock != "" || ethGetLogsMsg.ToBlock != "") &&
+		ethGetLogsMsg.BlockHash != "" {
+		return EthNewFilterParseMsg{}, util.LogErr("cannot specify both BlockHash and FromBlock/ToBlock, choose one or the other")
+	}
+
+	if ethGetLogsMsg.FromBlock == "latest" ||
+		ethGetLogsMsg.FromBlock == "" {
+		fromBlock = rpc.LatestBlockNumber
+
+	} else if ethGetLogsMsg.FromBlock == "earliest" {
+		fromBlock = rpc.EarliestBlockNumber
+
+	} else if ethGetLogsMsg.FromBlock == "pending" {
+		fromBlock = rpc.PendingBlockNumber
+
+	} else {
+		return EthNewFilterParseMsg{}, util.LogErr("invalid from/to block type, (latest/earliest/pending)")
+	}
+
+	if ethGetLogsMsg.ToBlock == "latest" ||
+		ethGetLogsMsg.ToBlock == "" {
+		toBlock = rpc.LatestBlockNumber
+
+	} else if ethGetLogsMsg.ToBlock == "earliest" {
+		toBlock = rpc.EarliestBlockNumber
+
+	} else if ethGetLogsMsg.ToBlock == "pending" {
+		toBlock = rpc.PendingBlockNumber
+
+	} else {
+		return EthNewFilterParseMsg{}, util.LogErr("invalid from/to block type, (latest/earliest/pending)")
+	}
+
+	if len(ethGetLogsMsg.Address) != 0 {
+		for _, address := range ethGetLogsMsg.Address {
+			byte20Addr := util.FromStringToByte20Address(address)
+			addresses = append(addresses, byte20Addr)
+		}
+	} else {
+		addresses = []common.Address{util.FromStringToByte20Address("0x0")}
+	}
+
+	if len(ethGetLogsMsg.Topics) != 0 {
+		for _, topic := range ethGetLogsMsg.Topics {
+			commonHashTopic := util.FromStringHexToHash(topic)
+			topicsHash = append(topicsHash, commonHashTopic)
+		}
+		topics = append(topics, topicsHash)
+	} else {
+		topics = append(topics, []common.Hash{})
+	}
+
+	if ethGetLogsMsg.BlockHash != "" {
+		blockHash = util.FromStringHexToHash(ethGetLogsMsg.BlockHash)
+
+		varInput := EthNewFilterParseMsg{
+			BlockHash: &blockHash,
+			FromBlock: nil,
+			ToBlock:   nil,
+			Addresses: addresses,
+			Topics:    topics,
+		}
+
+		return varInput, nil
+	}
+
+	varInput := EthNewFilterParseMsg{
+		BlockHash: nil,
+		FromBlock: &fromBlock,
+		ToBlock:   &toBlock,
+		Addresses: addresses,
+		Topics:    topics,
+	}
+
+	return varInput, nil
 }

@@ -405,6 +405,225 @@ func (xplac *XplaClient) EthBlockNumber() *XplaClient {
 	return xplac
 }
 
+// Query web3 client version.
+func (xplac *XplaClient) Web3ClientVersion() *XplaClient {
+	xplac.Module = mevm.EvmModule
+	xplac.MsgType = mevm.EvmWeb3ClientVersionMsgType
+	xplac.Msg = nil
+	return xplac
+}
+
+// Query web3 sha3.
+func (xplac *XplaClient) Web3Sha3(web3Sha3Msg types.Web3Sha3Msg) *XplaClient {
+	msg, err := mevm.MakeWeb3Sha3Msg(web3Sha3Msg)
+	if err != nil {
+		xplac.Err = err
+		return xplac
+	}
+	xplac.Module = mevm.EvmModule
+	xplac.MsgType = mevm.EvmWeb3Sha3MsgType
+	xplac.Msg = msg
+	return xplac
+}
+
+// Query current network ID.
+func (xplac *XplaClient) NetVersion() *XplaClient {
+	xplac.Module = mevm.EvmModule
+	xplac.MsgType = mevm.EvmNetVersionMsgType
+	xplac.Msg = nil
+	return xplac
+}
+
+// Query the number of peers currently connected to the client.
+func (xplac *XplaClient) NetPeerCount() *XplaClient {
+	xplac.Module = mevm.EvmModule
+	xplac.MsgType = mevm.EvmNetPeerCountMsgType
+	xplac.Msg = nil
+	return xplac
+}
+
+// actively listening for network connections.
+func (xplac *XplaClient) NetListening() *XplaClient {
+	xplac.Module = mevm.EvmModule
+	xplac.MsgType = mevm.EvmNetListeningMsgType
+	xplac.Msg = nil
+	return xplac
+}
+
+// ethereum protocol version.
+func (xplac *XplaClient) EthProtocolVersion() *XplaClient {
+	xplac.Module = mevm.EvmModule
+	xplac.MsgType = mevm.EvmEthProtocolVersionMsgType
+	xplac.Msg = nil
+	return xplac
+}
+
+// Query the sync status object depending on the details of tendermint's sync protocol.
+func (xplac *XplaClient) EthSyncing() *XplaClient {
+	xplac.Module = mevm.EvmModule
+	xplac.MsgType = mevm.EvmEthSyncingMsgType
+	xplac.Msg = nil
+	return xplac
+}
+
+// Query all eth accounts.
+func (xplac *XplaClient) EthAccounts() *XplaClient {
+	xplac.Module = mevm.EvmModule
+	xplac.MsgType = mevm.EvmEthAccountsMsgType
+	xplac.Msg = nil
+	return xplac
+}
+
+// Query the number of transaction a given block.
+func (xplac *XplaClient) EthGetBlockTransactionCount(ethGetBlockTransactionCountMsg types.EthGetBlockTransactionCountMsg) *XplaClient {
+	if ethGetBlockTransactionCountMsg.BlockHash == "" && ethGetBlockTransactionCountMsg.BlockHeight == "" {
+		xplac.Err = util.LogErr("cannot query without block hash or height parameter")
+	}
+
+	if ethGetBlockTransactionCountMsg.BlockHash != "" && ethGetBlockTransactionCountMsg.BlockHeight != "" {
+		xplac.Err = util.LogErr("select only one parameter, block hash or height")
+	}
+
+	msg, err := mevm.MakeEthGetBlockTransactionCountMsg(ethGetBlockTransactionCountMsg)
+	if err != nil {
+		xplac.Err = err
+		return xplac
+	}
+	xplac.Module = mevm.EvmModule
+	xplac.MsgType = mevm.EvmEthGetBlockTransactionCountMsgType
+	xplac.Msg = msg
+
+	return xplac
+}
+
+// Query estimate gas.
+func (xplac *XplaClient) EstimateGas(invokeSolContractMsg types.InvokeSolContractMsg) *XplaClient {
+	msg, err := mevm.MakeEstimateGasSolMsg(invokeSolContractMsg)
+	if err != nil {
+		xplac.Err = err
+		return xplac
+	}
+	xplac.Module = mevm.EvmModule
+	xplac.MsgType = mevm.EvmEthEstimateGasMsgType
+	xplac.Msg = msg
+	return xplac
+}
+
+// Query transaction by block hash and index.
+func (xplac *XplaClient) EthGetTransactionByBlockHashAndIndex(getTransactionByBlockHashAndIndexMsg types.GetTransactionByBlockHashAndIndexMsg) *XplaClient {
+	msg, err := mevm.MakeGetTransactionByBlockHashAndIndexMsg(getTransactionByBlockHashAndIndexMsg)
+	if err != nil {
+		xplac.Err = err
+		return xplac
+	}
+	xplac.Module = mevm.EvmModule
+	xplac.MsgType = mevm.EvmGetTransactionByBlockHashAndIndexMsgType
+	xplac.Msg = msg
+	return xplac
+}
+
+// Query transaction receipt.
+func (xplac *XplaClient) EthGetTransactionReceipt(getTransactionReceiptMsg types.GetTransactionReceiptMsg) *XplaClient {
+	msg, err := mevm.MakeGetTransactionReceiptMsg(getTransactionReceiptMsg)
+	if err != nil {
+		xplac.Err = err
+		return xplac
+	}
+	xplac.Module = mevm.EvmModule
+	xplac.MsgType = mevm.EvmGetTransactionReceiptMsgType
+	xplac.Msg = msg
+	return xplac
+}
+
+// Query filter ID by eth new filter.
+func (xplac *XplaClient) EthNewFilter(ethNewFilterMsg types.EthNewFilterMsg) *XplaClient {
+	msg, err := mevm.MakeEthNewFilterMsg(ethNewFilterMsg)
+	if err != nil {
+		xplac.Err = err
+		return xplac
+	}
+	xplac.Module = mevm.EvmModule
+	xplac.MsgType = mevm.EvmEthNewFilterMsgType
+	xplac.Msg = msg
+	return xplac
+}
+
+// Query filter ID by eth new block filter.
+func (xplac *XplaClient) EthNewBlockFilter() *XplaClient {
+	xplac.Module = mevm.EvmModule
+	xplac.MsgType = mevm.EvmEthNewBlockFilterMsgType
+	xplac.Msg = nil
+	return xplac
+}
+
+// Query filter ID by eth new pending transaction filter.
+func (xplac *XplaClient) EthNewPendingTransactionFilter() *XplaClient {
+	xplac.Module = mevm.EvmModule
+	xplac.MsgType = mevm.EvmEthNewPendingTransactionFilterMsgType
+	xplac.Msg = nil
+	return xplac
+}
+
+// Uninstall filter.
+func (xplac *XplaClient) EthUnistallFilter(ethUninsatllFilterMsg types.EthUninsatllFilterMsg) *XplaClient {
+	msg, err := mevm.MakeEthUninstallFilterMsg(ethUninsatllFilterMsg)
+	if err != nil {
+		xplac.Err = err
+		return xplac
+	}
+	xplac.Module = mevm.EvmModule
+	xplac.MsgType = mevm.EvmEthUninsatllFilterMsgType
+	xplac.Msg = msg
+	return xplac
+}
+
+// Query filter changes.
+func (xplac *XplaClient) EthGetFilterChanges(ethGetFilterChangesMsg types.EthGetFilterChangesMsg) *XplaClient {
+	msg, err := mevm.MakeEthGetFilterChangesMsg(ethGetFilterChangesMsg)
+	if err != nil {
+		xplac.Err = err
+		return xplac
+	}
+	xplac.Module = mevm.EvmModule
+	xplac.MsgType = mevm.EvmEthGetFilterChangesMsgType
+	xplac.Msg = msg
+	return xplac
+}
+
+// Query filter logs.
+func (xplac *XplaClient) EthGetFilterLogs(ethGetFilterLogsMsg types.EthGetFilterLogsMsg) *XplaClient {
+	msg, err := mevm.MakeEthGetFilterLogsMsg(ethGetFilterLogsMsg)
+	if err != nil {
+		xplac.Err = err
+		return xplac
+	}
+	xplac.Module = mevm.EvmModule
+	xplac.MsgType = mevm.EvmEthGetFilterLogsMsgType
+	xplac.Msg = msg
+	return xplac
+}
+
+// Get logs.
+func (xplac *XplaClient) EthGetLogs(ethGetLogsMsg types.EthGetLogsMsg) *XplaClient {
+	msg, err := mevm.MakeEthGetLogsMsg(ethGetLogsMsg)
+	if err != nil {
+		xplac.Err = err
+		return xplac
+	}
+	xplac.Module = mevm.EvmModule
+	xplac.MsgType = mevm.EvmEthGetLogsMsgType
+	xplac.Msg = msg
+	return xplac
+}
+
+// Query coinbase.
+func (xplac *XplaClient) EthCoinbase() *XplaClient {
+	xplac.Module = mevm.EvmModule
+	xplac.MsgType = mevm.EvmEthCoinbaseMsgType
+	xplac.Msg = nil
+	return xplac
+}
+
 // Feegrant module
 
 // Query details of fee grants.

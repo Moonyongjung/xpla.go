@@ -154,6 +154,13 @@ func FromStringHexToHash(hashString string) common.Hash {
 	return common.HexToHash(hashString)
 }
 
+func From0xHexStringToIBignt(hexString string) *big.Int {
+	n := new(big.Int)
+	n.SetString(hexString[2:], 16)
+
+	return n
+}
+
 func ToString(value interface{}, defaultValue string) string {
 	s := fmt.Sprintf("%v", value)
 	if s == "" {
@@ -188,7 +195,16 @@ func JsonMarshalData(jsonData interface{}) ([]byte, error) {
 		return nil, err
 	}
 
-	return byteData, err
+	return byteData, nil
+}
+
+func JsonMarshalDataIndent(jsonData interface{}) ([]byte, error) {
+	byteData, err := json.MarshalIndent(jsonData, "", "    ")
+	if err != nil {
+		return nil, err
+	}
+
+	return byteData, nil
 }
 
 func JsonUnmarshalData(jsonStruct interface{}, byteValue []byte) interface{} {

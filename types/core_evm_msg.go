@@ -52,6 +52,52 @@ type AccountInfoMsg struct {
 	Account string
 }
 
+type Web3Sha3Msg struct {
+	InputParam string
+}
+
+type EthGetBlockTransactionCountMsg struct {
+	BlockHash   string
+	BlockHeight string
+}
+
+type GetTransactionByBlockHashAndIndexMsg struct {
+	BlockHash string
+	Index     string
+}
+
+type GetTransactionReceiptMsg struct {
+	TransactionHash string
+}
+
+type EthNewFilterMsg struct {
+	FromBlock string
+	ToBlock   string
+	Address   []string
+	Topics    []string
+}
+
+type EthGetLogsMsg struct {
+	BlockHash string
+	FromBlock string
+	ToBlock   string
+	Address   []string
+	Topics    []string
+}
+
+type EthUninsatllFilterMsg struct {
+	FilterId string
+}
+
+type EthGetFilterChangesMsg struct {
+	FilterId string
+}
+
+type EthGetFilterLogsMsg struct {
+	FilterId string
+}
+
+// Responses
 type CallSolContractResponse struct {
 	ContractResponse []string `json:"contract_response"`
 }
@@ -87,4 +133,78 @@ type EthChainIdResponse struct {
 
 type EthBlockNumberResponse struct {
 	BlockNumber uint64 `json:"block_number"`
+}
+
+type Web3ClientVersionResponse struct {
+	Web3ClientVersion string `json:"web3_clientVersion"`
+}
+
+type Web3Sha3Response struct {
+	Web3Sha3 string `json:"web3_sha3"`
+}
+
+type NetVersionResponse struct {
+	NetVersion string `json:"net_version"`
+}
+
+type NetPeerCountResponse struct {
+	NetPeerCount int `json:"net_peerCount"`
+}
+
+type NetListeningResponse struct {
+	NetListening bool `json:"net_listening"`
+}
+
+type EthProtocolVersionResponse struct {
+	EthProtocolVersionHex string   `json:"eth_protocolVersion_hex"`
+	EthProtocolVersion    *big.Int `json:"eth_protocolVersion"`
+}
+
+type EthSyncingResponse struct {
+	EthSyncing bool `json:"eth_syncing"`
+}
+
+type EthAccountsResponse struct {
+	EthAccounts []string `json:"eth_accounts"`
+}
+
+type EthGetBlockTransactionCountResponse struct {
+	EthGetBlockTransactionCountHex string   `json:"eth_getBlockTransactionCount_hex"`
+	EthGetBlockTransactionCount    *big.Int `json:"eth_getBlockTransactionCount"`
+}
+
+type EstimateGasResponse struct {
+	EstimateGas uint64 `json:"eth_estimateGas"`
+}
+
+type EthNewFilterResponse struct {
+	NewFilter interface{} `json:"eth_newFilter"`
+}
+
+type EthNewBlockFilterResponse struct {
+	NewBlockFilter interface{} `json:"eth_newBlockFilter"`
+}
+
+type EthNewPendingTransactionFilterResponse struct {
+	NewPendingTransactionFilter interface{} `json:"eth_newPendingTransactionFilter"`
+}
+
+type EthUninstallFilterResponse struct {
+	UninstallFilter bool `json:"eth_uninstallFilter"`
+}
+
+type EthGetFilterChangesResponse struct {
+	GetFilterChanges []string `json:"eth_getFilterChanges"`
+}
+
+type EthGetFilterLogsResponse struct {
+	GetFilterLogs []string `json:"eth_getFilterLogs"`
+}
+
+type EthGetLogsResponse struct {
+	GetLogs interface{} `json:"eth_getLogs"`
+}
+
+type EthCoinbaseResponse struct {
+	Coinbase string `json:"eth_coinbase"`
 }

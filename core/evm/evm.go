@@ -74,3 +74,103 @@ func MakeQueryAccountInfoMsg(accountInfoMsg types.AccountInfoMsg) (types.Account
 
 	return msg, nil
 }
+
+// (Query) make msg - web3 sha3
+func MakeWeb3Sha3Msg(web3Sha3Msg types.Web3Sha3Msg) (types.Web3Sha3Msg, error) {
+	msg, err := parseWeb3Sha3Args(web3Sha3Msg)
+	if err != nil {
+		return types.Web3Sha3Msg{}, err
+	}
+
+	return msg, nil
+}
+
+// (Query) make msg - get transaction count of the block number
+func MakeEthGetBlockTransactionCountMsg(ethGetBlockTransactionCountMsg types.EthGetBlockTransactionCountMsg) (types.EthGetBlockTransactionCountMsg, error) {
+	msg, err := parseEthGetBlockTransactionCountArgs(ethGetBlockTransactionCountMsg)
+	if err != nil {
+		return types.EthGetBlockTransactionCountMsg{}, err
+	}
+
+	return msg, nil
+}
+
+// (Query) make msg - sol contract estimate gas
+func MakeEstimateGasSolMsg(invokeSolContractMsg types.InvokeSolContractMsg) (types.InvokeSolContractMsg, error) {
+	msg, err := parseEstimateGasSolArgs(invokeSolContractMsg)
+	if err != nil {
+		return types.InvokeSolContractMsg{}, err
+	}
+
+	return msg, nil
+}
+
+// (Query) make msg - get transaction by block hash and index
+func MakeGetTransactionByBlockHashAndIndexMsg(getTransactionByBlockHashAndIndexMsg types.GetTransactionByBlockHashAndIndexMsg) (types.GetTransactionByBlockHashAndIndexMsg, error) {
+	msg, err := parseGetTransactionByBlockHashAndIndexArgs(getTransactionByBlockHashAndIndexMsg)
+	if err != nil {
+		return types.GetTransactionByBlockHashAndIndexMsg{}, err
+	}
+
+	return msg, nil
+}
+
+// (Query) make msg - get transaction receipt
+func MakeGetTransactionReceiptMsg(getTransactionReceiptMsg types.GetTransactionReceiptMsg) (types.GetTransactionReceiptMsg, error) {
+	msg, err := parseGetTransactionReceiptArgs(getTransactionReceiptMsg)
+	if err != nil {
+		return types.GetTransactionReceiptMsg{}, err
+	}
+
+	return msg, nil
+}
+
+// (Query) make msg - eth new filter
+func MakeEthNewFilterMsg(ethNewFilterMsg types.EthNewFilterMsg) (EthNewFilterParseMsg, error) {
+	msg, err := parseEthNewFilterArgs(ethNewFilterMsg)
+	if err != nil {
+		return EthNewFilterParseMsg{}, err
+	}
+
+	return msg, nil
+}
+
+// (Query) make msg - eth uninstall filter
+func MakeEthUninstallFilterMsg(ethUninsatllFilter types.EthUninsatllFilterMsg) (types.EthUninsatllFilterMsg, error) {
+	msg, err := parseEthUninsatllFilterArgs(ethUninsatllFilter)
+	if err != nil {
+		return types.EthUninsatllFilterMsg{}, err
+	}
+
+	return msg, nil
+}
+
+// (Query) make msg - eth get filter changes
+func MakeEthGetFilterChangesMsg(ethGetFilterChangesMsg types.EthGetFilterChangesMsg) (types.EthGetFilterChangesMsg, error) {
+	msg, err := parseEthGetFilterChangesArgs(ethGetFilterChangesMsg)
+	if err != nil {
+		return types.EthGetFilterChangesMsg{}, err
+	}
+
+	return msg, nil
+}
+
+// (Query) make msg - eth get filter logs
+func MakeEthGetFilterLogsMsg(ethGetFilterLogsMsg types.EthGetFilterLogsMsg) (types.EthGetFilterLogsMsg, error) {
+	msg, err := parseEthGetFilterLogsArgs(ethGetFilterLogsMsg)
+	if err != nil {
+		return types.EthGetFilterLogsMsg{}, err
+	}
+
+	return msg, nil
+}
+
+// (Query) make msg - eth get logs
+func MakeEthGetLogsMsg(ethGetLogsMsg types.EthGetLogsMsg) (EthNewFilterParseMsg, error) {
+	msg, err := parseEthGetLogsArgs(ethGetLogsMsg)
+	if err != nil {
+		return EthNewFilterParseMsg{}, err
+	}
+
+	return msg, nil
+}
