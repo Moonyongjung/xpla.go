@@ -20,11 +20,11 @@ import (
 func parseSubmitProposalArgs(submitProposalMsg types.SubmitProposalMsg, privKey key.PrivateKey) (govtypes.MsgSubmitProposal, error) {
 	proposer, err := util.GetAddrByPrivKey(privKey)
 	if err != nil {
-		return govtypes.MsgSubmitProposal{}, err
+		return govtypes.MsgSubmitProposal{}, util.LogErr(errors.ErrParse, err)
 	}
 	amount, err := sdk.ParseCoinsNormalized(util.DenomAdd(submitProposalMsg.Deposit))
 	if err != nil {
-		return govtypes.MsgSubmitProposal{}, err
+		return govtypes.MsgSubmitProposal{}, util.LogErr(errors.ErrParse, err)
 	}
 
 	content := govtypes.ContentFromProposalType(
@@ -35,7 +35,7 @@ func parseSubmitProposalArgs(submitProposalMsg types.SubmitProposalMsg, privKey 
 
 	msg, err := govtypes.NewMsgSubmitProposal(content, amount, proposer)
 	if err != nil {
-		return govtypes.MsgSubmitProposal{}, err
+		return govtypes.MsgSubmitProposal{}, util.LogErr(errors.ErrParse, err)
 	}
 
 	return *msg, nil
@@ -46,11 +46,11 @@ func parseGovDepositArgs(govDepositMsg types.GovDepositMsg, privKey key.PrivateK
 	proposalId := util.FromStringToUint64(govDepositMsg.ProposalID)
 	from, err := util.GetAddrByPrivKey(privKey)
 	if err != nil {
-		return govtypes.MsgDeposit{}, err
+		return govtypes.MsgDeposit{}, util.LogErr(errors.ErrParse, err)
 	}
 	amount, err := sdk.ParseCoinsNormalized(util.DenomAdd(govDepositMsg.Deposit))
 	if err != nil {
-		return govtypes.MsgDeposit{}, err
+		return govtypes.MsgDeposit{}, util.LogErr(errors.ErrParse, err)
 	}
 
 	msg := govtypes.NewMsgDeposit(from, proposalId, amount)
@@ -63,12 +63,12 @@ func parseVoteArgs(voteMsg types.VoteMsg, privKey key.PrivateKey) (govtypes.MsgV
 	proposalId := util.FromStringToUint64(voteMsg.ProposalID)
 	from, err := util.GetAddrByPrivKey(privKey)
 	if err != nil {
-		return govtypes.MsgVote{}, err
+		return govtypes.MsgVote{}, util.LogErr(errors.ErrParse, err)
 	}
 
 	byteVoteOption, err := govtypes.VoteOptionFromString(govutils.NormalizeVoteOption(voteMsg.Option))
 	if err != nil {
-		return govtypes.MsgVote{}, err
+		return govtypes.MsgVote{}, util.LogErr(errors.ErrParse, err)
 	}
 
 	msg := govtypes.NewMsgVote(from, proposalId, byteVoteOption)
@@ -80,18 +80,15 @@ func parseWeightedVoteArgs(weightedVoteMsg types.WeightedVoteMsg, privKey key.Pr
 	proposalId := util.FromStringToUint64(weightedVoteMsg.ProposalID)
 	from, err := util.GetAddrByPrivKey(privKey)
 	if err != nil {
-		return govtypes.MsgVoteWeighted{}, err
+		return govtypes.MsgVoteWeighted{}, util.LogErr(errors.ErrParse, err)
 	}
 
-	options, err := weightedVoteOptionConverting(weightedVoteMsg)
-	if err != nil {
-		return govtypes.MsgVoteWeighted{}, err
-	}
+	options := weightedVoteOptionConverting(weightedVoteMsg)
 
 	msg := govtypes.NewMsgVoteWeighted(from, proposalId, options)
 	err = msg.ValidateBasic()
 	if err != nil {
-		return govtypes.MsgVoteWeighted{}, err
+		return govtypes.MsgVoteWeighted{}, util.LogErr(errors.ErrParse, err)
 	}
 
 	return *msg, nil
@@ -115,14 +112,14 @@ func parseQueryProposalsArgs(queryProposalsMsg types.QueryProposalsMsg) (govtype
 	if len(depositorAddr) != 0 {
 		_, err := sdk.AccAddressFromBech32(depositorAddr)
 		if err != nil {
-			return govtypes.QueryProposalsRequest{}, err
+			return govtypes.QueryProposalsRequest{}, util.LogErr(errors.ErrParse, err)
 		}
 	}
 
 	if len(voterAddr) != 0 {
 		_, err := sdk.AccAddressFromBech32(voterAddr)
 		if err != nil {
-			return govtypes.QueryProposalsRequest{}, err
+			return govtypes.QueryProposalsRequest{}, util.LogErr(errors.ErrParse, err)
 		}
 	}
 
@@ -130,7 +127,7 @@ func parseQueryProposalsArgs(queryProposalsMsg types.QueryProposalsMsg) (govtype
 		proposalStatus1, err := govtypes.ProposalStatusFromString(govutils.NormalizeProposalStatus(strProposalStatus))
 		proposalStatus = proposalStatus1
 		if err != nil {
-			return govtypes.QueryProposalsRequest{}, err
+			return govtypes.QueryProposalsRequest{}, util.LogErr(errors.ErrParse, err)
 		}
 	}
 
@@ -149,7 +146,7 @@ func parseQueryDepositArgs(queryDepositMsg types.QueryDepositMsg, grpcConn grpc.
 	proposalId := util.FromStringToUint64(queryDepositMsg.ProposalID)
 	depositorAddr, err := sdk.AccAddressFromBech32(queryDepositMsg.Depositor)
 	if err != nil {
-		return nil, "", err
+		return nil, "", util.LogErr(errors.ErrParse, err)
 	}
 
 	if queryType == types.QueryGrpc {
@@ -160,7 +157,7 @@ func parseQueryDepositArgs(queryDepositMsg types.QueryDepositMsg, grpcConn grpc.
 			&govtypes.QueryProposalRequest{ProposalId: proposalId},
 		)
 		if err != nil {
-			return nil, "", err
+			return nil, "", util.LogErr(errors.ErrGrpcRequest, err)
 		}
 
 		propStatus = proposalRes.Proposal.Status
@@ -205,7 +202,7 @@ func parseQueryDepositsArgs(queryDepositMsg types.QueryDepositMsg, grpcConn grpc
 			&govtypes.QueryProposalRequest{ProposalId: proposalId},
 		)
 		if err != nil {
-			return nil, "", err
+			return nil, "", util.LogErr(errors.ErrGrpcRequest, err)
 		}
 
 		propStatus = proposalRes.Proposal.Status
@@ -292,7 +289,7 @@ func parseQueryVoteArgs(queryVoteMsg types.QueryVoteMsg, grpcConn grpc.ClientCon
 			&govtypes.QueryProposalRequest{ProposalId: proposalId},
 		)
 		if err != nil {
-			return govtypes.QueryVoteRequest{}, err
+			return govtypes.QueryVoteRequest{}, util.LogErr(errors.ErrGrpcRequest, err)
 		}
 
 	} else {
@@ -324,7 +321,7 @@ func parseQueryVotesArgs(queryVoteMsg types.QueryVoteMsg, grpcConn grpc.ClientCo
 			&govtypes.QueryProposalRequest{ProposalId: proposalId},
 		)
 		if err != nil {
-			return nil, "", err
+			return nil, "", util.LogErr(errors.ErrGrpcRequest, err)
 		}
 
 		propStatus = proposalRes.Proposal.Status
@@ -357,7 +354,7 @@ func parseQueryVotesArgs(queryVoteMsg types.QueryVoteMsg, grpcConn grpc.ClientCo
 
 }
 
-func weightedVoteOptionConverting(weightedVoteMsg types.WeightedVoteMsg) (govtypes.WeightedVoteOptions, error) {
+func weightedVoteOptionConverting(weightedVoteMsg types.WeightedVoteMsg) govtypes.WeightedVoteOptions {
 	weightedVoteOptions := govtypes.WeightedVoteOptions{}
 
 	if weightedVoteMsg.Yes != "" {
@@ -385,5 +382,5 @@ func weightedVoteOptionConverting(weightedVoteMsg types.WeightedVoteMsg) (govtyp
 		})
 	}
 
-	return weightedVoteOptions, nil
+	return weightedVoteOptions
 }

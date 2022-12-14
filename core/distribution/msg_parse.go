@@ -6,6 +6,7 @@ import (
 	"github.com/Moonyongjung/xpla.go/core"
 	"github.com/Moonyongjung/xpla.go/key"
 	"github.com/Moonyongjung/xpla.go/types"
+	"github.com/Moonyongjung/xpla.go/types/errors"
 	"github.com/Moonyongjung/xpla.go/util"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -20,12 +21,12 @@ import (
 func parseFundCommunityPoolArgs(fundCommunityPoolMsg types.FundCommunityPoolMsg, privKey key.PrivateKey) (disttypes.MsgFundCommunityPool, error) {
 	depositorAddr, err := util.GetAddrByPrivKey(privKey)
 	if err != nil {
-		return disttypes.MsgFundCommunityPool{}, err
+		return disttypes.MsgFundCommunityPool{}, util.LogErr(errors.ErrParse, err)
 	}
 
 	amount, err := sdk.ParseCoinsNormalized(util.DenomAdd(fundCommunityPoolMsg.Amount))
 	if err != nil {
-		return disttypes.MsgFundCommunityPool{}, err
+		return disttypes.MsgFundCommunityPool{}, util.LogErr(errors.ErrParse, err)
 	}
 
 	msg := disttypes.NewMsgFundCommunityPool(amount, depositorAddr)
@@ -40,7 +41,7 @@ func parseProposalCommunityPoolSpendArgs(communityPoolSpendMsg types.CommunityPo
 	if communityPoolSpendMsg.JsonFilePath != "" {
 		proposal, err = distcli.ParseCommunityPoolSpendProposalWithDeposit(encodingConfig.Marshaler, communityPoolSpendMsg.JsonFilePath)
 		if err != nil {
-			return govtypes.MsgSubmitProposal{}, err
+			return govtypes.MsgSubmitProposal{}, util.LogErr(errors.ErrParse, err)
 		}
 	} else {
 		proposal.Title = communityPoolSpendMsg.Title
@@ -52,28 +53,28 @@ func parseProposalCommunityPoolSpendArgs(communityPoolSpendMsg types.CommunityPo
 
 	amount, err := sdk.ParseCoinsNormalized(util.DenomAdd(proposal.Amount))
 	if err != nil {
-		return govtypes.MsgSubmitProposal{}, err
+		return govtypes.MsgSubmitProposal{}, util.LogErr(errors.ErrParse, err)
 	}
 
 	deposit, err := sdk.ParseCoinsNormalized(util.DenomAdd(proposal.Deposit))
 	if err != nil {
-		return govtypes.MsgSubmitProposal{}, err
+		return govtypes.MsgSubmitProposal{}, util.LogErr(errors.ErrParse, err)
 	}
 
 	from, err := util.GetAddrByPrivKey(privKey)
 	if err != nil {
-		return govtypes.MsgSubmitProposal{}, err
+		return govtypes.MsgSubmitProposal{}, util.LogErr(errors.ErrParse, err)
 	}
 	recpAddr, err := sdk.AccAddressFromBech32(proposal.Recipient)
 	if err != nil {
-		return govtypes.MsgSubmitProposal{}, err
+		return govtypes.MsgSubmitProposal{}, util.LogErr(errors.ErrParse, err)
 	}
 
 	content := disttypes.NewCommunityPoolSpendProposal(proposal.Title, proposal.Description, recpAddr, amount)
 
 	msg, err := govtypes.NewMsgSubmitProposal(content, deposit, from)
 	if err != nil {
-		return govtypes.MsgSubmitProposal{}, err
+		return govtypes.MsgSubmitProposal{}, util.LogErr(errors.ErrParse, err)
 	}
 
 	return *msg, nil
@@ -83,12 +84,12 @@ func parseProposalCommunityPoolSpendArgs(communityPoolSpendMsg types.CommunityPo
 func parseWithdrawRewardsArgs(withdrawRewardsMsg types.WithdrawRewardsMsg, privKey key.PrivateKey) ([]sdk.Msg, error) {
 	delAddr, err := util.GetAddrByPrivKey(privKey)
 	if err != nil {
-		return nil, err
+		return nil, util.LogErr(errors.ErrParse, err)
 	}
 
 	valAddr, err := sdk.ValAddressFromBech32(withdrawRewardsMsg.ValidatorAddr)
 	if err != nil {
-		return nil, err
+		return nil, util.LogErr(errors.ErrParse, err)
 	}
 
 	msgs := []sdk.Msg{disttypes.NewMsgWithdrawDelegatorReward(delAddr, valAddr)}
@@ -98,7 +99,7 @@ func parseWithdrawRewardsArgs(withdrawRewardsMsg types.WithdrawRewardsMsg, privK
 
 	for _, msg := range msgs {
 		if err := msg.ValidateBasic(); err != nil {
-			return nil, err
+			return nil, util.LogErr(errors.ErrParse, err)
 		}
 	}
 
@@ -109,7 +110,7 @@ func parseWithdrawRewardsArgs(withdrawRewardsMsg types.WithdrawRewardsMsg, privK
 func parseWithdrawAllRewardsArgs(privKey key.PrivateKey, grpcConn grpc.ClientConn, ctx context.Context) ([]sdk.Msg, error) {
 	delAddr, err := util.GetAddrByPrivKey(privKey)
 	if err != nil {
-		return nil, err
+		return nil, util.LogErr(errors.ErrParse, err)
 	}
 	queryClient := disttypes.NewQueryClient(grpcConn)
 	delValsRes, err := queryClient.DelegatorValidators(
@@ -119,7 +120,7 @@ func parseWithdrawAllRewardsArgs(privKey key.PrivateKey, grpcConn grpc.ClientCon
 		},
 	)
 	if err != nil {
-		return nil, err
+		return nil, util.LogErr(errors.ErrGrpcRequest, err)
 	}
 
 	vals := delValsRes.Validators
@@ -127,12 +128,12 @@ func parseWithdrawAllRewardsArgs(privKey key.PrivateKey, grpcConn grpc.ClientCon
 	for _, valAddr := range vals {
 		val, err := sdk.ValAddressFromBech32(valAddr)
 		if err != nil {
-			return nil, err
+			return nil, util.LogErr(errors.ErrParse, err)
 		}
 
 		msg := disttypes.NewMsgWithdrawDelegatorReward(delAddr, val)
 		if err := msg.ValidateBasic(); err != nil {
-			return nil, err
+			return nil, util.LogErr(errors.ErrParse, err)
 		}
 		msgs = append(msgs, msg)
 	}
@@ -144,11 +145,11 @@ func parseWithdrawAllRewardsArgs(privKey key.PrivateKey, grpcConn grpc.ClientCon
 func parseSetWithdrawAddrArgs(setWithdrawAddrMsg types.SetwithdrawAddrMsg, privKey key.PrivateKey) (disttypes.MsgSetWithdrawAddress, error) {
 	delAddr, err := util.GetAddrByPrivKey(privKey)
 	if err != nil {
-		return disttypes.MsgSetWithdrawAddress{}, err
+		return disttypes.MsgSetWithdrawAddress{}, util.LogErr(errors.ErrParse, err)
 	}
 	withdrawAddr, err := sdk.AccAddressFromBech32(setWithdrawAddrMsg.WithdrawAddr)
 	if err != nil {
-		return disttypes.MsgSetWithdrawAddress{}, err
+		return disttypes.MsgSetWithdrawAddress{}, util.LogErr(errors.ErrParse, err)
 	}
 
 	msg := disttypes.NewMsgSetWithdrawAddress(delAddr, withdrawAddr)
@@ -160,7 +161,7 @@ func parseSetWithdrawAddrArgs(setWithdrawAddrMsg types.SetwithdrawAddrMsg, privK
 func parseValidatorOutstandingRewardsArgs(validatorOutstandingRewardsMsg types.ValidatorOutstandingRewardsMsg) (disttypes.QueryValidatorOutstandingRewardsRequest, error) {
 	valAddr, err := sdk.ValAddressFromBech32(validatorOutstandingRewardsMsg.ValidatorAddr)
 	if err != nil {
-		return disttypes.QueryValidatorOutstandingRewardsRequest{}, err
+		return disttypes.QueryValidatorOutstandingRewardsRequest{}, util.LogErr(errors.ErrParse, err)
 	}
 
 	return disttypes.QueryValidatorOutstandingRewardsRequest{
@@ -172,7 +173,7 @@ func parseValidatorOutstandingRewardsArgs(validatorOutstandingRewardsMsg types.V
 func parseQueryDistCommissionArgs(queryDistCommissionMsg types.QueryDistCommissionMsg) (disttypes.QueryValidatorCommissionRequest, error) {
 	valAddr, err := sdk.ValAddressFromBech32(queryDistCommissionMsg.ValidatorAddr)
 	if err != nil {
-		return disttypes.QueryValidatorCommissionRequest{}, err
+		return disttypes.QueryValidatorCommissionRequest{}, util.LogErr(errors.ErrParse, err)
 	}
 
 	return disttypes.QueryValidatorCommissionRequest{
@@ -184,7 +185,7 @@ func parseQueryDistCommissionArgs(queryDistCommissionMsg types.QueryDistCommissi
 func parseDistSlashesArgs(queryDistSlashesMsg types.QueryDistSlashesMsg) (disttypes.QueryValidatorSlashesRequest, error) {
 	valAddr, err := sdk.ValAddressFromBech32(queryDistSlashesMsg.ValidatorAddr)
 	if err != nil {
-		return disttypes.QueryValidatorSlashesRequest{}, err
+		return disttypes.QueryValidatorSlashesRequest{}, util.LogErr(errors.ErrParse, err)
 	}
 	startHeightNumber := util.FromStringToUint64(queryDistSlashesMsg.StartHeight)
 	endHeightNumber := util.FromStringToUint64(queryDistSlashesMsg.EndHeight)
@@ -204,7 +205,7 @@ func parseQueryDistRewardsArgs(queryDistRewardsMsg types.QueryDistRewardsMsg) (d
 	delAddr := queryDistRewardsMsg.DelegatorAddr
 	valAddr, err := sdk.ValAddressFromBech32(queryDistRewardsMsg.ValidatorAddr)
 	if err != nil {
-		return disttypes.QueryDelegationRewardsRequest{}, err
+		return disttypes.QueryDelegationRewardsRequest{}, util.LogErr(errors.ErrParse, err)
 	}
 
 	return disttypes.QueryDelegationRewardsRequest{

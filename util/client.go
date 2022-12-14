@@ -30,7 +30,7 @@ func NewClient() (cmclient.Context, error) {
 	encodingConfig := MakeEncodingConfig()
 	clientKeyring, err := NewKeyring(BackendMemory, "")
 	if err != nil {
-		return cmclient.Context{}, err
+		return cmclient.Context{}, LogErr(errors.ErrKeyNotFound, err)
 	}
 
 	clientCtx = clientCtx.
@@ -72,7 +72,7 @@ func NewEvmClient(evmRpcUrl string, ctx context.Context) (*EvmClient, error) {
 	httpClient := &http.Client{Transport: &defaultTransport}
 	rpcClient, err := erpc.DialHTTPWithClient(evmRpcUrl, httpClient)
 	if err != nil {
-		return nil, err
+		return nil, LogErr(errors.ErrEvmRpcRequest, err)
 	}
 
 	ethClient := ethclient.NewClient(rpcClient)
@@ -91,7 +91,7 @@ func NewKeyring(backendType string, keyringPath string) (keyring.Keyring, error)
 			hd.EthSecp256k1Option(),
 		)
 		if err != nil {
-			return nil, err
+			return nil, LogErr(errors.ErrKeyNotFound, err)
 		}
 
 		return k, nil
@@ -105,7 +105,7 @@ func NewKeyring(backendType string, keyringPath string) (keyring.Keyring, error)
 			hd.EthSecp256k1Option(),
 		)
 		if err != nil {
-			return nil, err
+			return nil, LogErr(errors.ErrKeyNotFound, err)
 		}
 
 		return k, nil

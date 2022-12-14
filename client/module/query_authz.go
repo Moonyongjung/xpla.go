@@ -31,7 +31,7 @@ func queryByGrpcAuthz(i IXplaClient) (string, error) {
 			&convertMsg,
 		)
 		if err != nil {
-			return "", err
+			return "", util.LogErr(errors.ErrGrpcRequest, err)
 		}
 
 	// Authz grant by grantee
@@ -42,7 +42,7 @@ func queryByGrpcAuthz(i IXplaClient) (string, error) {
 			&convertMsg,
 		)
 		if err != nil {
-			return "", err
+			return "", util.LogErr(errors.ErrGrpcRequest, err)
 		}
 
 	// Authz grant by granter
@@ -53,7 +53,7 @@ func queryByGrpcAuthz(i IXplaClient) (string, error) {
 			&convertMsg,
 		)
 		if err != nil {
-			return "", err
+			return "", util.LogErr(errors.ErrGrpcRequest, err)
 		}
 
 	default:

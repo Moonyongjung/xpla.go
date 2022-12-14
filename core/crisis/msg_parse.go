@@ -17,7 +17,7 @@ func parseInvariantBrokenArgs(invariantBrokenMsg types.InvariantBrokenMsg, privK
 
 	senderAddr, err := util.GetAddrByPrivKey(privKey)
 	if err != nil {
-		return crisistypes.MsgVerifyInvariant{}, err
+		return crisistypes.MsgVerifyInvariant{}, util.LogErr(errors.ErrParse, err)
 	}
 	msg := crisistypes.NewMsgVerifyInvariant(senderAddr, invariantBrokenMsg.ModuleName, invariantBrokenMsg.InvariantRoute)
 

@@ -31,16 +31,16 @@ func parseStoreCodeArgs(storeMsg types.StoreMsg, sender sdk.AccAddress) (wasmtyp
 
 	wasm, err := os.ReadFile(storeMsg.FilePath)
 	if err != nil {
-		return wasmtypes.MsgStoreCode{}, err
+		return wasmtypes.MsgStoreCode{}, util.LogErr(errors.ErrParse, err)
 	}
 
 	// gzip the wasm file
 	if ioutils.IsWasm(wasm) {
 		wasm, err = ioutils.GzipIt(wasm)
-
 		if err != nil {
-			return wasmtypes.MsgStoreCode{}, err
+			return wasmtypes.MsgStoreCode{}, util.LogErr(errors.ErrParse, err)
 		}
+
 	} else if !ioutils.IsGzip(wasm) {
 		return wasmtypes.MsgStoreCode{}, util.LogErr(errors.ErrInvalidRequest, "invalid input file. Use wasm binary or gzip")
 	}
@@ -85,7 +85,7 @@ func instantiatePermission(permission string, sender sdk.AccAddress) (*wasmtypes
 		}
 		addr, err := sdk.AccAddressFromBech32(onlyAddr)
 		if err != nil {
-			return nil, err
+			return nil, util.LogErr(errors.ErrParse, err)
 		}
 		x := wasmtypes.AccessTypeOnlyAddress.With(addr)
 		return &x, nil
@@ -111,7 +111,7 @@ func parseInstantiateArgs(
 	// get the id of the code to instantiate
 	codeID, err := strconv.ParseUint(rawCodeID, 10, 64)
 	if err != nil {
-		return wasmtypes.MsgInstantiateContract{}, err
+		return wasmtypes.MsgInstantiateContract{}, util.LogErr(errors.ErrParse, err)
 	}
 
 	amountStr := instantiateMsgData.Amount
@@ -189,7 +189,7 @@ func parseExecuteArgs(executeMsgData types.ExecuteMsg,
 func parseClearContractAdminArgs(clearContractAdminMsg types.ClearContractAdminMsg, privKey key.PrivateKey) (wasmtypes.MsgClearAdmin, error) {
 	sender, err := util.GetAddrByPrivKey(privKey)
 	if err != nil {
-		return wasmtypes.MsgClearAdmin{}, err
+		return wasmtypes.MsgClearAdmin{}, util.LogErr(errors.ErrParse, err)
 	}
 
 	return wasmtypes.MsgClearAdmin{
@@ -202,7 +202,7 @@ func parseClearContractAdminArgs(clearContractAdminMsg types.ClearContractAdminM
 func parseSetContractAdmintArgs(setContractAdminMsg types.SetContractAdminMsg, privKey key.PrivateKey) (wasmtypes.MsgUpdateAdmin, error) {
 	sender, err := util.GetAddrByPrivKey(privKey)
 	if err != nil {
-		return wasmtypes.MsgUpdateAdmin{}, err
+		return wasmtypes.MsgUpdateAdmin{}, util.LogErr(errors.ErrParse, err)
 	}
 
 	return wasmtypes.MsgUpdateAdmin{
@@ -216,7 +216,7 @@ func parseSetContractAdmintArgs(setContractAdminMsg types.SetContractAdminMsg, p
 func parseMigrateArgs(migrateMsg types.MigrateMsg, privKey key.PrivateKey) (wasmtypes.MsgMigrateContract, error) {
 	sender, err := util.GetAddrByPrivKey(privKey)
 	if err != nil {
-		return wasmtypes.MsgMigrateContract{}, err
+		return wasmtypes.MsgMigrateContract{}, util.LogErr(errors.ErrParse, err)
 	}
 
 	return wasmtypes.MsgMigrateContract{
@@ -234,7 +234,7 @@ func parseQueryArgs(queryMsgData types.QueryMsg,
 
 	queryData, err := decoder.DecodeString(queryMsgData.QueryMsg)
 	if err != nil {
-		return wasmtypes.QuerySmartContractStateRequest{}, err
+		return wasmtypes.QuerySmartContractStateRequest{}, util.LogErr(errors.ErrParse, err)
 	}
 
 	return wasmtypes.QuerySmartContractStateRequest{
@@ -247,7 +247,7 @@ func parseQueryArgs(queryMsgData types.QueryMsg,
 func parseLibwasmvmVersionArgs() (string, error) {
 	version, err := wasmvm.LibwasmvmVersion()
 	if err != nil {
-		return "", err
+		return "", util.LogErr(errors.ErrParse, err)
 	}
 	return version, nil
 }

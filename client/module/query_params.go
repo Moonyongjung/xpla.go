@@ -32,7 +32,7 @@ func queryByGrpcParams(i IXplaClient) (string, error) {
 			&convertMsg,
 		)
 		if err != nil {
-			return "", err
+			return "", util.LogErr(errors.ErrGrpcRequest, err)
 		}
 
 	default:

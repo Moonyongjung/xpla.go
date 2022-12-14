@@ -16,7 +16,7 @@ import (
 func parseUnjailArgs(privKey key.PrivateKey) (slashingtypes.MsgUnjail, error) {
 	addr, err := util.GetAddrByPrivKey(privKey)
 	if err != nil {
-		return slashingtypes.MsgUnjail{}, err
+		return slashingtypes.MsgUnjail{}, util.LogErr(errors.ErrParse, err)
 	}
 
 	msg := slashingtypes.NewMsgUnjail(sdk.ValAddress(addr))
@@ -30,7 +30,7 @@ func parseQuerySigingInfoArgs(signingInfoMsg types.SigningInfoMsg, xplacEncoding
 		var pk cryptotypes.PubKey
 		err := xplacEncodingConfig.Marshaler.UnmarshalInterfaceJSON([]byte(signingInfoMsg.ConsPubKey), &pk)
 		if err != nil {
-			return slashingtypes.QuerySigningInfoRequest{}, err
+			return slashingtypes.QuerySigningInfoRequest{}, util.LogErr(errors.ErrFailedToUnmarshal, err)
 		}
 
 		return slashingtypes.QuerySigningInfoRequest{

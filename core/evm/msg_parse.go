@@ -30,7 +30,7 @@ func parseDeploySolContractArgs(deploySolContractMsg types.DeploySolContractMsg)
 	if deploySolContractMsg.BytecodeJsonFilePath != "" {
 		bytecode, err = util.BytecodeParsing(deploySolContractMsg.BytecodeJsonFilePath)
 		if err != nil {
-			return err
+			return util.LogErr(errors.ErrParse, err)
 		}
 	}
 
@@ -38,7 +38,7 @@ func parseDeploySolContractArgs(deploySolContractMsg types.DeploySolContractMsg)
 	if deploySolContractMsg.ABIJsonFilePath != "" {
 		abi, err = util.AbiParsing(deploySolContractMsg.ABIJsonFilePath)
 		if err != nil {
-			return err
+			return util.LogErr(errors.ErrParse, err)
 		}
 	}
 
@@ -61,7 +61,7 @@ func parseInvokeSolContractArgs(invokeSolContractMsg types.InvokeSolContractMsg)
 	if invokeSolContractMsg.BytecodeJsonFilePath != "" {
 		bytecode, err = util.BytecodeParsing(invokeSolContractMsg.BytecodeJsonFilePath)
 		if err != nil {
-			return types.InvokeSolContractMsg{}, err
+			return types.InvokeSolContractMsg{}, util.LogErr(errors.ErrParse, err)
 		}
 	}
 
@@ -69,7 +69,7 @@ func parseInvokeSolContractArgs(invokeSolContractMsg types.InvokeSolContractMsg)
 	if invokeSolContractMsg.ABIJsonFilePath != "" {
 		abi, err = util.AbiParsing(invokeSolContractMsg.ABIJsonFilePath)
 		if err != nil {
-			return types.InvokeSolContractMsg{}, err
+			return types.InvokeSolContractMsg{}, util.LogErr(errors.ErrParse, err)
 		}
 	}
 	invokeSolContractMsg.ContractAddress = util.FromStringToTypeHexString(invokeSolContractMsg.ContractAddress)
@@ -88,7 +88,7 @@ func parseCallSolContractArgs(callSolContractMsg types.CallSolContractMsg, byteA
 	if callSolContractMsg.BytecodeJsonFilePath != "" {
 		bytecode, err = util.BytecodeParsing(callSolContractMsg.BytecodeJsonFilePath)
 		if err != nil {
-			return CallSolContractParseMsg{}, err
+			return CallSolContractParseMsg{}, util.LogErr(errors.ErrParse, err)
 		}
 	}
 
@@ -96,7 +96,7 @@ func parseCallSolContractArgs(callSolContractMsg types.CallSolContractMsg, byteA
 	if callSolContractMsg.ABIJsonFilePath != "" {
 		abi, err = util.AbiParsing(callSolContractMsg.ABIJsonFilePath)
 		if err != nil {
-			return CallSolContractParseMsg{}, err
+			return CallSolContractParseMsg{}, util.LogErr(errors.ErrParse, err)
 		}
 	}
 	callSolContractMsg.ContractAddress = util.FromStringToTypeHexString(callSolContractMsg.ContractAddress)
@@ -107,7 +107,7 @@ func parseCallSolContractArgs(callSolContractMsg types.CallSolContractMsg, byteA
 
 	callByteData, err := util.GetAbiPack(callSolContractMsg.ContractFuncCallName, callSolContractMsg.Args...)
 	if err != nil {
-		return CallSolContractParseMsg{}, err
+		return CallSolContractParseMsg{}, util.LogErr(errors.ErrParse, err)
 	}
 
 	fromAddr := util.FromStringToByte20Address(byteAddress)
@@ -169,7 +169,7 @@ func parseEstimateGasSolArgs(invokeSolContractMsg types.InvokeSolContractMsg, by
 	if invokeSolContractMsg.BytecodeJsonFilePath != "" {
 		bytecode, err = util.BytecodeParsing(invokeSolContractMsg.BytecodeJsonFilePath)
 		if err != nil {
-			return CallSolContractParseMsg{}, err
+			return CallSolContractParseMsg{}, util.LogErr(errors.ErrParse, err)
 		}
 	}
 
@@ -177,7 +177,7 @@ func parseEstimateGasSolArgs(invokeSolContractMsg types.InvokeSolContractMsg, by
 	if invokeSolContractMsg.ABIJsonFilePath != "" {
 		abi, err = util.AbiParsing(invokeSolContractMsg.ABIJsonFilePath)
 		if err != nil {
-			return CallSolContractParseMsg{}, err
+			return CallSolContractParseMsg{}, util.LogErr(errors.ErrParse, err)
 		}
 	}
 	invokeSolContractMsg.ContractAddress = util.FromStringToTypeHexString(invokeSolContractMsg.ContractAddress)
@@ -188,7 +188,7 @@ func parseEstimateGasSolArgs(invokeSolContractMsg types.InvokeSolContractMsg, by
 
 	callByteData, err := util.GetAbiPack(invokeSolContractMsg.ContractFuncCallName, invokeSolContractMsg.Args...)
 	if err != nil {
-		return CallSolContractParseMsg{}, err
+		return CallSolContractParseMsg{}, util.LogErr(errors.ErrParse, err)
 	}
 
 	fromAddr := util.FromStringToByte20Address(byteAddress)

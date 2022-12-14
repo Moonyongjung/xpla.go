@@ -32,7 +32,7 @@ func queryByGrpcFeegrant(i IXplaClient) (string, error) {
 			&convertMsg,
 		)
 		if err != nil {
-			return "", err
+			return "", util.LogErr(errors.ErrGrpcRequest, err)
 		}
 
 	// Feegrant grants by grantee
@@ -43,7 +43,7 @@ func queryByGrpcFeegrant(i IXplaClient) (string, error) {
 			&convertMsg,
 		)
 		if err != nil {
-			return "", err
+			return "", util.LogErr(errors.ErrGrpcRequest, err)
 		}
 
 	// Feegrant grants by granter
@@ -54,7 +54,7 @@ func queryByGrpcFeegrant(i IXplaClient) (string, error) {
 			&convertMsg,
 		)
 		if err != nil {
-			return "", err
+			return "", util.LogErr(errors.ErrGrpcRequest, err)
 		}
 
 	default:

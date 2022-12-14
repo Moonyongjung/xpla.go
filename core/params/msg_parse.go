@@ -3,6 +3,7 @@ package params
 import (
 	"github.com/Moonyongjung/xpla.go/key"
 	"github.com/Moonyongjung/xpla.go/types"
+	"github.com/Moonyongjung/xpla.go/types/errors"
 	"github.com/Moonyongjung/xpla.go/util"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -20,7 +21,7 @@ func parseProposalParamChangeArgs(paramChangeMsg types.ParamChangeMsg, privKey k
 	if paramChangeMsg.JsonFilePath != "" {
 		proposal, err = paramscutils.ParseParamChangeProposalJSON(encodingConfig.Amino, paramChangeMsg.JsonFilePath)
 		if err != nil {
-			return govtypes.MsgSubmitProposal{}, err
+			return govtypes.MsgSubmitProposal{}, util.LogErr(errors.ErrParse, err)
 		}
 	} else {
 		proposal.Title = paramChangeMsg.Title
@@ -31,7 +32,7 @@ func parseProposalParamChangeArgs(paramChangeMsg types.ParamChangeMsg, privKey k
 		for _, change := range paramChangeMsg.Changes {
 			var targetJson paramscutils.ParamChangeJSON
 			if err := encodingConfig.Amino.UnmarshalJSON([]byte(change), &targetJson); err != nil {
-				return govtypes.MsgSubmitProposal{}, err
+				return govtypes.MsgSubmitProposal{}, util.LogErr(errors.ErrFailedToUnmarshal, err)
 			}
 			paramChangeJsons = append(paramChangeJsons, targetJson)
 		}
@@ -41,12 +42,12 @@ func parseProposalParamChangeArgs(paramChangeMsg types.ParamChangeMsg, privKey k
 
 	deposit, err := sdk.ParseCoinsNormalized(util.DenomAdd(proposal.Deposit))
 	if err != nil {
-		return govtypes.MsgSubmitProposal{}, err
+		return govtypes.MsgSubmitProposal{}, util.LogErr(errors.ErrParse, err)
 	}
 
 	from, err := util.GetAddrByPrivKey(privKey)
 	if err != nil {
-		return govtypes.MsgSubmitProposal{}, err
+		return govtypes.MsgSubmitProposal{}, util.LogErr(errors.ErrParse, err)
 	}
 	content := paramsproposal.NewParameterChangeProposal(
 		proposal.Title, proposal.Description, proposal.Changes.ToParamChanges(),
@@ -54,7 +55,7 @@ func parseProposalParamChangeArgs(paramChangeMsg types.ParamChangeMsg, privKey k
 
 	msg, err := govtypes.NewMsgSubmitProposal(content, deposit, from)
 	if err != nil {
-		return govtypes.MsgSubmitProposal{}, err
+		return govtypes.MsgSubmitProposal{}, util.LogErr(errors.ErrParse, err)
 	}
 
 	return *msg, nil

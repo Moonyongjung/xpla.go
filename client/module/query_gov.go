@@ -33,7 +33,7 @@ func queryByGrpcGov(i IXplaClient) (string, error) {
 			&convertMsg,
 		)
 		if err != nil {
-			return "", err
+			return "", util.LogErr(errors.ErrGrpcRequest, err)
 		}
 
 	// Gov proposals
@@ -44,7 +44,7 @@ func queryByGrpcGov(i IXplaClient) (string, error) {
 			&convertMsg,
 		)
 		if err != nil {
-			return "", err
+			return "", util.LogErr(errors.ErrGrpcRequest, err)
 		}
 
 	// Gov deposit parameter
@@ -60,7 +60,7 @@ func queryByGrpcGov(i IXplaClient) (string, error) {
 
 		resByTxQuery, err := govutils.QueryDepositByTxQuery(clientCtx, convertMsg)
 		if err != nil {
-			return "", err
+			return "", util.LogErr(errors.ErrGrpcRequest, err)
 		}
 		clientCtx.Codec.MustUnmarshalJSON(resByTxQuery, &deposit)
 		res = &deposit
@@ -73,7 +73,7 @@ func queryByGrpcGov(i IXplaClient) (string, error) {
 			&convertMsg,
 		)
 		if err != nil {
-			return "", err
+			return "", util.LogErr(errors.ErrGrpcRequest, err)
 		}
 
 	// Gov deposits parameter
@@ -88,7 +88,7 @@ func queryByGrpcGov(i IXplaClient) (string, error) {
 
 		resByTxQuery, err := govutils.QueryDepositsByTxQuery(clientCtx, convertMsg)
 		if err != nil {
-			return "", err
+			return "", util.LogErr(errors.ErrGrpcRequest, err)
 		}
 		clientCtx.Codec.MustUnmarshalJSON(resByTxQuery, &deposit)
 		res = &deposit
@@ -101,7 +101,7 @@ func queryByGrpcGov(i IXplaClient) (string, error) {
 			&convertMsg,
 		)
 		if err != nil {
-			return "", err
+			return "", util.LogErr(errors.ErrGrpcRequest, err)
 		}
 
 	// Gov tally
@@ -112,7 +112,7 @@ func queryByGrpcGov(i IXplaClient) (string, error) {
 			&convertMsg,
 		)
 		if err != nil {
-			return "", err
+			return "", util.LogErr(errors.ErrGrpcRequest, err)
 		}
 
 	// Gov params
@@ -122,7 +122,7 @@ func queryByGrpcGov(i IXplaClient) (string, error) {
 			&govtypes.QueryParamsRequest{ParamsType: "voting"},
 		)
 		if err != nil {
-			return "", err
+			return "", util.LogErr(errors.ErrGrpcRequest, err)
 		}
 
 		tallyRes, err := queryClient.Params(
@@ -130,7 +130,7 @@ func queryByGrpcGov(i IXplaClient) (string, error) {
 			&govtypes.QueryParamsRequest{ParamsType: "tallying"},
 		)
 		if err != nil {
-			return "", err
+			return "", util.LogErr(errors.ErrGrpcRequest, err)
 		}
 
 		depositRes, err := queryClient.Params(
@@ -138,7 +138,7 @@ func queryByGrpcGov(i IXplaClient) (string, error) {
 			&govtypes.QueryParamsRequest{ParamsType: "deposit"},
 		)
 		if err != nil {
-			return "", err
+			return "", util.LogErr(errors.ErrGrpcRequest, err)
 		}
 
 		govAllParams := govtypes.NewParams(
@@ -149,7 +149,7 @@ func queryByGrpcGov(i IXplaClient) (string, error) {
 
 		bytes, err := util.JsonMarshalData(govAllParams)
 		if err != nil {
-			return "", err
+			return "", util.LogErr(errors.ErrFailedToMarshal, err)
 		}
 		return string(bytes), nil
 
@@ -161,12 +161,12 @@ func queryByGrpcGov(i IXplaClient) (string, error) {
 			&convertMsg,
 		)
 		if err != nil {
-			return "", err
+			return "", util.LogErr(errors.ErrGrpcRequest, err)
 		}
 
 		bytes, err := util.JsonMarshalData(resParams.GetVotingParams())
 		if err != nil {
-			return "", err
+			return "", util.LogErr(errors.ErrFailedToMarshal, err)
 		}
 		return string(bytes), nil
 
@@ -178,12 +178,12 @@ func queryByGrpcGov(i IXplaClient) (string, error) {
 			&convertMsg,
 		)
 		if err != nil {
-			return "", err
+			return "", util.LogErr(errors.ErrGrpcRequest, err)
 		}
 
 		bytes, err := util.JsonMarshalData(resParams.GetTallyParams())
 		if err != nil {
-			return "", err
+			return "", util.LogErr(errors.ErrFailedToMarshal, err)
 		}
 		return string(bytes), nil
 
@@ -195,12 +195,12 @@ func queryByGrpcGov(i IXplaClient) (string, error) {
 			&convertMsg,
 		)
 		if err != nil {
-			return "", err
+			return "", util.LogErr(errors.ErrGrpcRequest, err)
 		}
 
 		bytes, err := util.JsonMarshalData(resParams.GetDepositParams())
 		if err != nil {
-			return "", err
+			return "", util.LogErr(errors.ErrFailedToMarshal, err)
 		}
 		return string(bytes), nil
 
@@ -216,12 +216,12 @@ func queryByGrpcGov(i IXplaClient) (string, error) {
 
 		prop, err := govutils.QueryProposerByTxQuery(clientCtx, proposalId)
 		if err != nil {
-			return "", err
+			return "", util.LogErr(errors.ErrGrpcRequest, err)
 		}
 
 		bytes, err := util.JsonMarshalData(prop)
 		if err != nil {
-			return "", err
+			return "", util.LogErr(errors.ErrFailedToMarshal, err)
 		}
 		return string(bytes), nil
 
@@ -233,7 +233,7 @@ func queryByGrpcGov(i IXplaClient) (string, error) {
 			&convertMsg,
 		)
 		if err != nil {
-			return "", err
+			return "", util.LogErr(errors.ErrGrpcRequest, err)
 		}
 
 		clientCtx, err := clientForQuery(i)
@@ -243,7 +243,7 @@ func queryByGrpcGov(i IXplaClient) (string, error) {
 
 		voterAddr, err := sdk.AccAddressFromBech32(convertMsg.Voter)
 		if err != nil {
-			return "", err
+			return "", util.LogErr(errors.ErrParse, err)
 		}
 
 		vote := resVote.GetVote()
@@ -251,11 +251,11 @@ func queryByGrpcGov(i IXplaClient) (string, error) {
 			params := govtypes.NewQueryVoteParams(convertMsg.ProposalId, voterAddr)
 			resByTxQuery, err := govutils.QueryVoteByTxQuery(clientCtx, params)
 			if err != nil {
-				return "", err
+				return "", util.LogErr(errors.ErrGrpcRequest, err)
 			}
 
 			if err := clientCtx.Codec.UnmarshalJSON(resByTxQuery, &vote); err != nil {
-				return "", err
+				return "", util.LogErr(errors.ErrFailedToUnmarshal, err)
 			}
 		}
 
@@ -270,7 +270,7 @@ func queryByGrpcGov(i IXplaClient) (string, error) {
 		}
 		resByTxQuery, err := govutils.QueryVotesByTxQuery(clientCtx, convertMsg)
 		if err != nil {
-			return "", err
+			return "", util.LogErr(errors.ErrGrpcRequest, err)
 		}
 
 		var votes govtypes.Votes
@@ -278,7 +278,7 @@ func queryByGrpcGov(i IXplaClient) (string, error) {
 		clientCtx.LegacyAmino.MustUnmarshalJSON(resByTxQuery, &votes)
 		out, err := printObjectLegacy(i, votes)
 		if err != nil {
-			return "", err
+			return "", util.LogErr(errors.ErrParse, err)
 		}
 		return string(out), nil
 
@@ -290,7 +290,7 @@ func queryByGrpcGov(i IXplaClient) (string, error) {
 			&convertMsg,
 		)
 		if err != nil {
-			return "", err
+			return "", util.LogErr(errors.ErrGrpcRequest, err)
 		}
 
 	default:

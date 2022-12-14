@@ -34,11 +34,11 @@ func queryByGrpcUpgrade(i IXplaClient) (string, error) {
 			&convertMsg,
 		)
 		if err != nil {
-			return "", err
+			return "", util.LogErr(errors.ErrGrpcRequest, err)
 		}
 
 		if appliedPlanRes.Height == 0 {
-			return "", err
+			return "", util.LogErr(errors.ErrParse, "applied plan height is 0")
 		}
 		headerData, err := appliedReturnBlockheader(appliedPlanRes, i.Ixplac.GetRpc(), i.Ixplac.GetContext())
 		if err != nil {
@@ -55,7 +55,7 @@ func queryByGrpcUpgrade(i IXplaClient) (string, error) {
 			&convertMsg,
 		)
 		if err != nil {
-			return "", err
+			return "", util.LogErr(errors.ErrGrpcRequest, err)
 		}
 
 	// Upgrade plan
@@ -66,7 +66,7 @@ func queryByGrpcUpgrade(i IXplaClient) (string, error) {
 			&convertMsg,
 		)
 		if err != nil {
-			return "", err
+			return "", util.LogErr(errors.ErrGrpcRequest, err)
 		}
 
 	default:
@@ -131,18 +131,18 @@ func appliedReturnBlockheader(res *upgradetypes.QueryAppliedPlanResponse, rpcUrl
 
 	client, err := cmclient.NewClientFromNode(rpcUrl)
 	if err != nil {
-		return nil, err
+		return nil, util.LogErr(errors.ErrSdkClient, err)
 	}
 	clientCtx = clientCtx.WithClient(client)
 
 	node, err := clientCtx.GetNode()
 	if err != nil {
-		return nil, err
+		return nil, util.LogErr(errors.ErrSdkClient, err)
 	}
 
 	headers, err := node.BlockchainInfo(ctx, res.Height, res.Height)
 	if err != nil {
-		return nil, err
+		return nil, util.LogErr(errors.ErrSdkClient, err)
 	}
 
 	if len(headers.BlockMetas) == 0 {
@@ -151,7 +151,7 @@ func appliedReturnBlockheader(res *upgradetypes.QueryAppliedPlanResponse, rpcUrl
 
 	bytes, err := clientCtx.LegacyAmino.MarshalJSONIndent(headers.BlockMetas[0], "", "  ")
 	if err != nil {
-		return nil, err
+		return nil, util.LogErr(errors.ErrFailedToMarshal, err)
 	}
 
 	return bytes, nil

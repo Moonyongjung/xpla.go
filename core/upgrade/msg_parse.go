@@ -3,6 +3,7 @@ package upgrade
 import (
 	"github.com/Moonyongjung/xpla.go/key"
 	"github.com/Moonyongjung/xpla.go/types"
+	"github.com/Moonyongjung/xpla.go/types/errors"
 	"github.com/Moonyongjung/xpla.go/util"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -24,17 +25,17 @@ func parseProposalSoftwareUpgradeArgs(softwareUpgradeMsg types.SoftwareUpgradeMs
 	)
 	from, err := util.GetAddrByPrivKey(privKey)
 	if err != nil {
-		return govtypes.MsgSubmitProposal{}, err
+		return govtypes.MsgSubmitProposal{}, util.LogErr(errors.ErrParse, err)
 	}
 
 	deposit, err := sdk.ParseCoinsNormalized(util.DenomAdd(softwareUpgradeMsg.Deposit))
 	if err != nil {
-		return govtypes.MsgSubmitProposal{}, err
+		return govtypes.MsgSubmitProposal{}, util.LogErr(errors.ErrParse, err)
 	}
 
 	msg, err := govtypes.NewMsgSubmitProposal(content, deposit, from)
 	if err != nil {
-		return govtypes.MsgSubmitProposal{}, err
+		return govtypes.MsgSubmitProposal{}, util.LogErr(errors.ErrParse, err)
 	}
 
 	return *msg, nil
@@ -44,12 +45,12 @@ func parseProposalSoftwareUpgradeArgs(softwareUpgradeMsg types.SoftwareUpgradeMs
 func parseCancelSoftwareUpgradeArgs(cancelSoftwareUpgradeMsg types.CancelSoftwareUpgradeMsg, privKey key.PrivateKey) (govtypes.MsgSubmitProposal, error) {
 	from, err := util.GetAddrByPrivKey(privKey)
 	if err != nil {
-		return govtypes.MsgSubmitProposal{}, err
+		return govtypes.MsgSubmitProposal{}, util.LogErr(errors.ErrParse, err)
 	}
 
 	deposit, err := sdk.ParseCoinsNormalized(util.DenomAdd(cancelSoftwareUpgradeMsg.Deposit))
 	if err != nil {
-		return govtypes.MsgSubmitProposal{}, err
+		return govtypes.MsgSubmitProposal{}, util.LogErr(errors.ErrParse, err)
 	}
 	content := upgradetypes.NewCancelSoftwareUpgradeProposal(
 		cancelSoftwareUpgradeMsg.Deposit,
@@ -58,7 +59,7 @@ func parseCancelSoftwareUpgradeArgs(cancelSoftwareUpgradeMsg types.CancelSoftwar
 
 	msg, err := govtypes.NewMsgSubmitProposal(content, deposit, from)
 	if err != nil {
-		return govtypes.MsgSubmitProposal{}, err
+		return govtypes.MsgSubmitProposal{}, util.LogErr(errors.ErrParse, err)
 	}
 
 	return *msg, nil

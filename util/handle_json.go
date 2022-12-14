@@ -5,6 +5,8 @@ import (
 	"encoding/json"
 	"io"
 	"os"
+
+	"github.com/Moonyongjung/xpla.go/types/errors"
 )
 
 func JsonMarshalData(jsonData interface{}) ([]byte, error) {
@@ -46,12 +48,12 @@ func SaveJsonPretty(jsonByte []byte, saveTxPath string) error {
 	var prettyJson bytes.Buffer
 	err := json.Indent(&prettyJson, jsonByte, "", "    ")
 	if err != nil {
-		return err
+		return LogErr(errors.ErrFailedToMarshal, err)
 	}
 
 	err = os.WriteFile(saveTxPath, prettyJson.Bytes(), 0660)
 	if err != nil {
-		return err
+		return LogErr(errors.ErrFailedToMarshal, err)
 	}
 
 	return nil

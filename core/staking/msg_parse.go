@@ -33,7 +33,7 @@ func parseCreateValidatorArgs(
 
 	privKeyAddr, err := util.GetAddrByPrivKey(privKey)
 	if err != nil {
-		return nil, err
+		return nil, util.LogErr(errors.ErrParse, err)
 	}
 
 	privKeyValAddr := sdk.ValAddress(privKeyAddr)
@@ -41,7 +41,7 @@ func parseCreateValidatorArgs(
 	addrStr := createValidatorMsg.ValidatorAddress
 	addr, err := sdk.ValAddressFromBech32(addrStr)
 	if err != nil {
-		return nil, err
+		return nil, util.LogErr(errors.ErrParse, err)
 	}
 
 	if privKeyValAddr.String() != addr.String() {
@@ -60,7 +60,7 @@ func parseCreateValidatorArgs(
 
 		nodeId, valPubKey, err = genutil.InitializeNodeValidatorFiles(serverCtx.Config)
 		if err != nil {
-			return nil, err
+			return nil, util.LogErr(errors.ErrParse, err)
 		}
 		ip, _ := server.ExternalIP()
 
@@ -117,7 +117,7 @@ func parseCreateValidatorArgs(
 
 	amountCoins, err := sdk.ParseCoinNormalized(amount)
 	if err != nil {
-		return nil, err
+		return nil, util.LogErr(errors.ErrParse, err)
 	}
 
 	buildCRates, err := buildCommissionRates(commissionRate, commissionMaxRate, commissionMaxChangeRate)
@@ -132,7 +132,7 @@ func parseCreateValidatorArgs(
 
 	msg, err := stakingtypes.NewMsgCreateValidator(addr, valPubKey, amountCoins, description, buildCRates, intMinSelfDelegation)
 	if err != nil {
-		return nil, err
+		return nil, util.LogErr(errors.ErrParse, err)
 	}
 	return msg, nil
 }
@@ -152,7 +152,7 @@ func parseEditValidatorArgs(editValidatorMsg types.EditValidatorMsg, privKey key
 	if commisionRate != "" {
 		rate, err := sdk.NewDecFromStr(commisionRate)
 		if err != nil {
-			return stakingtypes.MsgEditValidator{}, err
+			return stakingtypes.MsgEditValidator{}, util.LogErr(errors.ErrParse, err)
 		}
 		newRate = &rate
 	}
@@ -170,7 +170,7 @@ func parseEditValidatorArgs(editValidatorMsg types.EditValidatorMsg, privKey key
 
 	addr, err := util.GetAddrByPrivKey(privKey)
 	if err != nil {
-		return stakingtypes.MsgEditValidator{}, err
+		return stakingtypes.MsgEditValidator{}, util.LogErr(errors.ErrParse, err)
 	}
 
 	msg := stakingtypes.NewMsgEditValidator(sdk.ValAddress(addr), description, newRate, newMinSelfDelegation)
@@ -182,16 +182,16 @@ func parseEditValidatorArgs(editValidatorMsg types.EditValidatorMsg, privKey key
 func parseDelegateArgs(delegateMsg types.DelegateMsg, privKey key.PrivateKey) (stakingtypes.MsgDelegate, error) {
 	amount, err := sdk.ParseCoinNormalized(util.DenomAdd(delegateMsg.Amount))
 	if err != nil {
-		return stakingtypes.MsgDelegate{}, err
+		return stakingtypes.MsgDelegate{}, util.LogErr(errors.ErrParse, err)
 	}
 	delAddr, err := util.GetAddrByPrivKey(privKey)
 	if err != nil {
-		return stakingtypes.MsgDelegate{}, err
+		return stakingtypes.MsgDelegate{}, util.LogErr(errors.ErrParse, err)
 	}
 
 	valAddr, err := sdk.ValAddressFromBech32(delegateMsg.ValAddr)
 	if err != nil {
-		return stakingtypes.MsgDelegate{}, err
+		return stakingtypes.MsgDelegate{}, util.LogErr(errors.ErrParse, err)
 	}
 
 	msg := stakingtypes.NewMsgDelegate(delAddr, valAddr, amount)
@@ -203,16 +203,16 @@ func parseDelegateArgs(delegateMsg types.DelegateMsg, privKey key.PrivateKey) (s
 func parseUnbondArgs(unbondMsg types.UnbondMsg, privKey key.PrivateKey) (stakingtypes.MsgUndelegate, error) {
 	amount, err := sdk.ParseCoinNormalized(util.DenomAdd(unbondMsg.Amount))
 	if err != nil {
-		return stakingtypes.MsgUndelegate{}, err
+		return stakingtypes.MsgUndelegate{}, util.LogErr(errors.ErrParse, err)
 	}
 	delAddr, err := util.GetAddrByPrivKey(privKey)
 	if err != nil {
-		return stakingtypes.MsgUndelegate{}, err
+		return stakingtypes.MsgUndelegate{}, util.LogErr(errors.ErrParse, err)
 	}
 
 	valAddr, err := sdk.ValAddressFromBech32(unbondMsg.ValAddr)
 	if err != nil {
-		return stakingtypes.MsgUndelegate{}, err
+		return stakingtypes.MsgUndelegate{}, util.LogErr(errors.ErrParse, err)
 	}
 
 	msg := stakingtypes.NewMsgUndelegate(delAddr, valAddr, amount)
@@ -224,20 +224,20 @@ func parseUnbondArgs(unbondMsg types.UnbondMsg, privKey key.PrivateKey) (staking
 func parseRedelegateArgs(redelegateMsg types.RedelegateMsg, privKey key.PrivateKey) (stakingtypes.MsgBeginRedelegate, error) {
 	amount, err := sdk.ParseCoinNormalized(util.DenomAdd(redelegateMsg.Amount))
 	if err != nil {
-		return stakingtypes.MsgBeginRedelegate{}, err
+		return stakingtypes.MsgBeginRedelegate{}, util.LogErr(errors.ErrParse, err)
 	}
 	delAddr, err := util.GetAddrByPrivKey(privKey)
 	if err != nil {
-		return stakingtypes.MsgBeginRedelegate{}, err
+		return stakingtypes.MsgBeginRedelegate{}, util.LogErr(errors.ErrParse, err)
 	}
 
 	valSrcAddr, err := sdk.ValAddressFromBech32(redelegateMsg.ValSrcAddr)
 	if err != nil {
-		return stakingtypes.MsgBeginRedelegate{}, err
+		return stakingtypes.MsgBeginRedelegate{}, util.LogErr(errors.ErrParse, err)
 	}
 	valDstAddr, err := sdk.ValAddressFromBech32(redelegateMsg.ValDstAddr)
 	if err != nil {
-		return stakingtypes.MsgBeginRedelegate{}, err
+		return stakingtypes.MsgBeginRedelegate{}, util.LogErr(errors.ErrParse, err)
 	}
 
 	msg := stakingtypes.NewMsgBeginRedelegate(delAddr, valSrcAddr, valDstAddr, amount)
@@ -262,15 +262,15 @@ func buildCommissionRates(rateStr, maxRateStr, maxChangeRateStr string) (commiss
 	}
 	rate, err := sdk.NewDecFromStr(rateStr)
 	if err != nil {
-		return commission, err
+		return commission, util.LogErr(errors.ErrParse, err)
 	}
 	maxRate, err := sdk.NewDecFromStr(maxRateStr)
 	if err != nil {
-		return commission, err
+		return commission, util.LogErr(errors.ErrParse, err)
 	}
 	maxChangeRate, err := sdk.NewDecFromStr(maxChangeRateStr)
 	if err != nil {
-		return commission, err
+		return commission, util.LogErr(errors.ErrParse, err)
 	}
 	commission = stakingtypes.NewCommissionRates(rate, maxRate, maxChangeRate)
 
@@ -292,7 +292,7 @@ func initializedNodeValidatorString(nodeKey string, privValKey string) (string, 
 	nodeKeyType := new(NodeKey)
 	err := tmjson.Unmarshal([]byte(nodeKey), nodeKeyType)
 	if err != nil {
-		return "", nil, err
+		return "", nil, util.LogErr(errors.ErrFailedToUnmarshal, err)
 	}
 
 	nodeID := hex.EncodeToString(nodeKeyType.PrivKey.PubKey().Address())
@@ -300,7 +300,7 @@ func initializedNodeValidatorString(nodeKey string, privValKey string) (string, 
 	pvKey := FilePVKey{}
 	err = tmjson.Unmarshal([]byte(privValKey), &pvKey)
 	if err != nil {
-		return "", nil, util.LogErr(errors.ErrInvalidRequest, "err reading privValidator key, ", err)
+		return "", nil, util.LogErr(errors.ErrFailedToUnmarshal, "err reading privValidator key, ", err)
 	}
 
 	// overwrite pubkey and address for convenience
@@ -309,7 +309,7 @@ func initializedNodeValidatorString(nodeKey string, privValKey string) (string, 
 
 	valPubKey, err := cryptocodec.FromTmPubKeyInterface(pvKey.PubKey)
 	if err != nil {
-		return "", nil, err
+		return "", nil, util.LogErr(errors.ErrParse, err)
 	}
 
 	return nodeID, valPubKey, nil

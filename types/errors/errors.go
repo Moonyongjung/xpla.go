@@ -5,6 +5,7 @@ type XGoError struct {
 	desc    string
 }
 
+// Return error code and message generating on the xpla.go.
 var (
 	ErrInvalidMsgType      = new(1, "invalid msg type")
 	ErrInvalidRequest      = new(2, "invalid request")
@@ -20,7 +21,10 @@ var (
 	ErrHttpRequest         = new(12, "HTTP request error")
 	ErrGrpcRequest         = new(13, "gRPC request error")
 	ErrEvmRpcRequest       = new(14, "EVM RPC request error")
-	ErrCannotConvert       = new(15, "cannot convert type")
+	ErrRpcRequest          = new(15, "RPC request error")
+	ErrCannotConvert       = new(16, "cannot convert type")
+	ErrParse               = new(17, "parse error")
+	ErrSdkClient           = new(18, "cosmos sdk client set error")
 )
 
 func new(errCode uint64, desc string) XGoError {

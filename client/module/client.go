@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/Moonyongjung/xpla.go/key"
+	"github.com/Moonyongjung/xpla.go/types/errors"
 	"github.com/Moonyongjung/xpla.go/util"
 	cmclient "github.com/cosmos/cosmos-sdk/client"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -58,7 +59,7 @@ func NewIXplaClient(moduleClient ModuleClient, qt uint8) *IXplaClient {
 func printProto(i IXplaClient, toPrint proto.Message) ([]byte, error) {
 	out, err := i.Ixplac.GetEncoding().Marshaler.MarshalJSON(toPrint)
 	if err != nil {
-		return nil, err
+		return nil, util.LogErr(errors.ErrFailedToMarshal, err)
 	}
 	return out, nil
 }
@@ -67,7 +68,7 @@ func printProto(i IXplaClient, toPrint proto.Message) ([]byte, error) {
 func printObjectLegacy(i IXplaClient, toPrint interface{}) ([]byte, error) {
 	out, err := i.Ixplac.GetEncoding().Amino.MarshalJSON(toPrint)
 	if err != nil {
-		return nil, err
+		return nil, util.LogErr(errors.ErrFailedToMarshal, err)
 	}
 	return out, nil
 }
@@ -76,7 +77,7 @@ func printObjectLegacy(i IXplaClient, toPrint interface{}) ([]byte, error) {
 func clientForQuery(i IXplaClient) (cmclient.Context, error) {
 	client, err := cmclient.NewClientFromNode(i.Ixplac.GetRpc())
 	if err != nil {
-		return cmclient.Context{}, err
+		return cmclient.Context{}, util.LogErr(errors.ErrSdkClient, err)
 	}
 
 	clientCtx, err := util.NewClient()

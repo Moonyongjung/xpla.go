@@ -34,7 +34,7 @@ func queryByGrpcWasm(i IXplaClient) (string, error) {
 			&convertMsg,
 		)
 		if err != nil {
-			return "", err
+			return "", util.LogErr(errors.ErrGrpcRequest, err)
 		}
 
 	// Wasm list code
@@ -45,7 +45,7 @@ func queryByGrpcWasm(i IXplaClient) (string, error) {
 			&convertMsg,
 		)
 		if err != nil {
-			return "", err
+			return "", util.LogErr(errors.ErrGrpcRequest, err)
 		}
 
 	// Wasm list contract by code
@@ -56,7 +56,7 @@ func queryByGrpcWasm(i IXplaClient) (string, error) {
 			&convertMsg,
 		)
 		if err != nil {
-			return "", err
+			return "", util.LogErr(errors.ErrGrpcRequest, err)
 		}
 
 	// Wasm download
@@ -71,7 +71,7 @@ func queryByGrpcWasm(i IXplaClient) (string, error) {
 			&convertMsg,
 		)
 		if err != nil {
-			return "", err
+			return "", util.LogErr(errors.ErrGrpcRequest, err)
 		}
 		os.WriteFile(downloadFileName, res.Data, 0o600)
 		return "download complete", nil
@@ -84,7 +84,7 @@ func queryByGrpcWasm(i IXplaClient) (string, error) {
 			&convertMsg,
 		)
 		if err != nil {
-			return "", err
+			return "", util.LogErr(errors.ErrGrpcRequest, err)
 		}
 
 	// Wasm contract info
@@ -95,7 +95,7 @@ func queryByGrpcWasm(i IXplaClient) (string, error) {
 			&convertMsg,
 		)
 		if err != nil {
-			return "", err
+			return "", util.LogErr(errors.ErrGrpcRequest, err)
 		}
 
 	// Wasm contract state all
@@ -106,7 +106,7 @@ func queryByGrpcWasm(i IXplaClient) (string, error) {
 			&convertMsg,
 		)
 		if err != nil {
-			return "", err
+			return "", util.LogErr(errors.ErrGrpcRequest, err)
 		}
 
 	// Wasm contract history
@@ -117,7 +117,7 @@ func queryByGrpcWasm(i IXplaClient) (string, error) {
 			&convertMsg,
 		)
 		if err != nil {
-			return "", err
+			return "", util.LogErr(errors.ErrGrpcRequest, err)
 		}
 
 	// Wasm pinned
@@ -128,7 +128,7 @@ func queryByGrpcWasm(i IXplaClient) (string, error) {
 			&convertMsg,
 		)
 		if err != nil {
-			return "", err
+			return "", util.LogErr(errors.ErrGrpcRequest, err)
 		}
 
 	// Wasm libwasmvm version

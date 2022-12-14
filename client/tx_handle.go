@@ -252,7 +252,7 @@ func txSignRound(xplac *XplaClient,
 
 	err := builder.SetSignatures(sigsV2...)
 	if err != nil {
-		return err
+		return util.LogErr(errors.ErrParse, err)
 	}
 
 	sigsV2 = []signing.SignatureV2{}
@@ -271,7 +271,7 @@ func txSignRound(xplac *XplaClient,
 			accSeqs[i],
 		)
 		if err != nil {
-			return err
+			return util.LogErr(errors.ErrParse, err)
 		}
 
 		sigsV2 = append(sigsV2, sigV2)
@@ -279,7 +279,7 @@ func txSignRound(xplac *XplaClient,
 
 	err = builder.SetSignatures(sigsV2...)
 	if err != nil {
-		return err
+		return util.LogErr(errors.ErrParse, err)
 	}
 
 	return nil
@@ -307,11 +307,11 @@ func evmTxSignRound(xplac *XplaClient,
 
 	signedTx, err := evmtypes.SignTx(tx, signer, ethPrivKey)
 	if err != nil {
-		return nil, err
+		return nil, util.LogErr(errors.ErrParse, err)
 	}
 	txbytes, err := signedTx.MarshalJSON()
 	if err != nil {
-		return nil, err
+		return nil, util.LogErr(errors.ErrFailedToMarshal, err)
 	}
 
 	return txbytes, nil
@@ -321,7 +321,7 @@ func evmTxSignRound(xplac *XplaClient,
 func readTxAndInitContexts(clientCtx cmclient.Context, filename string) (cmclient.Context, tx.Factory, sdk.Tx, error) {
 	stdTx, err := authclient.ReadTxFromFile(clientCtx, filename)
 	if err != nil {
-		return clientCtx, tx.Factory{}, nil, err
+		return clientCtx, tx.Factory{}, nil, util.LogErr(errors.ErrParse, err)
 	}
 
 	txFactory := util.NewFactory(clientCtx)
@@ -335,7 +335,7 @@ func marshalSignatureJSON(txConfig cmclient.TxConfig, txBldr cmclient.TxBuilder,
 	if signatureOnly {
 		sigs, err := parsedTx.GetSignaturesV2()
 		if err != nil {
-			return nil, err
+			return nil, util.LogErr(errors.ErrParse, err)
 		}
 		return txConfig.MarshalSignatureJSON(sigs)
 	}

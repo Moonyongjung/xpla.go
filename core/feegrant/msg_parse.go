@@ -17,7 +17,7 @@ import (
 func parseFeeGrantArgs(feeGrantMsg types.FeeGrantMsg, privKey key.PrivateKey) (feegrant.MsgGrantAllowance, error) {
 	granter, err := util.GetAddrByPrivKey(privKey)
 	if err != nil {
-		return feegrant.MsgGrantAllowance{}, err
+		return feegrant.MsgGrantAllowance{}, util.LogErr(errors.ErrParse, err)
 	}
 
 	if feeGrantMsg.Granter != granter.String() {
@@ -26,7 +26,7 @@ func parseFeeGrantArgs(feeGrantMsg types.FeeGrantMsg, privKey key.PrivateKey) (f
 
 	grantee, err := sdk.AccAddressFromBech32(feeGrantMsg.Grantee)
 	if err != nil {
-		return feegrant.MsgGrantAllowance{}, err
+		return feegrant.MsgGrantAllowance{}, util.LogErr(errors.ErrParse, err)
 	}
 
 	limit := util.DenomAdd(feeGrantMsg.SpendLimit)
@@ -35,7 +35,7 @@ func parseFeeGrantArgs(feeGrantMsg types.FeeGrantMsg, privKey key.PrivateKey) (f
 	}
 	spendLimit, err := sdk.ParseCoinsNormalized(limit)
 	if err != nil {
-		return feegrant.MsgGrantAllowance{}, err
+		return feegrant.MsgGrantAllowance{}, util.LogErr(errors.ErrParse, err)
 	}
 
 	basic := feegrant.BasicAllowance{
@@ -46,7 +46,7 @@ func parseFeeGrantArgs(feeGrantMsg types.FeeGrantMsg, privKey key.PrivateKey) (f
 	if feeGrantMsg.Expiration != "" {
 		expireTime, err := time.Parse(time.RFC3339, feeGrantMsg.Expiration)
 		if err != nil {
-			return feegrant.MsgGrantAllowance{}, err
+			return feegrant.MsgGrantAllowance{}, util.LogErr(errors.ErrParse, err)
 		}
 		basic.Expiration = &expireTime
 	}
@@ -59,7 +59,7 @@ func parseFeeGrantArgs(feeGrantMsg types.FeeGrantMsg, privKey key.PrivateKey) (f
 	if periodClock > 0 || feeGrantMsg.PeriodLimit != "" {
 		periodLimit, err := sdk.ParseCoinsNormalized(util.DenomAdd(feeGrantMsg.PeriodLimit))
 		if err != nil {
-			return feegrant.MsgGrantAllowance{}, err
+			return feegrant.MsgGrantAllowance{}, util.LogErr(errors.ErrParse, err)
 		}
 
 		if periodClock <= 0 {
@@ -89,13 +89,13 @@ func parseFeeGrantArgs(feeGrantMsg types.FeeGrantMsg, privKey key.PrivateKey) (f
 	if len(feeGrantMsg.AllowedMsg) > 0 {
 		grant, err = feegrant.NewAllowedMsgAllowance(grant, feeGrantMsg.AllowedMsg)
 		if err != nil {
-			return feegrant.MsgGrantAllowance{}, err
+			return feegrant.MsgGrantAllowance{}, util.LogErr(errors.ErrParse, err)
 		}
 	}
 
 	msg, err := feegrant.NewMsgGrantAllowance(grant, granter, grantee)
 	if err != nil {
-		return feegrant.MsgGrantAllowance{}, err
+		return feegrant.MsgGrantAllowance{}, util.LogErr(errors.ErrParse, err)
 	}
 
 	return *msg, nil
@@ -105,7 +105,7 @@ func parseFeeGrantArgs(feeGrantMsg types.FeeGrantMsg, privKey key.PrivateKey) (f
 func parseRevokeFeeGrantArgs(revokeFeeGrantMsg types.RevokeFeeGrantMsg, privKey key.PrivateKey) (feegrant.MsgRevokeAllowance, error) {
 	granter, err := util.GetAddrByPrivKey(privKey)
 	if err != nil {
-		return feegrant.MsgRevokeAllowance{}, err
+		return feegrant.MsgRevokeAllowance{}, util.LogErr(errors.ErrParse, err)
 	}
 
 	if revokeFeeGrantMsg.Granter != granter.String() {
@@ -113,7 +113,7 @@ func parseRevokeFeeGrantArgs(revokeFeeGrantMsg types.RevokeFeeGrantMsg, privKey 
 	}
 	grantee, err := sdk.AccAddressFromBech32(revokeFeeGrantMsg.Grantee)
 	if err != nil {
-		return feegrant.MsgRevokeAllowance{}, err
+		return feegrant.MsgRevokeAllowance{}, util.LogErr(errors.ErrParse, err)
 	}
 
 	msg := feegrant.NewMsgRevokeAllowance(granter, grantee)
@@ -125,11 +125,11 @@ func parseRevokeFeeGrantArgs(revokeFeeGrantMsg types.RevokeFeeGrantMsg, privKey 
 func parseQueryFeeGrantArgs(queryGrantMsg types.QueryFeeGrantMsg) (feegrant.QueryAllowanceRequest, error) {
 	granter, err := sdk.AccAddressFromBech32(queryGrantMsg.Granter)
 	if err != nil {
-		return feegrant.QueryAllowanceRequest{}, err
+		return feegrant.QueryAllowanceRequest{}, util.LogErr(errors.ErrParse, err)
 	}
 	grantee, err := sdk.AccAddressFromBech32(queryGrantMsg.Grantee)
 	if err != nil {
-		return feegrant.QueryAllowanceRequest{}, err
+		return feegrant.QueryAllowanceRequest{}, util.LogErr(errors.ErrParse, err)
 	}
 
 	return feegrant.QueryAllowanceRequest{
@@ -142,7 +142,7 @@ func parseQueryFeeGrantArgs(queryGrantMsg types.QueryFeeGrantMsg) (feegrant.Quer
 func parseQueryFeeGrantsByGranteeArgs(queryGrantMsg types.QueryFeeGrantMsg) (feegrant.QueryAllowancesRequest, error) {
 	grantee, err := sdk.AccAddressFromBech32(queryGrantMsg.Grantee)
 	if err != nil {
-		return feegrant.QueryAllowancesRequest{}, err
+		return feegrant.QueryAllowancesRequest{}, util.LogErr(errors.ErrParse, err)
 	}
 
 	return feegrant.QueryAllowancesRequest{
@@ -155,7 +155,7 @@ func parseQueryFeeGrantsByGranteeArgs(queryGrantMsg types.QueryFeeGrantMsg) (fee
 func parseQueryFeeGrantsByGranterArgs(queryGrantMsg types.QueryFeeGrantMsg) (feegrant.QueryAllowancesByGranterRequest, error) {
 	granter, err := sdk.AccAddressFromBech32(queryGrantMsg.Granter)
 	if err != nil {
-		return feegrant.QueryAllowancesByGranterRequest{}, err
+		return feegrant.QueryAllowancesByGranterRequest{}, util.LogErr(errors.ErrParse, err)
 	}
 
 	return feegrant.QueryAllowancesByGranterRequest{

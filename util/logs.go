@@ -11,10 +11,6 @@ func LogInfo(log ...interface{}) {
 	fmt.Println(ToStringTrim(log, ""))
 }
 
-// func LogErr(log ...interface{}) error {
-// 	return errors.New(ToStringTrim(log, ""))
-// }
-
 func LogErr(errType xgoerrors.XGoError, errDesc ...interface{}) error {
 	return logErrReturn("code", errType.ErrCode(), ":", errType.Desc(), "-", errDesc)
 }

@@ -14,7 +14,7 @@ import (
 func parseFundFeeCollectorArgs(fundFeeCollectorMsg types.FundFeeCollectorMsg, privKey key.PrivateKey) (rewardtypes.MsgFundFeeCollector, error) {
 	addrByPrivKey, err := key.Bech32AddrString(privKey)
 	if err != nil {
-		return rewardtypes.MsgFundFeeCollector{}, err
+		return rewardtypes.MsgFundFeeCollector{}, util.LogErr(errors.ErrParse, err)
 	}
 
 	if fundFeeCollectorMsg.DepositorAddr != addrByPrivKey {
@@ -23,12 +23,12 @@ func parseFundFeeCollectorArgs(fundFeeCollectorMsg types.FundFeeCollectorMsg, pr
 
 	amount, err := sdk.ParseCoinsNormalized(util.DenomAdd(fundFeeCollectorMsg.Amount))
 	if err != nil {
-		return rewardtypes.MsgFundFeeCollector{}, err
+		return rewardtypes.MsgFundFeeCollector{}, util.LogErr(errors.ErrParse, err)
 	}
 
 	addr, err := sdk.AccAddressFromBech32(fundFeeCollectorMsg.DepositorAddr)
 	if err != nil {
-		return rewardtypes.MsgFundFeeCollector{}, err
+		return rewardtypes.MsgFundFeeCollector{}, util.LogErr(errors.ErrParse, err)
 	}
 
 	msg := rewardtypes.NewMsgFundFeeCollector(amount, addr)

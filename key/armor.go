@@ -132,7 +132,7 @@ func decryptPrivKey(saltBytes []byte, encBytes []byte, passphrase string) (privK
 	if err != nil && err.Error() == "Ciphertext decryption failed" {
 		return privKey, util.LogErr(errors.ErrInvalidRequest, "invalid account password")
 	} else if err != nil {
-		return privKey, err
+		return privKey, util.LogErr(errors.ErrParse, err)
 	}
 
 	return legacy.PrivKeyFromBytes(privKeyBytes)

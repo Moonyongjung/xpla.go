@@ -27,7 +27,7 @@ func (i IXplaClient) QueryEvm() (string, error) {
 	if i.Ixplac.GetGasLimit() == "" {
 		gasLimitAdjustment, err := util.GasLimitAdjustment(util.FromStringToUint64(util.DefaultEvmGasLimit), gasAdj)
 		if err != nil {
-			return "", err
+			return "", util.LogErr(errors.ErrParse, err)
 		}
 		gasLimit = gasLimitAdjustment
 	}
@@ -52,12 +52,12 @@ func (i IXplaClient) QueryEvm() (string, error) {
 
 		res, err := evmClient.Client.CallContract(evmClient.Ctx, convertMsg.CallMsg, nil)
 		if err != nil {
-			return "", err
+			return "", util.LogErr(errors.ErrEvmRpcRequest, err)
 		}
 
 		result, err := util.GetAbiUnpack(convertMsg.CallName, res)
 		if err != nil {
-			return "", err
+			return "", util.LogErr(errors.ErrParse, err)
 		}
 
 		var callSolContractResponse types.CallSolContractResponse
@@ -76,7 +76,7 @@ func (i IXplaClient) QueryEvm() (string, error) {
 			return "", util.LogErr(errors.ErrNotFound, "tx is pending..")
 		}
 		if err != nil {
-			return "", err
+			return "", util.LogErr(errors.ErrEvmRpcRequest, err)
 		}
 
 		return jsonReturn(tx)
@@ -91,7 +91,7 @@ func (i IXplaClient) QueryEvm() (string, error) {
 			commonBlockHash := util.FromStringHexToHash(convertMsg.BlockHash)
 			block, err = evmClient.Client.BlockByHash(evmClient.Ctx, commonBlockHash)
 			if err != nil {
-				return "", err
+				return "", util.LogErr(errors.ErrEvmRpcRequest, err)
 			}
 		} else {
 			blockNumber, err := util.FromStringToBigInt(convertMsg.BlockHeight)
@@ -101,7 +101,7 @@ func (i IXplaClient) QueryEvm() (string, error) {
 
 			block, err = evmClient.Client.BlockByNumber(evmClient.Ctx, blockNumber)
 			if err != nil {
-				return "", err
+				return "", util.LogErr(errors.ErrEvmRpcRequest, err)
 			}
 		}
 
@@ -121,44 +121,44 @@ func (i IXplaClient) QueryEvm() (string, error) {
 
 		balance, err := evmClient.Client.BalanceAt(evmClient.Ctx, account, nil)
 		if err != nil {
-			return "", err
+			return "", util.LogErr(errors.ErrEvmRpcRequest, err)
 		}
 		currentNonce, err := evmClient.Client.NonceAt(evmClient.Ctx, account, nil)
 		if err != nil {
-			return "", err
+			return "", util.LogErr(errors.ErrEvmRpcRequest, err)
 		}
 		storage, err := evmClient.Client.StorageAt(evmClient.Ctx, account, util.FromStringHexToHash("0"), nil)
 		if err != nil {
-			return "", err
+			return "", util.LogErr(errors.ErrEvmRpcRequest, err)
 		}
 		code, err := evmClient.Client.CodeAt(evmClient.Ctx, account, nil)
 		if err != nil {
-			return "", err
+			return "", util.LogErr(errors.ErrEvmRpcRequest, err)
 		}
 		pendingBalance, err := evmClient.Client.PendingBalanceAt(evmClient.Ctx, account)
 		if err != nil {
-			return "", err
+			return "", util.LogErr(errors.ErrEvmRpcRequest, err)
 		}
 		pendingNonce, err := evmClient.Client.PendingNonceAt(evmClient.Ctx, account)
 		if err != nil {
-			return "", err
+			return "", util.LogErr(errors.ErrEvmRpcRequest, err)
 		}
 		pendingStorage, err := evmClient.Client.PendingStorageAt(evmClient.Ctx, account, util.FromStringHexToHash("0"))
 		if err != nil {
-			return "", err
+			return "", util.LogErr(errors.ErrEvmRpcRequest, err)
 		}
 		pendingCode, err := evmClient.Client.PendingCodeAt(evmClient.Ctx, account)
 		if err != nil {
-			return "", err
+			return "", util.LogErr(errors.ErrEvmRpcRequest, err)
 		}
 		pendingTransactionCount, err := evmClient.Client.PendingTransactionCount(evmClient.Ctx)
 		if err != nil {
-			return "", err
+			return "", util.LogErr(errors.ErrEvmRpcRequest, err)
 		}
 
 		bech32Addr, err := util.FromByte20AddressToCosmosAddr(account)
 		if err != nil {
-			return "", err
+			return "", util.LogErr(errors.ErrParse, err)
 		}
 
 		var accountInfoResponse types.AccountInfoResponse
@@ -181,12 +181,12 @@ func (i IXplaClient) QueryEvm() (string, error) {
 	case i.Ixplac.GetMsgType() == mevm.EvmSuggestGasPriceMsgType:
 		gasPrice, err := evmClient.Client.SuggestGasPrice(evmClient.Ctx)
 		if err != nil {
-			return "", err
+			return "", util.LogErr(errors.ErrEvmRpcRequest, err)
 		}
 
 		gasTipCap, err := evmClient.Client.SuggestGasTipCap(evmClient.Ctx)
 		if err != nil {
-			return "", err
+			return "", util.LogErr(errors.ErrEvmRpcRequest, err)
 		}
 
 		var suggestGasPriceResponse types.SuggestGasPriceResponse
@@ -199,7 +199,7 @@ func (i IXplaClient) QueryEvm() (string, error) {
 	case i.Ixplac.GetMsgType() == mevm.EvmQueryChainIdMsgType:
 		chainId, err := evmClient.Client.ChainID(evmClient.Ctx)
 		if err != nil {
-			return "", err
+			return "", util.LogErr(errors.ErrEvmRpcRequest, err)
 		}
 
 		var ethChainIdResponse types.EthChainIdResponse
@@ -211,7 +211,7 @@ func (i IXplaClient) QueryEvm() (string, error) {
 	case i.Ixplac.GetMsgType() == mevm.EvmQueryCurrentBlockNumberMsgType:
 		blockNumber, err := evmClient.Client.BlockNumber(evmClient.Ctx)
 		if err != nil {
-			return "", err
+			return "", util.LogErr(errors.ErrEvmRpcRequest, err)
 		}
 
 		var ethBlockNumberResponse types.EthBlockNumberResponse
@@ -224,7 +224,7 @@ func (i IXplaClient) QueryEvm() (string, error) {
 		var result string
 		err := evmClient.RpcClient.CallContext(evmClient.Ctx, &result, "web3_clientVersion")
 		if err != nil {
-			return "", err
+			return "", util.LogErr(errors.ErrEvmRpcRequest, err)
 		}
 
 		var web3ClientVersionResponse types.Web3ClientVersionResponse
@@ -239,7 +239,7 @@ func (i IXplaClient) QueryEvm() (string, error) {
 		var result string
 		err := evmClient.RpcClient.CallContext(evmClient.Ctx, &result, "web3_sha3", convertMsg.InputParam)
 		if err != nil {
-			return "", err
+			return "", util.LogErr(errors.ErrEvmRpcRequest, err)
 		}
 
 		var web3Sha3Response types.Web3Sha3Response
@@ -252,7 +252,7 @@ func (i IXplaClient) QueryEvm() (string, error) {
 		var result string
 		err := evmClient.RpcClient.CallContext(evmClient.Ctx, &result, "net_version")
 		if err != nil {
-			return "", err
+			return "", util.LogErr(errors.ErrEvmRpcRequest, err)
 		}
 
 		var netVersionResponse types.NetVersionResponse
@@ -265,7 +265,7 @@ func (i IXplaClient) QueryEvm() (string, error) {
 		var result int
 		err := evmClient.RpcClient.CallContext(evmClient.Ctx, &result, "net_peerCount")
 		if err != nil {
-			return "", err
+			return "", util.LogErr(errors.ErrEvmRpcRequest, err)
 		}
 
 		var netPeerCountResponse types.NetPeerCountResponse
@@ -278,7 +278,7 @@ func (i IXplaClient) QueryEvm() (string, error) {
 		var result bool
 		err := evmClient.RpcClient.CallContext(evmClient.Ctx, &result, "net_listening")
 		if err != nil {
-			return "", err
+			return "", util.LogErr(errors.ErrEvmRpcRequest, err)
 		}
 
 		var netListeningResponse types.NetListeningResponse
@@ -293,7 +293,7 @@ func (i IXplaClient) QueryEvm() (string, error) {
 		var result string
 		err := evmClient.RpcClient.CallContext(evmClient.Ctx, &result, "eth_protocolVersion")
 		if err != nil {
-			return "", err
+			return "", util.LogErr(errors.ErrEvmRpcRequest, err)
 		}
 
 		if result != "" {
@@ -311,7 +311,7 @@ func (i IXplaClient) QueryEvm() (string, error) {
 		var result bool
 		err := evmClient.RpcClient.CallContext(evmClient.Ctx, &result, "eth_syncing")
 		if err != nil {
-			return "", err
+			return "", util.LogErr(errors.ErrEvmRpcRequest, err)
 		}
 
 		var ethSyncingResponse types.EthSyncingResponse
@@ -324,7 +324,7 @@ func (i IXplaClient) QueryEvm() (string, error) {
 		var result []string
 		err := evmClient.RpcClient.CallContext(evmClient.Ctx, &result, "eth_accounts")
 		if err != nil {
-			return "", err
+			return "", util.LogErr(errors.ErrEvmRpcRequest, err)
 		}
 
 		var ethAccountsResponse types.EthAccountsResponse
@@ -341,14 +341,14 @@ func (i IXplaClient) QueryEvm() (string, error) {
 		if convertMsg.BlockHash != "" {
 			err := evmClient.RpcClient.CallContext(evmClient.Ctx, &result, "eth_getBlockTransactionCountByHash", convertMsg.BlockHash)
 			if err != nil {
-				return "", err
+				return "", util.LogErr(errors.ErrEvmRpcRequest, err)
 			}
 		}
 
 		if convertMsg.BlockHeight != "" {
 			err := evmClient.RpcClient.CallContext(evmClient.Ctx, &result, "eth_getBlockTransactionCountByNumber", convertMsg.BlockHeight)
 			if err != nil {
-				return "", err
+				return "", util.LogErr(errors.ErrEvmRpcRequest, err)
 			}
 		}
 
@@ -373,7 +373,7 @@ func (i IXplaClient) QueryEvm() (string, error) {
 
 		res, err := evmClient.Client.EstimateGas(evmClient.Ctx, convertMsg.CallMsg)
 		if err != nil {
-			return "", err
+			return "", util.LogErr(errors.ErrEvmRpcRequest, err)
 		}
 
 		var estimateGasResponse types.EstimateGasResponse
@@ -390,7 +390,7 @@ func (i IXplaClient) QueryEvm() (string, error) {
 
 		res, err := evmClient.Client.TransactionInBlock(evmClient.Ctx, blockHash, uint(index))
 		if err != nil {
-			return "", err
+			return "", util.LogErr(errors.ErrEvmRpcRequest, err)
 		}
 
 		return jsonReturn(res)
@@ -403,7 +403,7 @@ func (i IXplaClient) QueryEvm() (string, error) {
 
 		res, err := evmClient.Client.TransactionReceipt(evmClient.Ctx, transactionHash)
 		if err != nil {
-			return "", err
+			return "", util.LogErr(errors.ErrEvmRpcRequest, err)
 		}
 
 		return jsonReturn(res)
@@ -415,7 +415,7 @@ func (i IXplaClient) QueryEvm() (string, error) {
 		var result interface{}
 		err = evmClient.RpcClient.CallContext(evmClient.Ctx, &result, "eth_newFilter", convertMsg)
 		if err != nil {
-			return "", err
+			return "", util.LogErr(errors.ErrEvmRpcRequest, err)
 		}
 
 		var ethNewFilterResponse types.EthNewFilterResponse
@@ -429,7 +429,7 @@ func (i IXplaClient) QueryEvm() (string, error) {
 		var result interface{}
 		err := evmClient.RpcClient.CallContext(evmClient.Ctx, &result, "eth_newBlockFilter")
 		if err != nil {
-			return "", err
+			return "", util.LogErr(errors.ErrEvmRpcRequest, err)
 		}
 
 		ethNewBlockFilterResponse := types.EthNewBlockFilterResponse{
@@ -444,7 +444,7 @@ func (i IXplaClient) QueryEvm() (string, error) {
 		var result interface{}
 		err := evmClient.RpcClient.CallContext(evmClient.Ctx, &result, "eth_newPendingTransactionFilter")
 		if err != nil {
-			return "", err
+			return "", util.LogErr(errors.ErrEvmRpcRequest, err)
 		}
 
 		ethNewPendingTransactionFilterResponse := types.EthNewPendingTransactionFilterResponse{
@@ -460,7 +460,7 @@ func (i IXplaClient) QueryEvm() (string, error) {
 		var result bool
 		err := evmClient.RpcClient.CallContext(evmClient.Ctx, &result, "eth_uninstallFilter", convertMsg.FilterId)
 		if err != nil {
-			return "", err
+			return "", util.LogErr(errors.ErrEvmRpcRequest, err)
 		}
 
 		ethUninstallFilterResponse := types.EthUninstallFilterResponse{
@@ -476,7 +476,7 @@ func (i IXplaClient) QueryEvm() (string, error) {
 		var result []string
 		err := evmClient.RpcClient.CallContext(evmClient.Ctx, &result, "eth_getFilterChanges", convertMsg.FilterId)
 		if err != nil {
-			return "", err
+			return "", util.LogErr(errors.ErrEvmRpcRequest, err)
 		}
 
 		ethGetFilterChangesResponse := types.EthGetFilterChangesResponse{
@@ -492,7 +492,7 @@ func (i IXplaClient) QueryEvm() (string, error) {
 		var result []string
 		err := evmClient.RpcClient.CallContext(evmClient.Ctx, &result, "eth_getFilterLogs", convertMsg.FilterId)
 		if err != nil {
-			return "", err
+			return "", util.LogErr(errors.ErrEvmRpcRequest, err)
 		}
 
 		ethGetFilterLogsResponse := types.EthGetFilterLogsResponse{
@@ -508,7 +508,7 @@ func (i IXplaClient) QueryEvm() (string, error) {
 		var result interface{}
 		err := evmClient.RpcClient.CallContext(evmClient.Ctx, &result, "eth_getLogs", convertMsg)
 		if err != nil {
-			return "", err
+			return "", util.LogErr(errors.ErrEvmRpcRequest, err)
 		}
 
 		ethGetLogsResponse := types.EthGetLogsResponse{
@@ -523,7 +523,7 @@ func (i IXplaClient) QueryEvm() (string, error) {
 		var result string
 		err := evmClient.RpcClient.CallContext(evmClient.Ctx, &result, "eth_coinbase")
 		if err != nil {
-			return "", err
+			return "", util.LogErr(errors.ErrEvmRpcRequest, err)
 		}
 
 		ethCoinbaseResponse := types.EthCoinbaseResponse{
@@ -540,7 +540,7 @@ func (i IXplaClient) QueryEvm() (string, error) {
 func jsonReturn(value interface{}) (string, error) {
 	json, err := util.JsonMarshalDataIndent(value)
 	if err != nil {
-		return "", err
+		return "", util.LogErr(errors.ErrFailedToMarshal, err)
 	}
 
 	return string(json), nil

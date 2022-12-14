@@ -33,7 +33,7 @@ func queryByGrpcAuth(i IXplaClient) (string, error) {
 			&convertMsg,
 		)
 		if err != nil {
-			return "", err
+			return "", util.LogErr(errors.ErrGrpcRequest, err)
 		}
 
 	// Auth account
@@ -44,7 +44,7 @@ func queryByGrpcAuth(i IXplaClient) (string, error) {
 			&convertMsg,
 		)
 		if err != nil {
-			return "", err
+			return "", util.LogErr(errors.ErrGrpcRequest, err)
 		}
 
 	// Auth accounts
@@ -55,7 +55,7 @@ func queryByGrpcAuth(i IXplaClient) (string, error) {
 			&convertMsg,
 		)
 		if err != nil {
-			return "", err
+			return "", util.LogErr(errors.ErrGrpcRequest, err)
 		}
 
 	// Auth tx by event
@@ -71,7 +71,7 @@ func queryByGrpcAuth(i IXplaClient) (string, error) {
 
 		res, err = authtx.QueryTxsByEvents(clientCtx, convertMsg.TmEvents, convertMsg.Page, convertMsg.Limit, "")
 		if err != nil {
-			return "", err
+			return "", util.LogErr(errors.ErrRpcRequest, err)
 		}
 
 	// Auth tx
@@ -89,12 +89,12 @@ func queryByGrpcAuth(i IXplaClient) (string, error) {
 		if convertMsg.TxType == "hash" {
 			res, err = authtx.QueryTx(clientCtx, convertMsg.TmEvents[0])
 			if err != nil {
-				return "", err
+				return "", util.LogErr(errors.ErrRpcRequest, err)
 			}
 		} else {
 			res, err = authtx.QueryTxsByEvents(clientCtx, convertMsg.TmEvents, rest.DefaultPage, rest.DefaultLimit, "")
 			if err != nil {
-				return "", err
+				return "", util.LogErr(errors.ErrRpcRequest, err)
 			}
 		}
 

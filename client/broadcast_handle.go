@@ -138,7 +138,7 @@ func waitTxReceipt(evmClient *util.EvmClient, signedTx *evmtypes.Transaction) (*
 		if err != nil {
 			count = count - 1
 			if count < 0 {
-				return nil, err
+				return nil, util.LogErr(errors.ErrEvmRpcRequest, "cannot receive the transaction receipt in count time is", count)
 			}
 			time.Sleep(time.Second * 1)
 		} else {

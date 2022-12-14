@@ -42,13 +42,13 @@ func (xplac *XplaClient) LoadAccount(address sdk.AccAddress) (res authtypes.Acco
 		}
 		response, err := queryClient.Account(xplac.Context, &queryAccountRequest)
 		if err != nil {
-			return nil, err
+			return nil, util.LogErr(errors.ErrGrpcRequest, err)
 		}
 
 		var newAccount authtypes.AccountI
 		err = xplac.EncodingConfig.InterfaceRegistry.UnpackAny(response.Account, &newAccount)
 		if err != nil {
-			return nil, err
+			return nil, util.LogErr(errors.ErrParse, err)
 		}
 
 		return newAccount, nil
@@ -67,13 +67,13 @@ func (xplac *XplaClient) Simulate(txbuilder cmclient.TxBuilder) (*sdktx.Simulate
 	}
 
 	if err := txbuilder.SetSignatures(sig); err != nil {
-		return nil, err
+		return nil, util.LogErr(errors.ErrParse, err)
 	}
 
 	sdkTx := txbuilder.GetTx()
 	txBytes, err := xplac.EncodingConfig.TxConfig.TxEncoder()(sdkTx)
 	if err != nil {
-		return nil, err
+		return nil, util.LogErr(errors.ErrParse, err)
 	}
 
 	if xplac.Opts.GrpcURL == "" {
@@ -81,7 +81,7 @@ func (xplac *XplaClient) Simulate(txbuilder cmclient.TxBuilder) (*sdktx.Simulate
 			TxBytes: txBytes,
 		})
 		if err != nil {
-			return nil, err
+			return nil, util.LogErr(errors.ErrFailedToMarshal, err)
 		}
 
 		out, err := util.CtxHttpClient("POST", xplac.Opts.LcdURL+simulateUrl, reqBytes, xplac.Context)
@@ -92,7 +92,7 @@ func (xplac *XplaClient) Simulate(txbuilder cmclient.TxBuilder) (*sdktx.Simulate
 		var response sdktx.SimulateResponse
 		err = xplac.EncodingConfig.Marshaler.UnmarshalJSON(out, &response)
 		if err != nil {
-			return nil, err
+			return nil, util.LogErr(errors.ErrFailedToUnmarshal, err)
 		}
 
 		return &response, nil
@@ -104,7 +104,7 @@ func (xplac *XplaClient) Simulate(txbuilder cmclient.TxBuilder) (*sdktx.Simulate
 
 		response, err := serviceClient.Simulate(xplac.Context, &simulateRequest)
 		if err != nil {
-			return nil, err
+			return nil, util.LogErr(errors.ErrGrpcRequest, err)
 		}
 
 		return response, nil
