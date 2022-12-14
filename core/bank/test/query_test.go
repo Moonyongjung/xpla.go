@@ -25,7 +25,7 @@ func (suite *TestSuite) TestQueryBalance() {
 
 	mnemonic, _ := key.NewMnemonic()
 	privKey, _ := key.NewPrivKey(mnemonic)
-	addr := util.GetAddrByPrivKey(privKey)
+	addr, _ := util.GetAddrByPrivKey(privKey)
 
 	xplaCoins := sdk.NewCoins(sdk.Coin{
 		Denom:  "axpla",

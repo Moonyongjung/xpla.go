@@ -3,6 +3,7 @@ package module
 import (
 	mbank "github.com/Moonyongjung/xpla.go/core/bank"
 	"github.com/Moonyongjung/xpla.go/types"
+	"github.com/Moonyongjung/xpla.go/types/errors"
 	"github.com/Moonyongjung/xpla.go/util"
 
 	bankv1beta1 "cosmossdk.io/api/cosmos/bank/v1beta1"
@@ -90,7 +91,7 @@ func queryByGrpcBank(i IXplaClient) (string, error) {
 		}
 
 	default:
-		return "", util.LogErr("invalid msg type")
+		return "", util.LogErr(errors.ErrInvalidMsgType, i.Ixplac.GetMsgType())
 	}
 
 	out, err = printProto(i, res)
@@ -141,7 +142,7 @@ func queryByLcdBank(i IXplaClient) (string, error) {
 		url = url + util.MakeQueryLabels(bankSupplyLabel, convertMsg.Denom)
 
 	default:
-		return "", util.LogErr("invalid msg type")
+		return "", util.LogErr(errors.ErrInvalidMsgType, i.Ixplac.GetMsgType())
 	}
 
 	out, err := util.CtxHttpClient("GET", i.Ixplac.GetLcdURL()+url, nil, i.Ixplac.GetContext())

@@ -5,6 +5,7 @@ import (
 
 	mevm "github.com/Moonyongjung/xpla.go/core/evm"
 	"github.com/Moonyongjung/xpla.go/types"
+	"github.com/Moonyongjung/xpla.go/types/errors"
 	"github.com/Moonyongjung/xpla.go/util"
 
 	ethtypes "github.com/ethereum/go-ethereum/core/types"
@@ -72,7 +73,7 @@ func (i IXplaClient) QueryEvm() (string, error) {
 		commonTxHash := util.FromStringHexToHash(convertMsg.TxHash)
 		tx, isPending, err := evmClient.Client.TransactionByHash(evmClient.Ctx, commonTxHash)
 		if isPending {
-			return "", util.LogErr("tx is pending..")
+			return "", util.LogErr(errors.ErrNotFound, "tx is pending..")
 		}
 		if err != nil {
 			return "", err
@@ -532,7 +533,7 @@ func (i IXplaClient) QueryEvm() (string, error) {
 		return jsonReturn(ethCoinbaseResponse)
 
 	default:
-		return "", util.LogErr("invalid evm msg type")
+		return "", util.LogErr(errors.ErrInvalidMsgType, i.Ixplac.GetMsgType())
 	}
 }
 

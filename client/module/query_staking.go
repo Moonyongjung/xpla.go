@@ -3,6 +3,7 @@ package module
 import (
 	mstaking "github.com/Moonyongjung/xpla.go/core/staking"
 	"github.com/Moonyongjung/xpla.go/types"
+	"github.com/Moonyongjung/xpla.go/types/errors"
 	"github.com/Moonyongjung/xpla.go/util"
 
 	stakingv1beta1 "cosmossdk.io/api/cosmos/staking/v1beta1"
@@ -157,7 +158,7 @@ func queryByGrpcStaking(i IXplaClient) (string, error) {
 		}
 
 	default:
-		return "", util.LogErr("invalid msg type")
+		return "", util.LogErr(errors.ErrInvalidMsgType, i.Ixplac.GetMsgType())
 	}
 
 	out, err = printProto(i, res)
@@ -234,7 +235,7 @@ func queryByLcdStaking(i IXplaClient) (string, error) {
 	case i.Ixplac.GetMsgType() == mstaking.StakingQueryRedelegationMsgType ||
 		i.Ixplac.GetMsgType() == mstaking.StakingQueryRedelegationsFromMsgType:
 
-		return "", util.LogErr("unsupported querying delegations by using LCD. query delegations of a delegator")
+		return "", util.LogErr(errors.ErrNotSupport, "unsupported querying delegations by using LCD. query delegations of a delegator")
 
 	// Staking redelegations
 	case i.Ixplac.GetMsgType() == mstaking.StakingQueryRedelegationsMsgType:
@@ -257,7 +258,7 @@ func queryByLcdStaking(i IXplaClient) (string, error) {
 		url = url + stakingParamsLabel
 
 	default:
-		return "", util.LogErr("invalid msg type")
+		return "", util.LogErr(errors.ErrInvalidMsgType, i.Ixplac.GetMsgType())
 	}
 
 	out, err := util.CtxHttpClient("GET", i.Ixplac.GetLcdURL()+url, nil, i.Ixplac.GetContext())

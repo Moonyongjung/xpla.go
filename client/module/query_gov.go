@@ -3,6 +3,7 @@ package module
 import (
 	mgov "github.com/Moonyongjung/xpla.go/core/gov"
 	"github.com/Moonyongjung/xpla.go/types"
+	"github.com/Moonyongjung/xpla.go/types/errors"
 	"github.com/Moonyongjung/xpla.go/util"
 
 	govv1beta1 "cosmossdk.io/api/cosmos/gov/v1beta1"
@@ -293,7 +294,7 @@ func queryByGrpcGov(i IXplaClient) (string, error) {
 		}
 
 	default:
-		return "", util.LogErr("invalid msg type")
+		return "", util.LogErr(errors.ErrInvalidMsgType, i.Ixplac.GetMsgType())
 	}
 
 	out, err = printProto(i, res)
@@ -358,7 +359,7 @@ func queryByLcdGov(i IXplaClient) (string, error) {
 
 	// Gov params
 	case i.Ixplac.GetMsgType() == mgov.GovQueryGovParamsMsgType:
-		return "", util.LogErr("unsupported querying all gov params by using LCD. query each parameter(voting|tallying|deposit)")
+		return "", util.LogErr(errors.ErrNotSupport, "unsupported querying all gov params by using LCD. query each parameter(voting|tallying|deposit)")
 
 	// Gov params of voting
 	case i.Ixplac.GetMsgType() == mgov.GovQueryGovParamVotingMsgType:
@@ -380,7 +381,7 @@ func queryByLcdGov(i IXplaClient) (string, error) {
 
 	// Gov proposer
 	case i.Ixplac.GetMsgType() == mgov.GovQueryProposerMsgType:
-		return "", util.LogErr("unsupported querying proposer by using LCD")
+		return "", util.LogErr(errors.ErrNotSupport, "unsupported querying proposer by using LCD")
 
 	// Gov vote
 	case i.Ixplac.GetMsgType() == mgov.GovQueryVoteMsgType:
@@ -401,7 +402,7 @@ func queryByLcdGov(i IXplaClient) (string, error) {
 		url = url + util.MakeQueryLabels(govProposalsLabel, util.FromUint64ToString(convertMsg.ProposalId), govVotesLabel)
 
 	default:
-		return "", util.LogErr("invalid msg type")
+		return "", util.LogErr(errors.ErrInvalidMsgType, i.Ixplac.GetMsgType())
 	}
 
 	out, err := util.CtxHttpClient("GET", i.Ixplac.GetLcdURL()+url, nil, i.Ixplac.GetContext())

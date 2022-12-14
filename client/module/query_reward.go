@@ -3,6 +3,7 @@ package module
 import (
 	mreward "github.com/Moonyongjung/xpla.go/core/reward"
 	"github.com/Moonyongjung/xpla.go/types"
+	"github.com/Moonyongjung/xpla.go/types/errors"
 	"github.com/Moonyongjung/xpla.go/util"
 
 	rewardtypes "github.com/xpladev/xpla/x/reward/types"
@@ -44,7 +45,7 @@ func queryByGrpcReward(i IXplaClient) (string, error) {
 		}
 
 	default:
-		return "", util.LogErr("invalid msg type")
+		return "", util.LogErr(errors.ErrInvalidMsgType, i.Ixplac.GetMsgType())
 	}
 
 	out, err = printProto(i, res)
@@ -73,7 +74,7 @@ func queryByLcdReward(i IXplaClient) (string, error) {
 		url = url + rewardPoolLabel
 
 	default:
-		return "", util.LogErr("invalid msg type")
+		return "", util.LogErr(errors.ErrInvalidMsgType, i.Ixplac.GetMsgType())
 	}
 
 	out, err := util.CtxHttpClient("GET", i.Ixplac.GetLcdURL()+url, nil, i.Ixplac.GetContext())

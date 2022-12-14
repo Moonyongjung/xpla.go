@@ -17,6 +17,7 @@ import (
 	mupgrade "github.com/Moonyongjung/xpla.go/core/upgrade"
 	mwasm "github.com/Moonyongjung/xpla.go/core/wasm"
 	"github.com/Moonyongjung/xpla.go/types"
+	"github.com/Moonyongjung/xpla.go/types/errors"
 	"github.com/Moonyongjung/xpla.go/util"
 )
 
@@ -120,7 +121,7 @@ func (xplac *XplaClient) QueryAuthzGrants(queryAuthzGrantMsg types.QueryAuthzGra
 		xplac.MsgType = mauthz.AuthzQueryGrantsByGranterMsgType
 		xplac.Msg = msg
 	} else {
-		xplac.Err = util.LogErr("No query grants parameters")
+		xplac.Err = util.LogErr(errors.ErrInsufficientParams, "No query grants parameters")
 	}
 	return xplac
 }
@@ -173,7 +174,7 @@ func (xplac *XplaClient) DenomMetadata(denomMetadataMsg ...types.DenomMetadataMs
 		xplac.MsgType = mbank.BankDenomMetadataMsgType
 		xplac.Msg = msg
 	} else {
-		xplac.Err = util.LogErr("Need one parameter")
+		xplac.Err = util.LogErr(errors.ErrInvalidRequest, "need only one parameter")
 	}
 	return xplac
 }
@@ -199,7 +200,7 @@ func (xplac *XplaClient) Total(totalMsg ...types.TotalMsg) *XplaClient {
 		xplac.MsgType = mbank.BankTotalSupplyOfMsgType
 		xplac.Msg = msg
 	} else {
-		xplac.Err = util.LogErr("Need one parameter")
+		xplac.Err = util.LogErr(errors.ErrInvalidRequest, "need only one parameter")
 	}
 	return xplac
 }
@@ -261,7 +262,7 @@ func (xplac *XplaClient) DistSlashes(queryDistSlashesMsg types.QueryDistSlashesM
 // Query all ditribution delegator rewards or rewards from a particular validator.
 func (xplac *XplaClient) DistRewards(queryDistRewardsMsg types.QueryDistRewardsMsg) *XplaClient {
 	if queryDistRewardsMsg.DelegatorAddr == "" {
-		xplac.Err = util.LogErr("must set a delegator address")
+		xplac.Err = util.LogErr(errors.ErrInsufficientParams, "must set a delegator address")
 	}
 
 	if queryDistRewardsMsg.ValidatorAddr != "" {
@@ -322,7 +323,7 @@ func (xplac *XplaClient) QueryEvidence(queryEvidenceMsg ...types.QueryEvidenceMs
 		xplac.MsgType = mevidence.EvidenceQueryMsgType
 		xplac.Msg = msg
 	} else {
-		xplac.Err = util.LogErr("Need one parameter")
+		xplac.Err = util.LogErr(errors.ErrInvalidRequest, "need only one parameter")
 	}
 	return xplac
 }
@@ -477,11 +478,11 @@ func (xplac *XplaClient) EthAccounts() *XplaClient {
 // Query the number of transaction a given block.
 func (xplac *XplaClient) EthGetBlockTransactionCount(ethGetBlockTransactionCountMsg types.EthGetBlockTransactionCountMsg) *XplaClient {
 	if ethGetBlockTransactionCountMsg.BlockHash == "" && ethGetBlockTransactionCountMsg.BlockHeight == "" {
-		xplac.Err = util.LogErr("cannot query without block hash or height parameter")
+		xplac.Err = util.LogErr(errors.ErrInsufficientParams, "cannot query, without block hash or height parameter")
 	}
 
 	if ethGetBlockTransactionCountMsg.BlockHash != "" && ethGetBlockTransactionCountMsg.BlockHeight != "" {
-		xplac.Err = util.LogErr("select only one parameter, block hash or height")
+		xplac.Err = util.LogErr(errors.ErrInvalidRequest, "select only one parameter, block hash OR height")
 	}
 
 	msg, err := mevm.MakeEthGetBlockTransactionCountMsg(ethGetBlockTransactionCountMsg)
@@ -656,7 +657,7 @@ func (xplac *XplaClient) QueryFeeGrants(queryFeeGrantMsg types.QueryFeeGrantMsg)
 		xplac.MsgType = mfeegrant.FeegrantQueryGrantsByGranterMsgType
 		xplac.Msg = msg
 	} else {
-		xplac.Err = util.LogErr("No query grants parameters")
+		xplac.Err = util.LogErr(errors.ErrInsufficientParams, "no query grants parameters")
 	}
 
 	return xplac
@@ -814,7 +815,7 @@ func (xplac *XplaClient) GovParams(govParamsMsg ...types.GovParamsMsg) *XplaClie
 		}
 		xplac.Msg = msg
 	} else {
-		xplac.Err = util.LogErr("Need one parameter")
+		xplac.Err = util.LogErr(errors.ErrInvalidRequest, "need only one parameter")
 	}
 	return xplac
 }
@@ -950,7 +951,7 @@ func (xplac *XplaClient) SigningInfos(signingInfoMsg ...types.SigningInfoMsg) *X
 		xplac.MsgType = mslashing.SlashingQuerySigningInfoMsgType
 		xplac.Msg = msg
 	} else {
-		xplac.Err = util.LogErr("Need one parameter")
+		xplac.Err = util.LogErr(errors.ErrInvalidRequest, "need only one parameter")
 	}
 	return xplac
 }
@@ -978,7 +979,7 @@ func (xplac *XplaClient) QueryValidators(queryValidatorMsg ...types.QueryValidat
 		xplac.MsgType = mstaking.StakingQueryValidatorMsgType
 		xplac.Msg = msg
 	} else {
-		xplac.Err = util.LogErr("Need one parameter")
+		xplac.Err = util.LogErr(errors.ErrInvalidRequest, "need only one parameter")
 	}
 	return xplac
 }
@@ -1013,7 +1014,7 @@ func (xplac *XplaClient) QueryDelegation(queryDelegationMsg types.QueryDelegatio
 		xplac.MsgType = mstaking.StakingQueryDelegationsToMsgType
 		xplac.Msg = msg
 	} else {
-		xplac.Err = util.LogErr("Wrong delegation msg")
+		xplac.Err = util.LogErr(errors.ErrInvalidRequest, "wrong delegation message")
 	}
 	return xplac
 }
@@ -1048,7 +1049,7 @@ func (xplac *XplaClient) QueryUnbondingDelegation(queryUnbondingDelegationMsg ty
 		xplac.MsgType = mstaking.StakingQueryUnbondingDelegationsFromMsgType
 		xplac.Msg = msg
 	} else {
-		xplac.Err = util.LogErr("Wrong unbonding delegation msg")
+		xplac.Err = util.LogErr(errors.ErrInvalidRequest, "wrong unbonding delegation message")
 	}
 	return xplac
 }
@@ -1086,7 +1087,7 @@ func (xplac *XplaClient) QueryRedelegation(queryRedelegationMsg types.QueryRedel
 		xplac.MsgType = mstaking.StakingQueryRedelegationsFromMsgType
 		xplac.Msg = msg
 	} else {
-		xplac.Err = util.LogErr("Wrong redelegation msg")
+		xplac.Err = util.LogErr(errors.ErrInvalidRequest, "wrong redelegation message")
 	}
 	return xplac
 }
@@ -1166,7 +1167,7 @@ func (xplac *XplaClient) ModulesVersion(queryModulesVersionMsg ...types.QueryMod
 		xplac.MsgType = mupgrade.UpgradeQueryModuleVersionsMsgType
 		xplac.Msg = msg
 	} else {
-		xplac.Err = util.LogErr("Need one parameter")
+		xplac.Err = util.LogErr(errors.ErrInvalidRequest, "need only one parameter")
 	}
 	return xplac
 }
@@ -1188,7 +1189,12 @@ func (xplac *XplaClient) Plan() *XplaClient {
 
 // Calls contract with given address with query data and prints the returned result.
 func (xplac *XplaClient) QueryContract(queryMsg types.QueryMsg) *XplaClient {
-	addr := util.GetAddrByPrivKey(xplac.Opts.PrivateKey)
+	addr, err := util.GetAddrByPrivKey(xplac.Opts.PrivateKey)
+	if err != nil {
+		xplac.Err = err
+		return xplac
+	}
+
 	msg, err := mwasm.MakeQueryMsg(queryMsg, addr)
 	if err != nil {
 		xplac.Err = err

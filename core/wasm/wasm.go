@@ -3,12 +3,12 @@ package wasm
 import (
 	"encoding/base64"
 	"encoding/hex"
-	"errors"
 
 	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
 	"github.com/Moonyongjung/xpla.go/core"
 	"github.com/Moonyongjung/xpla.go/key"
 	"github.com/Moonyongjung/xpla.go/types"
+	"github.com/Moonyongjung/xpla.go/types/errors"
 	"github.com/Moonyongjung/xpla.go/util"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
@@ -17,11 +17,11 @@ import (
 func MakeStoreCodeMsg(storeMsg types.StoreMsg, addr sdk.AccAddress) (wasmtypes.MsgStoreCode, error) {
 	msg, err := parseStoreCodeArgs(storeMsg, addr)
 	if err != nil {
-		return wasmtypes.MsgStoreCode{}, util.LogErr(err)
+		return wasmtypes.MsgStoreCode{}, err
 	}
 
 	if err = msg.ValidateBasic(); err != nil {
-		return wasmtypes.MsgStoreCode{}, util.LogErr(err)
+		return wasmtypes.MsgStoreCode{}, err
 	}
 
 	return msg, nil
@@ -30,23 +30,23 @@ func MakeStoreCodeMsg(storeMsg types.StoreMsg, addr sdk.AccAddress) (wasmtypes.M
 // (Tx) make msg - instantiate
 func MakeInstantiateMsg(instantiateMsg types.InstantiateMsg, addr sdk.AccAddress) (wasmtypes.MsgInstantiateContract, error) {
 	if (types.InstantiateMsg{}) == instantiateMsg {
-		return wasmtypes.MsgInstantiateContract{}, util.LogErr("Empty request or type of parameter is not correct")
+		return wasmtypes.MsgInstantiateContract{}, util.LogErr(errors.ErrInsufficientParams, "Empty request or type of parameter is not correct")
 	}
 
 	if instantiateMsg.CodeId == "" ||
 		instantiateMsg.Amount == "" ||
 		instantiateMsg.Label == "" ||
 		instantiateMsg.InitMsg == "" {
-		return wasmtypes.MsgInstantiateContract{}, util.LogErr("Empty mandatory parameters")
+		return wasmtypes.MsgInstantiateContract{}, util.LogErr(errors.ErrInsufficientParams, "Empty mandatory parameters")
 	}
 
 	msg, err := parseInstantiateArgs(instantiateMsg, addr)
 	if err != nil {
-		return wasmtypes.MsgInstantiateContract{}, util.LogErr(err)
+		return wasmtypes.MsgInstantiateContract{}, err
 	}
 
 	if err = msg.ValidateBasic(); err != nil {
-		return wasmtypes.MsgInstantiateContract{}, util.LogErr(err)
+		return wasmtypes.MsgInstantiateContract{}, err
 	}
 
 	return msg, nil
@@ -55,17 +55,15 @@ func MakeInstantiateMsg(instantiateMsg types.InstantiateMsg, addr sdk.AccAddress
 // (Tx) make msg - execute
 func MakeExecuteMsg(executeMsg types.ExecuteMsg, addr sdk.AccAddress) (wasmtypes.MsgExecuteContract, error) {
 	if (types.ExecuteMsg{}) == executeMsg {
-		return wasmtypes.MsgExecuteContract{}, util.LogErr("Empty request or type of parameter is not correct")
+		return wasmtypes.MsgExecuteContract{}, util.LogErr(errors.ErrInsufficientParams, "Empty request or type of parameter is not correct")
 	}
 
 	msg, err := parseExecuteArgs(executeMsg, addr)
 	if err != nil {
-		util.LogErr(err)
 		return wasmtypes.MsgExecuteContract{}, err
 	}
 
 	if err = msg.ValidateBasic(); err != nil {
-		util.LogErr(err)
 		return wasmtypes.MsgExecuteContract{}, err
 	}
 
@@ -74,40 +72,42 @@ func MakeExecuteMsg(executeMsg types.ExecuteMsg, addr sdk.AccAddress) (wasmtypes
 
 // (Tx) make msg - clear contract admin
 func MakeClearContractAdminMsg(clearContractAdminMsg types.ClearContractAdminMsg, privKey key.PrivateKey) (wasmtypes.MsgClearAdmin, error) {
-	return wasmtypes.MsgClearAdmin{
-		Sender:   util.GetAddrByPrivKey(privKey).String(),
-		Contract: clearContractAdminMsg.ContractAddress,
-	}, nil
+	msg, err := parseClearContractAdminArgs(clearContractAdminMsg, privKey)
+	if err != nil {
+		return wasmtypes.MsgClearAdmin{}, err
+	}
+
+	return msg, nil
 }
 
 // (Tx) make msg - set contract admin
 func MakeSetContractAdmintMsg(setContractAdminMsg types.SetContractAdminMsg, privKey key.PrivateKey) (wasmtypes.MsgUpdateAdmin, error) {
-	return wasmtypes.MsgUpdateAdmin{
-		Sender:   util.GetAddrByPrivKey(privKey).String(),
-		Contract: setContractAdminMsg.ContractAddress,
-		NewAdmin: setContractAdminMsg.NewAdmin,
-	}, nil
+	msg, err := parseSetContractAdmintArgs(setContractAdminMsg, privKey)
+	if err != nil {
+		return wasmtypes.MsgUpdateAdmin{}, err
+	}
+
+	return msg, nil
 }
 
 // (Tx) make msg - migrate
 func MakeMigrateMsg(migrateMsg types.MigrateMsg, privKey key.PrivateKey) (wasmtypes.MsgMigrateContract, error) {
-	return wasmtypes.MsgMigrateContract{
-		Sender:   util.GetAddrByPrivKey(privKey).String(),
-		Contract: migrateMsg.ContractAddress,
-		CodeID:   util.FromStringToUint64(migrateMsg.CodeId),
-		Msg:      []byte(migrateMsg.MigrateMsg),
-	}, nil
+	msg, err := parseMigrateArgs(migrateMsg, privKey)
+	if err != nil {
+		return wasmtypes.MsgMigrateContract{}, err
+	}
+
+	return msg, nil
 }
 
 // (Query) make msg - query contract
 func MakeQueryMsg(queryMsg types.QueryMsg, addr sdk.AccAddress) (wasmtypes.QuerySmartContractStateRequest, error) {
 	if (types.QueryMsg{}) == queryMsg {
-		return wasmtypes.QuerySmartContractStateRequest{}, util.LogErr("Empty request or type of parameter is not correct")
+		return wasmtypes.QuerySmartContractStateRequest{}, util.LogErr(errors.ErrInsufficientParams, "Empty request or type of parameter is not correct")
 	}
 
 	msg, err := parseQueryArgs(queryMsg, addr)
 	if err != nil {
-		util.LogErr(err)
 		return wasmtypes.QuerySmartContractStateRequest{}, err
 	}
 
@@ -124,7 +124,7 @@ func MakeListcodeMsg() (wasmtypes.QueryCodesRequest, error) {
 // (Query) make msg - list contract by code
 func MakeListContractByCodeMsg(listContractByCodeMsg types.ListContractByCodeMsg) (wasmtypes.QueryContractsByCodeRequest, error) {
 	if (types.ListContractByCodeMsg{}) == listContractByCodeMsg {
-		return wasmtypes.QueryContractsByCodeRequest{}, util.LogErr("Empty request or type of parameter is not correct")
+		return wasmtypes.QueryContractsByCodeRequest{}, util.LogErr(errors.ErrInsufficientParams, "Empty request or type of parameter is not correct")
 	}
 	return wasmtypes.QueryContractsByCodeRequest{
 		CodeId:     util.FromStringToUint64(listContractByCodeMsg.CodeId),
@@ -136,7 +136,7 @@ func MakeListContractByCodeMsg(listContractByCodeMsg types.ListContractByCodeMsg
 func MakeDownloadMsg(downloadMsg types.DownloadMsg) ([]interface{}, error) {
 	var msgInterfaceSlice []interface{}
 	if (types.DownloadMsg{}) == downloadMsg {
-		return nil, util.LogErr("Empty request or type of parameter is not correct")
+		return nil, util.LogErr(errors.ErrInsufficientParams, "Empty request or type of parameter is not correct")
 	}
 	msg := wasmtypes.QueryCodeRequest{
 		CodeId: util.FromStringToUint64(downloadMsg.CodeId),
@@ -149,7 +149,7 @@ func MakeDownloadMsg(downloadMsg types.DownloadMsg) ([]interface{}, error) {
 // (Query) make msg - code info
 func MakeCodeInfoMsg(codeInfoMsg types.CodeInfoMsg) (wasmtypes.QueryCodeRequest, error) {
 	if (types.CodeInfoMsg{}) == codeInfoMsg {
-		return wasmtypes.QueryCodeRequest{}, util.LogErr("Empty request or type of parameter is not correct")
+		return wasmtypes.QueryCodeRequest{}, util.LogErr(errors.ErrInsufficientParams, "Empty request or type of parameter is not correct")
 	}
 	return wasmtypes.QueryCodeRequest{
 		CodeId: util.FromStringToUint64(codeInfoMsg.CodeId),
@@ -159,7 +159,7 @@ func MakeCodeInfoMsg(codeInfoMsg types.CodeInfoMsg) (wasmtypes.QueryCodeRequest,
 // (Query) make msg - contract info
 func MakeContractInfoMsg(contractInfoMsg types.ContractInfoMsg) (wasmtypes.QueryContractInfoRequest, error) {
 	if (types.ContractInfoMsg{}) == contractInfoMsg {
-		return wasmtypes.QueryContractInfoRequest{}, util.LogErr("Empty request or type of parameter is not correct")
+		return wasmtypes.QueryContractInfoRequest{}, util.LogErr(errors.ErrInsufficientParams, "Empty request or type of parameter is not correct")
 	}
 	return wasmtypes.QueryContractInfoRequest{
 		Address: contractInfoMsg.ContractAddress,
@@ -169,7 +169,7 @@ func MakeContractInfoMsg(contractInfoMsg types.ContractInfoMsg) (wasmtypes.Query
 // (Query) make msg - contract state all
 func MakeContractStateAllMsg(contractStateAllMsg types.ContractStateAllMsg) (wasmtypes.QueryAllContractStateRequest, error) {
 	if (types.ContractStateAllMsg{}) == contractStateAllMsg {
-		return wasmtypes.QueryAllContractStateRequest{}, util.LogErr("Empty request or type of parameter is not correct")
+		return wasmtypes.QueryAllContractStateRequest{}, util.LogErr(errors.ErrInsufficientParams, "Empty request or type of parameter is not correct")
 	}
 	return wasmtypes.QueryAllContractStateRequest{
 		Address:    contractStateAllMsg.ContractAddress,
@@ -180,7 +180,7 @@ func MakeContractStateAllMsg(contractStateAllMsg types.ContractStateAllMsg) (was
 // (Query) make msg - history
 func MakeContractHistoryMsg(contractHistoryMsg types.ContractHistoryMsg) (wasmtypes.QueryContractHistoryRequest, error) {
 	if (types.ContractHistoryMsg{}) == contractHistoryMsg {
-		return wasmtypes.QueryContractHistoryRequest{}, util.LogErr("Empty request or type of parameter is not correct")
+		return wasmtypes.QueryContractHistoryRequest{}, util.LogErr(errors.ErrInsufficientParams, "Empty request or type of parameter is not correct")
 	}
 	return wasmtypes.QueryContractHistoryRequest{
 		Address:    contractHistoryMsg.ContractAddress,
@@ -224,7 +224,7 @@ func (a *ArgumentDecoder) DecodeString(s string) ([]byte, error) {
 		}
 		if found != -1 {
 
-			return nil, errors.New("multiple decoding flags used")
+			return nil, util.LogErr(errors.ErrInvalidRequest, "multiple decoding flags used")
 		}
 		found = i
 	}

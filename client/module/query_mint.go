@@ -3,6 +3,7 @@ package module
 import (
 	mmint "github.com/Moonyongjung/xpla.go/core/mint"
 	"github.com/Moonyongjung/xpla.go/types"
+	"github.com/Moonyongjung/xpla.go/types/errors"
 	"github.com/Moonyongjung/xpla.go/util"
 
 	mintv1beta1 "cosmossdk.io/api/cosmos/mint/v1beta1"
@@ -56,7 +57,7 @@ func queryByGrpcMint(i IXplaClient) (string, error) {
 		}
 
 	default:
-		return "", util.LogErr("invalid msg type")
+		return "", util.LogErr(errors.ErrInvalidMsgType, i.Ixplac.GetMsgType())
 	}
 
 	out, err = printProto(i, res)
@@ -90,7 +91,7 @@ func queryByLcdMint(i IXplaClient) (string, error) {
 		url = url + mintAnnualProvisionsLabel
 
 	default:
-		return "", util.LogErr("invalid msg type")
+		return "", util.LogErr(errors.ErrInvalidMsgType, i.Ixplac.GetMsgType())
 	}
 
 	out, err := util.CtxHttpClient("GET", i.Ixplac.GetLcdURL()+url, nil, i.Ixplac.GetContext())

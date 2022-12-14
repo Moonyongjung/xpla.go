@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/Moonyongjung/xpla.go/types"
+	xgoerrors "github.com/Moonyongjung/xpla.go/types/errors"
 	"github.com/Moonyongjung/xpla.go/util"
 
 	"github.com/cosmos/cosmos-sdk/baseapp"
@@ -169,7 +170,7 @@ func TestAddr(addr string, bech string) (sdk.AccAddress, error) {
 	}
 	bechexpected := res.String()
 	if bech != bechexpected {
-		return nil, util.LogErr("bech encoding doesn't match reference")
+		return nil, util.LogErr(xgoerrors.ErrInvalidRequest, "bech encoding doesn't match reference")
 	}
 
 	bechres, err := sdk.AccAddressFromBech32(bech)

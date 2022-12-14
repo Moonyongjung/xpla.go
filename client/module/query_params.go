@@ -3,6 +3,7 @@ package module
 import (
 	mparams "github.com/Moonyongjung/xpla.go/core/params"
 	"github.com/Moonyongjung/xpla.go/types"
+	"github.com/Moonyongjung/xpla.go/types/errors"
 	"github.com/Moonyongjung/xpla.go/util"
 
 	paramsv1beta1 "cosmossdk.io/api/cosmos/params/v1beta1"
@@ -35,7 +36,7 @@ func queryByGrpcParams(i IXplaClient) (string, error) {
 		}
 
 	default:
-		return "", util.LogErr("invalid msg type")
+		return "", util.LogErr(errors.ErrInvalidMsgType, i.Ixplac.GetMsgType())
 	}
 
 	out, err = printProto(i, res)
@@ -67,7 +68,7 @@ func queryByLcdParams(i IXplaClient) (string, error) {
 		url = url + paramsParamsLabel + subspace + key
 
 	default:
-		return "", util.LogErr("invalid msg type")
+		return "", util.LogErr(errors.ErrInvalidMsgType, i.Ixplac.GetMsgType())
 	}
 
 	out, err := util.CtxHttpClient("GET", i.Ixplac.GetLcdURL()+url, nil, i.Ixplac.GetContext())

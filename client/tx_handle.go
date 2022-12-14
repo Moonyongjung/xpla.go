@@ -19,6 +19,7 @@ import (
 	mwasm "github.com/Moonyongjung/xpla.go/core/wasm"
 	"github.com/Moonyongjung/xpla.go/key"
 	"github.com/Moonyongjung/xpla.go/types"
+	"github.com/Moonyongjung/xpla.go/types/errors"
 	"github.com/Moonyongjung/xpla.go/util"
 
 	"github.com/CosmWasm/wasmd/x/wasm"
@@ -194,7 +195,7 @@ func setTxBuilderMsg(xplac *XplaClient) (cmclient.TxBuilder, error) {
 		builder.SetMsgs(&convertMsg)
 
 	} else {
-		return nil, util.LogErr("invalid message type")
+		return nil, util.LogErr(errors.ErrInvalidMsgType, xplac.MsgType)
 	}
 
 	return builder, nil
@@ -361,10 +362,10 @@ func getMultisigInfo(clientCtx cmclient.Context, name string) (keyring.Info, err
 	kb := clientCtx.Keyring
 	multisigInfo, err := kb.Key(name)
 	if err != nil {
-		return nil, util.LogErr(err, "error getting keybase multisig account")
+		return nil, util.LogErr(errors.ErrKeyNotFound, "error getting keybase multisig account", err)
 	}
 	if multisigInfo.GetType() != keyring.TypeMulti {
-		return nil, util.LogErr(name, "must be of type", keyring.TypeMulti, ":", multisigInfo.GetType())
+		return nil, util.LogErr(errors.ErrInvalidMsgType, name, "must be of type", keyring.TypeMulti, ":", multisigInfo.GetType())
 	}
 
 	return multisigInfo, nil

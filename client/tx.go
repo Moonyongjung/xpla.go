@@ -6,6 +6,7 @@ import (
 	mevm "github.com/Moonyongjung/xpla.go/core/evm"
 	"github.com/Moonyongjung/xpla.go/key"
 	"github.com/Moonyongjung/xpla.go/types"
+	"github.com/Moonyongjung/xpla.go/types/errors"
 	"github.com/Moonyongjung/xpla.go/util"
 
 	cmclient "github.com/cosmos/cosmos-sdk/client"
@@ -169,7 +170,7 @@ func (xplac *XplaClient) SignTx(signTxMsg types.SignTxMsg) ([]byte, error) {
 	}
 	var emptySignTxMsg types.SignTxMsg
 	if signTxMsg == emptySignTxMsg {
-		return nil, util.LogErr("need sign tx message of xpla client's option")
+		return nil, util.LogErr(errors.ErrNotSatisfiedOptions, "need sign tx message of xpla client's option")
 	}
 
 	clientCtx, err := util.NewClient()
@@ -319,10 +320,6 @@ func (xplac *XplaClient) MultiSign(txMultiSignMsg types.TxMultiSignMsg) ([]byte,
 			return nil, err
 		}
 
-		if txFactory.ChainID() == "" {
-			return nil, util.LogErr("set the chain id with either the --chain-id flag or config file")
-		}
-
 		signingData := authsigning.SignerData{
 			ChainID:       txFactory.ChainID(),
 			AccountNumber: txFactory.AccountNumber(),
@@ -333,7 +330,7 @@ func (xplac *XplaClient) MultiSign(txMultiSignMsg types.TxMultiSignMsg) ([]byte,
 			err = authsigning.VerifySignature(sig.PubKey, signingData, sig.Data, txCfg.SignModeHandler(), txBuilder.GetTx())
 			if err != nil {
 				addr, _ := sdk.AccAddressFromHex(sig.PubKey.Address().String())
-				return nil, util.LogErr("couldn't verify signature for address", addr)
+				return nil, util.LogErr(errors.ErrInvalidRequest, "couldn't verify signature for address", addr)
 			}
 
 			if err := multisig.AddSignatureV2(multisigSig, sig, multisigPub.GetPubKeys()); err != nil {
@@ -466,7 +463,7 @@ func (xplac *XplaClient) createAndSignEvmTx() ([]byte, error) {
 		return evmTxSignRound(xplac, toAddr, gasPrice, amount, invokeByteData, chainId, ethPrivKey)
 
 	default:
-		return nil, util.LogErr("invalid evm msg type")
+		return nil, util.LogErr(errors.ErrInvalidMsgType, "invalid EVM message type")
 	}
 }
 

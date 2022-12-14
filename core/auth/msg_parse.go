@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/Moonyongjung/xpla.go/types"
+	"github.com/Moonyongjung/xpla.go/types/errors"
 	"github.com/Moonyongjung/xpla.go/util"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -36,9 +37,9 @@ func parseTxsByEventsArgs(txsByEventsMsg types.QueryTxsByEventsMsg) (QueryTxsByE
 
 	for _, event := range events {
 		if !strings.Contains(event, "=") {
-			return QueryTxsByEventParseMsg{}, util.LogErr("invalid event; event", event, "should be of the format:", eventFormat)
+			return QueryTxsByEventParseMsg{}, util.LogErr(errors.ErrInvalidRequest, "invalid event; event", event, "should be of the format:", eventFormat)
 		} else if strings.Count(event, "=") > 1 {
-			return QueryTxsByEventParseMsg{}, util.LogErr("invalid event; event", event, "should be of the format:", eventFormat)
+			return QueryTxsByEventParseMsg{}, util.LogErr(errors.ErrInvalidRequest, "invalid event; event", event, "should be of the format:", eventFormat)
 		}
 
 		tokens := strings.Split(event, "=")
@@ -66,7 +67,7 @@ func parseQueryTxArgs(queryTxMsg types.QueryTxMsg) (QueryTxParseMsg, error) {
 
 	if queryTxMsg.Type == "" || queryTxMsg.Type == "hash" {
 		if queryTxMsg.Value == "" {
-			return QueryTxParseMsg{}, util.LogErr("argument should be a tx hash")
+			return QueryTxParseMsg{}, util.LogErr(errors.ErrInvalidRequest, "argument should be a tx hash")
 		}
 
 		queryTxParseMsg.TmEvents = []string{queryTxMsg.Value}
@@ -92,7 +93,7 @@ func parseQueryTxArgs(queryTxMsg types.QueryTxMsg) (QueryTxParseMsg, error) {
 
 	} else if queryTxMsg.Type == "acc_seq" {
 		if queryTxMsg.Value == "" {
-			return QueryTxParseMsg{}, util.LogErr("`acc_seq` type takes an argument '<addr>/<seq>'")
+			return QueryTxParseMsg{}, util.LogErr(errors.ErrInvalidRequest, "`acc_seq` type takes an argument '<addr>/<seq>'")
 		}
 
 		tmEvents := []string{
@@ -105,6 +106,6 @@ func parseQueryTxArgs(queryTxMsg types.QueryTxMsg) (QueryTxParseMsg, error) {
 		return queryTxParseMsg, nil
 
 	} else {
-		return QueryTxParseMsg{}, util.LogErr("Unknown type")
+		return QueryTxParseMsg{}, util.LogErr(errors.ErrInvalidMsgType, "unknown type (hash|signature|acc_seq)")
 	}
 }

@@ -3,6 +3,7 @@ package module
 import (
 	mdist "github.com/Moonyongjung/xpla.go/core/distribution"
 	"github.com/Moonyongjung/xpla.go/types"
+	"github.com/Moonyongjung/xpla.go/types/errors"
 	"github.com/Moonyongjung/xpla.go/util"
 
 	distv1beta1 "cosmossdk.io/api/cosmos/distribution/v1beta1"
@@ -100,7 +101,7 @@ func queryByGrpcDist(i IXplaClient) (string, error) {
 		}
 
 	default:
-		return "", util.LogErr("invalid msg type")
+		return "", util.LogErr(errors.ErrInvalidMsgType, i.Ixplac.GetMsgType())
 	}
 
 	out, err = printProto(i, res)
@@ -165,7 +166,7 @@ func queryByLcdDist(i IXplaClient) (string, error) {
 		url = url + distCommunityPoolLabel
 
 	default:
-		return "", util.LogErr("invalid msg type")
+		return "", util.LogErr(errors.ErrInvalidMsgType, i.Ixplac.GetMsgType())
 	}
 
 	out, err := util.CtxHttpClient("GET", i.Ixplac.GetLcdURL()+url, nil, i.Ixplac.GetContext())

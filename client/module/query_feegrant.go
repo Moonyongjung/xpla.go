@@ -3,6 +3,7 @@ package module
 import (
 	mfeegrant "github.com/Moonyongjung/xpla.go/core/feegrant"
 	"github.com/Moonyongjung/xpla.go/types"
+	"github.com/Moonyongjung/xpla.go/types/errors"
 	"github.com/Moonyongjung/xpla.go/util"
 
 	feegrantv1beta1 "cosmossdk.io/api/cosmos/feegrant/v1beta1"
@@ -57,7 +58,7 @@ func queryByGrpcFeegrant(i IXplaClient) (string, error) {
 		}
 
 	default:
-		return "", util.LogErr("invalid msg type")
+		return "", util.LogErr(errors.ErrInvalidMsgType, i.Ixplac.GetMsgType())
 	}
 
 	out, err = printProto(i, res)
@@ -91,10 +92,10 @@ func queryByLcdFeegrant(i IXplaClient) (string, error) {
 
 	// Feegrant grants by granter
 	case i.Ixplac.GetMsgType() == mfeegrant.FeegrantQueryGrantsByGranterMsgType:
-		return "", util.LogErr("unsupported querying feegrant state(grants by granter) by using LCD")
+		return "", util.LogErr(errors.ErrNotSupport, "unsupported querying feegrant state(grants by granter) by using LCD")
 
 	default:
-		return "", util.LogErr("invalid msg type")
+		return "", util.LogErr(errors.ErrInvalidMsgType, i.Ixplac.GetMsgType())
 	}
 
 	out, err := util.CtxHttpClient("GET", i.Ixplac.GetLcdURL()+url, nil, i.Ixplac.GetContext())

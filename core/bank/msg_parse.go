@@ -4,6 +4,7 @@ import (
 	"github.com/Moonyongjung/xpla.go/core"
 	"github.com/Moonyongjung/xpla.go/key"
 	"github.com/Moonyongjung/xpla.go/types"
+	"github.com/Moonyongjung/xpla.go/types/errors"
 	"github.com/Moonyongjung/xpla.go/util"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -15,12 +16,12 @@ func parseBankSendArgs(bankSendMsg types.BankSendMsg, privKey key.PrivateKey) (b
 	denom := types.XplaDenom
 
 	if bankSendMsg.FromAddress == "" || bankSendMsg.ToAddress == "" || bankSendMsg.Amount == "" {
-		return banktypes.MsgSend{}, util.LogErr("No parameters")
+		return banktypes.MsgSend{}, util.LogErr(errors.ErrInsufficientParams, "no parameters")
 	}
 
 	amountBigInt, ok := sdk.NewIntFromString(util.DenomRemove(bankSendMsg.Amount))
 	if !ok {
-		return banktypes.MsgSend{}, util.LogErr("Wrong amount parameter")
+		return banktypes.MsgSend{}, util.LogErr(errors.ErrInvalidRequest, "Wrong amount parameter")
 	}
 
 	msg := banktypes.MsgSend{
@@ -37,7 +38,7 @@ func parseBankSendArgs(bankSendMsg types.BankSendMsg, privKey key.PrivateKey) (b
 func parseBankAllBalancesArgs(bankBalancesMsg types.BankBalancesMsg) (banktypes.QueryAllBalancesRequest, error) {
 	addr, err := sdk.AccAddressFromBech32(bankBalancesMsg.Address)
 	if err != nil {
-		return banktypes.QueryAllBalancesRequest{}, util.LogErr(err)
+		return banktypes.QueryAllBalancesRequest{}, util.LogErr(errors.ErrInvalidRequest, err)
 	}
 
 	params := *banktypes.NewQueryAllBalancesRequest(addr, core.PageRequest)
@@ -48,7 +49,7 @@ func parseBankAllBalancesArgs(bankBalancesMsg types.BankBalancesMsg) (banktypes.
 func parseBankBalanceArgs(bankBalancesMsg types.BankBalancesMsg) (banktypes.QueryBalanceRequest, error) {
 	addr, err := sdk.AccAddressFromBech32(bankBalancesMsg.Address)
 	if err != nil {
-		return banktypes.QueryBalanceRequest{}, util.LogErr(err)
+		return banktypes.QueryBalanceRequest{}, util.LogErr(errors.ErrInvalidRequest, err)
 	}
 
 	params := *banktypes.NewQueryBalanceRequest(addr, bankBalancesMsg.Denom)

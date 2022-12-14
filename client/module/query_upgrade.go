@@ -5,6 +5,7 @@ import (
 
 	mupgrade "github.com/Moonyongjung/xpla.go/core/upgrade"
 	"github.com/Moonyongjung/xpla.go/types"
+	"github.com/Moonyongjung/xpla.go/types/errors"
 	"github.com/Moonyongjung/xpla.go/util"
 
 	upgradev1beta1 "cosmossdk.io/api/cosmos/upgrade/v1beta1"
@@ -69,8 +70,7 @@ func queryByGrpcUpgrade(i IXplaClient) (string, error) {
 		}
 
 	default:
-		return "", util.LogErr("invalid msg type")
-
+		return "", util.LogErr(errors.ErrInvalidMsgType, i.Ixplac.GetMsgType())
 	}
 
 	out, err = printProto(i, res)
@@ -108,7 +108,7 @@ func queryByLcdUpgrade(i IXplaClient) (string, error) {
 		url = url + upgradeCurrentPlanLabel
 
 	default:
-		return "", util.LogErr("invalid msg type")
+		return "", util.LogErr(errors.ErrInvalidMsgType, i.Ixplac.GetMsgType())
 
 	}
 
@@ -122,7 +122,7 @@ func queryByLcdUpgrade(i IXplaClient) (string, error) {
 
 func appliedReturnBlockheader(res *upgradetypes.QueryAppliedPlanResponse, rpcUrl string, ctx context.Context) ([]byte, error) {
 	if rpcUrl == "" {
-		return nil, util.LogErr("need RPC URL")
+		return nil, util.LogErr(errors.ErrNotSatisfiedOptions, "need RPC URL")
 	}
 	clientCtx, err := util.NewClient()
 	if err != nil {
@@ -146,7 +146,7 @@ func appliedReturnBlockheader(res *upgradetypes.QueryAppliedPlanResponse, rpcUrl
 	}
 
 	if len(headers.BlockMetas) == 0 {
-		return nil, util.LogErr("no headers returns for height", res.Height)
+		return nil, util.LogErr(errors.ErrNotFound, "no headers returns for height", res.Height)
 	}
 
 	bytes, err := clientCtx.LegacyAmino.MarshalJSONIndent(headers.BlockMetas[0], "", "  ")

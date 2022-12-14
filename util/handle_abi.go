@@ -13,12 +13,15 @@ func AbiParsing(jsonFilePath string) (string, error) {
 type bytecodeParsingStruct struct {
 }
 
-func BytecodeParsing(jsonFilePath string) string {
+func BytecodeParsing(jsonFilePath string) (string, error) {
 	var bytecodeStruct bytecodeParsingStruct
-	jsonData := JsonUnmarshal(bytecodeStruct, jsonFilePath)
+	jsonData, err := JsonUnmarshal(bytecodeStruct, jsonFilePath)
+	if err != nil {
+		return "", err
+	}
 	bytecode := jsonData.(map[string]interface{})["object"].(string)
 
-	return bytecode
+	return bytecode, nil
 }
 
 // For invoke(as execute) contract, parameters are packed by using ABI.

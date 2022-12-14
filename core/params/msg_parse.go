@@ -44,7 +44,10 @@ func parseProposalParamChangeArgs(paramChangeMsg types.ParamChangeMsg, privKey k
 		return govtypes.MsgSubmitProposal{}, err
 	}
 
-	from := util.GetAddrByPrivKey(privKey)
+	from, err := util.GetAddrByPrivKey(privKey)
+	if err != nil {
+		return govtypes.MsgSubmitProposal{}, err
+	}
 	content := paramsproposal.NewParameterChangeProposal(
 		proposal.Title, proposal.Description, proposal.Changes.ToParamChanges(),
 	)

@@ -1,6 +1,7 @@
 package client
 
 import (
+	"github.com/Moonyongjung/xpla.go/types/errors"
 	"github.com/Moonyongjung/xpla.go/util"
 
 	cmclient "github.com/cosmos/cosmos-sdk/client"
@@ -30,7 +31,7 @@ func (xplac *XplaClient) LoadAccount(address sdk.AccAddress) (res authtypes.Acco
 		var response authtypes.QueryAccountResponse
 		err = xplac.EncodingConfig.Marshaler.UnmarshalJSON(out, &response)
 		if err != nil {
-			return nil, util.LogErr(err, "failed to unmarshal response")
+			return nil, util.LogErr(errors.ErrFailedToUnmarshal, err)
 		}
 		return response.Account.GetCachedValue().(authtypes.AccountI), nil
 

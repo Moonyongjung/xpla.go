@@ -29,8 +29,8 @@ func (suite *TestSuite) TestGRPCQueryAuthorization() {
 	k1, _ := key.NewPrivKey(m1)
 	k2, _ := key.NewPrivKey(m2)
 
-	granter := util.GetAddrByPrivKey(k1)
-	grantee := util.GetAddrByPrivKey(k2)
+	granter, _ := util.GetAddrByPrivKey(k1)
+	grantee, _ := util.GetAddrByPrivKey(k2)
 
 	testCases := []struct {
 		msg      string
@@ -97,8 +97,8 @@ func (suite *TestSuite) TestGRPCQueryAuthorizations() {
 	k1, _ := key.NewPrivKey(m1)
 	k2, _ := key.NewPrivKey(m2)
 
-	granter := util.GetAddrByPrivKey(k1)
-	grantee := util.GetAddrByPrivKey(k2)
+	granter, _ := util.GetAddrByPrivKey(k1)
+	grantee, _ := util.GetAddrByPrivKey(k2)
 
 	testCases := []struct {
 		msg      string
@@ -162,8 +162,8 @@ func (suite *TestSuite) TestGRPCQueryGranterGrants() {
 	k1, _ := key.NewPrivKey(m1)
 	k2, _ := key.NewPrivKey(m2)
 
-	granter := util.GetAddrByPrivKey(k1)
-	grantee := util.GetAddrByPrivKey(k2)
+	granter, _ := util.GetAddrByPrivKey(k1)
+	grantee, _ := util.GetAddrByPrivKey(k2)
 
 	testCases := []struct {
 		msg      string
@@ -230,8 +230,8 @@ func (suite *TestSuite) TestGRPCQueryGranteeGrants() {
 	k1, _ := key.NewPrivKey(m1)
 	k2, _ := key.NewPrivKey(m2)
 
-	granter := util.GetAddrByPrivKey(k1)
-	grantee := util.GetAddrByPrivKey(k2)
+	granter, _ := util.GetAddrByPrivKey(k1)
+	grantee, _ := util.GetAddrByPrivKey(k2)
 
 	testCases := []struct {
 		msg      string

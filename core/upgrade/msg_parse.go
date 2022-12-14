@@ -22,7 +22,11 @@ func parseProposalSoftwareUpgradeArgs(softwareUpgradeMsg types.SoftwareUpgradeMs
 		softwareUpgradeMsg.Description,
 		plan,
 	)
-	from := util.GetAddrByPrivKey(privKey)
+	from, err := util.GetAddrByPrivKey(privKey)
+	if err != nil {
+		return govtypes.MsgSubmitProposal{}, err
+	}
+
 	deposit, err := sdk.ParseCoinsNormalized(util.DenomAdd(softwareUpgradeMsg.Deposit))
 	if err != nil {
 		return govtypes.MsgSubmitProposal{}, err
@@ -38,7 +42,11 @@ func parseProposalSoftwareUpgradeArgs(softwareUpgradeMsg types.SoftwareUpgradeMs
 
 // Parsing - cancel software upgrade
 func parseCancelSoftwareUpgradeArgs(cancelSoftwareUpgradeMsg types.CancelSoftwareUpgradeMsg, privKey key.PrivateKey) (govtypes.MsgSubmitProposal, error) {
-	from := util.GetAddrByPrivKey(privKey)
+	from, err := util.GetAddrByPrivKey(privKey)
+	if err != nil {
+		return govtypes.MsgSubmitProposal{}, err
+	}
+
 	deposit, err := sdk.ParseCoinsNormalized(util.DenomAdd(cancelSoftwareUpgradeMsg.Deposit))
 	if err != nil {
 		return govtypes.MsgSubmitProposal{}, err

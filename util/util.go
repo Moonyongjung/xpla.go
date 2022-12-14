@@ -10,12 +10,12 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-func GetAddrByPrivKey(priv cryptotypes.PrivKey) sdk.AccAddress {
+func GetAddrByPrivKey(priv cryptotypes.PrivKey) (sdk.AccAddress, error) {
 	addr, err := sdk.AccAddressFromHex(priv.PubKey().Address().String())
 	if err != nil {
-		LogErr(err)
+		return nil, err
 	}
-	return addr
+	return addr, nil
 }
 
 func GasLimitAdjustment(gasUsed uint64, gasAdjustment string) (string, error) {

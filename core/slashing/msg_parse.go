@@ -3,6 +3,7 @@ package slashing
 import (
 	"github.com/Moonyongjung/xpla.go/key"
 	"github.com/Moonyongjung/xpla.go/types"
+	"github.com/Moonyongjung/xpla.go/types/errors"
 	"github.com/Moonyongjung/xpla.go/util"
 
 	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
@@ -13,7 +14,11 @@ import (
 
 // Parsing - unjail
 func parseUnjailArgs(privKey key.PrivateKey) (slashingtypes.MsgUnjail, error) {
-	addr := util.GetAddrByPrivKey(privKey)
+	addr, err := util.GetAddrByPrivKey(privKey)
+	if err != nil {
+		return slashingtypes.MsgUnjail{}, err
+	}
+
 	msg := slashingtypes.NewMsgUnjail(sdk.ValAddress(addr))
 
 	return *msg, nil
@@ -36,6 +41,6 @@ func parseQuerySigingInfoArgs(signingInfoMsg types.SigningInfoMsg, xplacEncoding
 			ConsAddress: signingInfoMsg.ConsAddr,
 		}, nil
 	} else {
-		return slashingtypes.QuerySigningInfoRequest{}, util.LogErr("need at least one input")
+		return slashingtypes.QuerySigningInfoRequest{}, util.LogErr(errors.ErrInsufficientParams, "need at least one input")
 	}
 }

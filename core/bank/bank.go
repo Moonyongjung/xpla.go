@@ -4,6 +4,7 @@ import (
 	"github.com/Moonyongjung/xpla.go/core"
 	"github.com/Moonyongjung/xpla.go/key"
 	"github.com/Moonyongjung/xpla.go/types"
+	"github.com/Moonyongjung/xpla.go/types/errors"
 	"github.com/Moonyongjung/xpla.go/util"
 
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
@@ -22,7 +23,7 @@ func MakeBankSendMsg(bankSendMsg types.BankSendMsg, privKey key.PrivateKey) (ban
 // (Query) make msg - all balances
 func MakeBankAllBalancesMsg(bankBalancesMsg types.BankBalancesMsg) (banktypes.QueryAllBalancesRequest, error) {
 	if (types.BankBalancesMsg{}) == bankBalancesMsg {
-		return banktypes.QueryAllBalancesRequest{}, util.LogErr("Empty request or type of parameter is not correct")
+		return banktypes.QueryAllBalancesRequest{}, util.LogErr(errors.ErrInsufficientParams, "Empty request or type of parameter is not correct")
 	}
 
 	msg, err := parseBankAllBalancesArgs(bankBalancesMsg)
@@ -36,7 +37,7 @@ func MakeBankAllBalancesMsg(bankBalancesMsg types.BankBalancesMsg) (banktypes.Qu
 // (Query) make msg - balance
 func MakeBankBalanceMsg(bankBalancesMsg types.BankBalancesMsg) (banktypes.QueryBalanceRequest, error) {
 	if (types.BankBalancesMsg{}) == bankBalancesMsg {
-		return banktypes.QueryBalanceRequest{}, util.LogErr("Empty request or type of parameter is not correct")
+		return banktypes.QueryBalanceRequest{}, util.LogErr(errors.ErrInsufficientParams, "Empty request or type of parameter is not correct")
 	}
 
 	msg, err := parseBankBalanceArgs(bankBalancesMsg)

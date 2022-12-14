@@ -31,27 +31,27 @@ func JsonUnmarshalData(jsonStruct interface{}, byteValue []byte) interface{} {
 	return jsonStruct
 }
 
-func JsonUnmarshal(jsonStruct interface{}, jsonFilePath string) interface{} {
+func JsonUnmarshal(jsonStruct interface{}, jsonFilePath string) (interface{}, error) {
 	jsonData, err := os.Open(jsonFilePath)
 	if err != nil {
-		LogErr(err)
+		return nil, err
 	}
 	byteValue, _ := io.ReadAll(jsonData)
 	jsonStruct = JsonUnmarshalData(jsonStruct, byteValue)
 
-	return jsonStruct
+	return jsonStruct, nil
 }
 
 func SaveJsonPretty(jsonByte []byte, saveTxPath string) error {
 	var prettyJson bytes.Buffer
 	err := json.Indent(&prettyJson, jsonByte, "", "    ")
 	if err != nil {
-		LogErr(err)
+		return err
 	}
 
 	err = os.WriteFile(saveTxPath, prettyJson.Bytes(), 0660)
 	if err != nil {
-		LogErr(err)
+		return err
 	}
 
 	return nil

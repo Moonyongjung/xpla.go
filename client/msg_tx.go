@@ -394,7 +394,11 @@ func (xplac *XplaClient) CancelSoftwareUpgrade(cancelSoftwareUpgradeMsg types.Ca
 
 // Upload a wasm binary.
 func (xplac *XplaClient) StoreCode(storeMsg types.StoreMsg) *XplaClient {
-	addr := util.GetAddrByPrivKey(xplac.Opts.PrivateKey)
+	addr, err := util.GetAddrByPrivKey(xplac.Opts.PrivateKey)
+	if err != nil {
+		xplac.Err = err
+		return xplac
+	}
 	msg, err := mwasm.MakeStoreCodeMsg(storeMsg, addr)
 	if err != nil {
 		xplac.Err = err
@@ -407,7 +411,11 @@ func (xplac *XplaClient) StoreCode(storeMsg types.StoreMsg) *XplaClient {
 
 // Instantiate a wasm contract.
 func (xplac *XplaClient) InstantiateContract(instantiageMsg types.InstantiateMsg) *XplaClient {
-	addr := util.GetAddrByPrivKey(xplac.Opts.PrivateKey)
+	addr, err := util.GetAddrByPrivKey(xplac.Opts.PrivateKey)
+	if err != nil {
+		xplac.Err = err
+		return xplac
+	}
 	msg, err := mwasm.MakeInstantiateMsg(instantiageMsg, addr)
 	if err != nil {
 		xplac.Err = err
@@ -420,7 +428,11 @@ func (xplac *XplaClient) InstantiateContract(instantiageMsg types.InstantiateMsg
 
 // Execute a wasm contract.
 func (xplac *XplaClient) ExecuteContract(executeMsg types.ExecuteMsg) *XplaClient {
-	addr := util.GetAddrByPrivKey(xplac.Opts.PrivateKey)
+	addr, err := util.GetAddrByPrivKey(xplac.Opts.PrivateKey)
+	if err != nil {
+		xplac.Err = err
+		return xplac
+	}
 	msg, err := mwasm.MakeExecuteMsg(executeMsg, addr)
 	if err != nil {
 		xplac.Err = err

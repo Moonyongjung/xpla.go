@@ -6,6 +6,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/Moonyongjung/xpla.go/types/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/ethereum/go-ethereum/common"
 )
@@ -18,7 +19,7 @@ func FromStringToBigInt(v string) (*big.Int, error) {
 	n := big.NewInt(0)
 	n, ok := n.SetString(v, 10)
 	if !ok {
-		return nil, LogErr("convert string to big int err")
+		return nil, LogErr(errors.ErrInvalidRequest, "convert string to big int err")
 	}
 	return n, nil
 }

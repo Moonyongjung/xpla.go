@@ -18,7 +18,11 @@ import (
 
 // Parsing - fund community pool
 func parseFundCommunityPoolArgs(fundCommunityPoolMsg types.FundCommunityPoolMsg, privKey key.PrivateKey) (disttypes.MsgFundCommunityPool, error) {
-	depositorAddr := util.GetAddrByPrivKey(privKey)
+	depositorAddr, err := util.GetAddrByPrivKey(privKey)
+	if err != nil {
+		return disttypes.MsgFundCommunityPool{}, err
+	}
+
 	amount, err := sdk.ParseCoinsNormalized(util.DenomAdd(fundCommunityPoolMsg.Amount))
 	if err != nil {
 		return disttypes.MsgFundCommunityPool{}, err
@@ -56,7 +60,10 @@ func parseProposalCommunityPoolSpendArgs(communityPoolSpendMsg types.CommunityPo
 		return govtypes.MsgSubmitProposal{}, err
 	}
 
-	from := util.GetAddrByPrivKey(privKey)
+	from, err := util.GetAddrByPrivKey(privKey)
+	if err != nil {
+		return govtypes.MsgSubmitProposal{}, err
+	}
 	recpAddr, err := sdk.AccAddressFromBech32(proposal.Recipient)
 	if err != nil {
 		return govtypes.MsgSubmitProposal{}, err
@@ -74,7 +81,11 @@ func parseProposalCommunityPoolSpendArgs(communityPoolSpendMsg types.CommunityPo
 
 // Parsing - withdraw rewards
 func parseWithdrawRewardsArgs(withdrawRewardsMsg types.WithdrawRewardsMsg, privKey key.PrivateKey) ([]sdk.Msg, error) {
-	delAddr := util.GetAddrByPrivKey(privKey)
+	delAddr, err := util.GetAddrByPrivKey(privKey)
+	if err != nil {
+		return nil, err
+	}
+
 	valAddr, err := sdk.ValAddressFromBech32(withdrawRewardsMsg.ValidatorAddr)
 	if err != nil {
 		return nil, err
@@ -96,7 +107,10 @@ func parseWithdrawRewardsArgs(withdrawRewardsMsg types.WithdrawRewardsMsg, privK
 
 // Parsing - withdraw all rewards
 func parseWithdrawAllRewardsArgs(privKey key.PrivateKey, grpcConn grpc.ClientConn, ctx context.Context) ([]sdk.Msg, error) {
-	delAddr := util.GetAddrByPrivKey(privKey)
+	delAddr, err := util.GetAddrByPrivKey(privKey)
+	if err != nil {
+		return nil, err
+	}
 	queryClient := disttypes.NewQueryClient(grpcConn)
 	delValsRes, err := queryClient.DelegatorValidators(
 		ctx,
@@ -128,7 +142,10 @@ func parseWithdrawAllRewardsArgs(privKey key.PrivateKey, grpcConn grpc.ClientCon
 
 // Parsing - set withdraw addr
 func parseSetWithdrawAddrArgs(setWithdrawAddrMsg types.SetwithdrawAddrMsg, privKey key.PrivateKey) (disttypes.MsgSetWithdrawAddress, error) {
-	delAddr := util.GetAddrByPrivKey(privKey)
+	delAddr, err := util.GetAddrByPrivKey(privKey)
+	if err != nil {
+		return disttypes.MsgSetWithdrawAddress{}, err
+	}
 	withdrawAddr, err := sdk.AccAddressFromBech32(setWithdrawAddrMsg.WithdrawAddr)
 	if err != nil {
 		return disttypes.MsgSetWithdrawAddress{}, err

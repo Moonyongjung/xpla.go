@@ -6,6 +6,7 @@ import (
 	"github.com/Moonyongjung/xpla.go/core"
 	"github.com/Moonyongjung/xpla.go/key"
 	"github.com/Moonyongjung/xpla.go/types"
+	"github.com/Moonyongjung/xpla.go/types/errors"
 	"github.com/Moonyongjung/xpla.go/util"
 
 	govv1beta1 "cosmossdk.io/api/cosmos/gov/v1beta1"
@@ -17,7 +18,10 @@ import (
 
 // Parsing - submit proposal
 func parseSubmitProposalArgs(submitProposalMsg types.SubmitProposalMsg, privKey key.PrivateKey) (govtypes.MsgSubmitProposal, error) {
-	proposer := util.GetAddrByPrivKey(privKey)
+	proposer, err := util.GetAddrByPrivKey(privKey)
+	if err != nil {
+		return govtypes.MsgSubmitProposal{}, err
+	}
 	amount, err := sdk.ParseCoinsNormalized(util.DenomAdd(submitProposalMsg.Deposit))
 	if err != nil {
 		return govtypes.MsgSubmitProposal{}, err
@@ -40,7 +44,10 @@ func parseSubmitProposalArgs(submitProposalMsg types.SubmitProposalMsg, privKey 
 // Parsing - deposit
 func parseGovDepositArgs(govDepositMsg types.GovDepositMsg, privKey key.PrivateKey) (govtypes.MsgDeposit, error) {
 	proposalId := util.FromStringToUint64(govDepositMsg.ProposalID)
-	from := util.GetAddrByPrivKey(privKey)
+	from, err := util.GetAddrByPrivKey(privKey)
+	if err != nil {
+		return govtypes.MsgDeposit{}, err
+	}
 	amount, err := sdk.ParseCoinsNormalized(util.DenomAdd(govDepositMsg.Deposit))
 	if err != nil {
 		return govtypes.MsgDeposit{}, err
@@ -54,7 +61,11 @@ func parseGovDepositArgs(govDepositMsg types.GovDepositMsg, privKey key.PrivateK
 // Parsing - vote
 func parseVoteArgs(voteMsg types.VoteMsg, privKey key.PrivateKey) (govtypes.MsgVote, error) {
 	proposalId := util.FromStringToUint64(voteMsg.ProposalID)
-	from := util.GetAddrByPrivKey(privKey)
+	from, err := util.GetAddrByPrivKey(privKey)
+	if err != nil {
+		return govtypes.MsgVote{}, err
+	}
+
 	byteVoteOption, err := govtypes.VoteOptionFromString(govutils.NormalizeVoteOption(voteMsg.Option))
 	if err != nil {
 		return govtypes.MsgVote{}, err
@@ -67,7 +78,10 @@ func parseVoteArgs(voteMsg types.VoteMsg, privKey key.PrivateKey) (govtypes.MsgV
 // Parsing - weighted vote
 func parseWeightedVoteArgs(weightedVoteMsg types.WeightedVoteMsg, privKey key.PrivateKey) (govtypes.MsgVoteWeighted, error) {
 	proposalId := util.FromStringToUint64(weightedVoteMsg.ProposalID)
-	from := util.GetAddrByPrivKey(privKey)
+	from, err := util.GetAddrByPrivKey(privKey)
+	if err != nil {
+		return govtypes.MsgVoteWeighted{}, err
+	}
 
 	options, err := weightedVoteOptionConverting(weightedVoteMsg)
 	if err != nil {
@@ -235,7 +249,7 @@ func parseGovTallyArgs(tallyMsg types.TallyMsg, grpcConn grpc.ClientConn, ctx co
 			&govtypes.QueryProposalRequest{ProposalId: proposalId},
 		)
 		if err != nil {
-			return govtypes.QueryTallyResultRequest{}, util.LogErr("failed to fetch proposal-id", proposalId, " : ", err)
+			return govtypes.QueryTallyResultRequest{}, util.LogErr(errors.ErrInvalidRequest, "failed to fetch proposal-id", proposalId, " : ", err)
 		}
 
 	} else {
@@ -262,7 +276,7 @@ func parseGovParamArgs(govParamsMsg types.GovParamsMsg) (govtypes.QueryParamsReq
 			ParamsType: govParamsMsg.ParamType,
 		}, nil
 	} else {
-		return govtypes.QueryParamsRequest{}, util.LogErr("argument must be one of (voting|tallying|deposit), was ", govParamsMsg.ParamType)
+		return govtypes.QueryParamsRequest{}, util.LogErr(errors.ErrInvalidMsgType, "argument must be one of (voting|tallying|deposit), was ", govParamsMsg.ParamType)
 	}
 }
 
