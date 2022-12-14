@@ -5,6 +5,7 @@ import (
 	"github.com/Moonyongjung/xpla.go/types"
 	"github.com/Moonyongjung/xpla.go/util"
 
+	"github.com/ethereum/go-ethereum"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/rpc"
@@ -41,7 +42,7 @@ func parseDeploySolContractArgs(deploySolContractMsg types.DeploySolContractMsg)
 		return util.LogErr("empty parameters, need ABI and bytecode")
 	}
 
-	XplaSolContractMetaData = &bind.MetaData{
+	util.XplaSolContractMetaData = &bind.MetaData{
 		ABI: abi,
 		Bin: bytecode,
 	}
@@ -64,8 +65,8 @@ func parseInvokeSolContractArgs(invokeSolContractMsg types.InvokeSolContractMsg)
 			return types.InvokeSolContractMsg{}, err
 		}
 	}
-	invokeSolContractMsg.ContractAddress = util.ToTypeHexString(invokeSolContractMsg.ContractAddress)
-	XplaSolContractMetaData = &bind.MetaData{
+	invokeSolContractMsg.ContractAddress = util.FromStringToTypeHexString(invokeSolContractMsg.ContractAddress)
+	util.XplaSolContractMetaData = &bind.MetaData{
 		ABI: abi,
 		Bin: bytecode,
 	}
@@ -74,7 +75,7 @@ func parseInvokeSolContractArgs(invokeSolContractMsg types.InvokeSolContractMsg)
 }
 
 // Parsing - call solidity contract
-func parseCallSolContractArgs(callSolContractMsg types.CallSolContractMsg) (types.CallSolContractMsg, error) {
+func parseCallSolContractArgs(callSolContractMsg types.CallSolContractMsg, byteAddress string) (CallSolContractParseMsg, error) {
 	var err error
 	bytecode := callSolContractMsg.Bytecode
 	if callSolContractMsg.BytecodeJsonFilePath != "" {
@@ -85,16 +86,41 @@ func parseCallSolContractArgs(callSolContractMsg types.CallSolContractMsg) (type
 	if callSolContractMsg.ABIJsonFilePath != "" {
 		abi, err = util.AbiParsing(callSolContractMsg.ABIJsonFilePath)
 		if err != nil {
-			return types.CallSolContractMsg{}, err
+			return CallSolContractParseMsg{}, err
 		}
 	}
-	callSolContractMsg.ContractAddress = util.ToTypeHexString(callSolContractMsg.ContractAddress)
-	XplaSolContractMetaData = &bind.MetaData{
+	callSolContractMsg.ContractAddress = util.FromStringToTypeHexString(callSolContractMsg.ContractAddress)
+	util.XplaSolContractMetaData = &bind.MetaData{
 		ABI: abi,
 		Bin: bytecode,
 	}
 
-	return callSolContractMsg, nil
+	callByteData, err := util.GetAbiPack(callSolContractMsg.ContractFuncCallName, callSolContractMsg.Args...)
+	if err != nil {
+		return CallSolContractParseMsg{}, err
+	}
+
+	fromAddr := util.FromStringToByte20Address(byteAddress)
+	toAddr := util.FromStringToByte20Address(callSolContractMsg.ContractAddress)
+
+	value, err := util.FromStringToBigInt("0")
+	if err != nil {
+		return CallSolContractParseMsg{}, err
+	}
+
+	msg := ethereum.CallMsg{
+		From:  fromAddr,
+		To:    &toAddr,
+		Value: value,
+		Data:  callByteData,
+	}
+
+	callSolContractParseMsg := CallSolContractParseMsg{
+		CallMsg:  msg,
+		CallName: callSolContractMsg.ContractFuncCallName,
+	}
+
+	return callSolContractParseMsg, nil
 }
 
 // Parsing - transaction by hash
@@ -127,7 +153,7 @@ func parseEthGetBlockTransactionCountArgs(ethGetBlockTransactionCountMsg types.E
 }
 
 // Parsing - sol contract estimate gas
-func parseEstimateGasSolArgs(invokeSolContractMsg types.InvokeSolContractMsg) (types.InvokeSolContractMsg, error) {
+func parseEstimateGasSolArgs(invokeSolContractMsg types.InvokeSolContractMsg, byteAddress string) (CallSolContractParseMsg, error) {
 	var err error
 	bytecode := invokeSolContractMsg.Bytecode
 	if invokeSolContractMsg.BytecodeJsonFilePath != "" {
@@ -138,16 +164,39 @@ func parseEstimateGasSolArgs(invokeSolContractMsg types.InvokeSolContractMsg) (t
 	if invokeSolContractMsg.ABIJsonFilePath != "" {
 		abi, err = util.AbiParsing(invokeSolContractMsg.ABIJsonFilePath)
 		if err != nil {
-			return types.InvokeSolContractMsg{}, err
+			return CallSolContractParseMsg{}, err
 		}
 	}
-	invokeSolContractMsg.ContractAddress = util.ToTypeHexString(invokeSolContractMsg.ContractAddress)
-	XplaSolContractMetaData = &bind.MetaData{
+	invokeSolContractMsg.ContractAddress = util.FromStringToTypeHexString(invokeSolContractMsg.ContractAddress)
+	util.XplaSolContractMetaData = &bind.MetaData{
 		ABI: abi,
 		Bin: bytecode,
 	}
 
-	return invokeSolContractMsg, nil
+	callByteData, err := util.GetAbiPack(invokeSolContractMsg.ContractFuncCallName, invokeSolContractMsg.Args...)
+	if err != nil {
+		return CallSolContractParseMsg{}, err
+	}
+
+	fromAddr := util.FromStringToByte20Address(byteAddress)
+	toAddr := util.FromStringToByte20Address(invokeSolContractMsg.ContractAddress)
+	value, err := util.FromStringToBigInt("0")
+	if err != nil {
+		return CallSolContractParseMsg{}, err
+	}
+
+	msg := ethereum.CallMsg{
+		From:  fromAddr,
+		To:    &toAddr,
+		Value: value,
+		Data:  callByteData,
+	}
+
+	callSolContractParseMsg := CallSolContractParseMsg{
+		CallMsg: msg,
+	}
+
+	return callSolContractParseMsg, nil
 }
 
 // Parsing - get transaction by block hash and index

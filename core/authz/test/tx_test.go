@@ -228,7 +228,7 @@ func SimulateMsgGrant(ak authz.AccountKeeper, bk authz.BankKeeper, _ keeper.Keep
 		txCfg := util.MakeEncodingConfig().TxConfig
 		tx, err := testutil.GenTx(
 			txCfg,
-			[]sdk.Msg{msg},
+			[]sdk.Msg{&msg},
 			fees,
 			testutil.DefaultTestGenTxGas,
 			chainID,
@@ -242,9 +242,9 @@ func SimulateMsgGrant(ak authz.AccountKeeper, bk authz.BankKeeper, _ keeper.Keep
 
 		_, _, err = app.Deliver(txCfg.TxEncoder(), tx)
 		if err != nil {
-			return simtypes.NoOpMsg(authz.ModuleName, sdk.MsgTypeURL(msg), "unable to deliver tx"), nil, err
+			return simtypes.NoOpMsg(authz.ModuleName, sdk.MsgTypeURL(&msg), "unable to deliver tx"), nil, err
 		}
-		return simtypes.NewOperationMsg(msg, true, "", nil), nil, err
+		return simtypes.NewOperationMsg(&msg, true, "", nil), nil, err
 	}
 }
 

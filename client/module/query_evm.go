@@ -7,7 +7,6 @@ import (
 	"github.com/Moonyongjung/xpla.go/types"
 	"github.com/Moonyongjung/xpla.go/util"
 
-	"github.com/ethereum/go-ethereum"
 	ethtypes "github.com/ethereum/go-ethereum/core/types"
 )
 
@@ -45,35 +44,17 @@ func (i IXplaClient) QueryEvm() (string, error) {
 	switch {
 	// Evm call contract
 	case i.Ixplac.GetMsgType() == mevm.EvmCallSolContractMsgType:
-		convertMsg, _ := i.Ixplac.GetMsg().(types.CallSolContractMsg)
+		convertMsg, _ := i.Ixplac.GetMsg().(mevm.CallSolContractParseMsg)
 
-		callByteData, err := GetAbiPack(convertMsg.ContractFuncCallName, convertMsg.Args...)
+		convertMsg.CallMsg.Gas = util.FromStringToUint64(gasLimit)
+		convertMsg.CallMsg.GasPrice = gasPriceBigInt
+
+		res, err := evmClient.Client.CallContract(evmClient.Ctx, convertMsg.CallMsg, nil)
 		if err != nil {
 			return "", err
 		}
 
-		fromAddr := util.FromStringToByte20Address(i.Ixplac.GetPrivateKey().PubKey().Address().String())
-		toAddr := util.FromStringToByte20Address(convertMsg.ContractAddress)
-		value, err := util.FromStringToBigInt("0")
-		if err != nil {
-			return "", err
-		}
-
-		msg := ethereum.CallMsg{
-			From:     fromAddr,
-			To:       &toAddr,
-			Gas:      util.FromStringToUint64(gasLimit),
-			GasPrice: gasPriceBigInt,
-			Value:    value,
-			Data:     callByteData,
-		}
-
-		res, err := evmClient.Client.CallContract(evmClient.Ctx, msg, nil)
-		if err != nil {
-			return "", err
-		}
-
-		result, err := GetAbiUnpack(convertMsg.ContractFuncCallName, res)
+		result, err := util.GetAbiUnpack(convertMsg.CallName, res)
 		if err != nil {
 			return "", err
 		}
@@ -355,8 +336,6 @@ func (i IXplaClient) QueryEvm() (string, error) {
 		convertMsg, _ := i.Ixplac.GetMsg().(types.EthGetBlockTransactionCountMsg)
 		resultBigInt := big.NewInt(0)
 
-		util.LogInfo(convertMsg)
-
 		var result string
 		if convertMsg.BlockHash != "" {
 			err := evmClient.RpcClient.CallContext(evmClient.Ctx, &result, "eth_getBlockTransactionCountByHash", convertMsg.BlockHash)
@@ -386,30 +365,12 @@ func (i IXplaClient) QueryEvm() (string, error) {
 
 	// Evm call contract
 	case i.Ixplac.GetMsgType() == mevm.EvmEthEstimateGasMsgType:
-		convertMsg, _ := i.Ixplac.GetMsg().(types.InvokeSolContractMsg)
+		convertMsg, _ := i.Ixplac.GetMsg().(mevm.CallSolContractParseMsg)
 
-		callByteData, err := GetAbiPack(convertMsg.ContractFuncCallName, convertMsg.Args...)
-		if err != nil {
-			return "", err
-		}
+		convertMsg.CallMsg.Gas = util.FromStringToUint64(gasLimit)
+		convertMsg.CallMsg.GasPrice = gasPriceBigInt
 
-		fromAddr := util.FromStringToByte20Address(i.Ixplac.GetPrivateKey().PubKey().Address().String())
-		toAddr := util.FromStringToByte20Address(convertMsg.ContractAddress)
-		value, err := util.FromStringToBigInt("0")
-		if err != nil {
-			return "", err
-		}
-
-		msg := ethereum.CallMsg{
-			From:     fromAddr,
-			To:       &toAddr,
-			Gas:      util.FromStringToUint64(gasLimit),
-			GasPrice: gasPriceBigInt,
-			Value:    value,
-			Data:     callByteData,
-		}
-
-		res, err := evmClient.Client.EstimateGas(evmClient.Ctx, msg)
+		res, err := evmClient.Client.EstimateGas(evmClient.Ctx, convertMsg.CallMsg)
 		if err != nil {
 			return "", err
 		}

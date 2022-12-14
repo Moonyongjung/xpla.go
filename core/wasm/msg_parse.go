@@ -5,8 +5,6 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/Moonyongjung/xpla.go/core"
-	"github.com/Moonyongjung/xpla.go/key"
 	"github.com/Moonyongjung/xpla.go/types"
 	"github.com/Moonyongjung/xpla.go/util"
 
@@ -185,39 +183,6 @@ func parseExecuteArgs(executeMsgData types.ExecuteMsg,
 	}, nil
 }
 
-// Parsing - clear contract admin
-func parseClearContractAdminArgs(clearContractAdminMsg types.ClearContractAdminMsg, privKey key.PrivateKey) (wasmtypes.MsgClearAdmin, error) {
-	return wasmtypes.MsgClearAdmin{
-		Sender:   util.GetAddrByPrivKey(privKey).String(),
-		Contract: clearContractAdminMsg.ContractAddress,
-	}, nil
-}
-
-// Parsing - set contract admin
-func parseSetContractAdminArgs(setContractAdminMsg types.SetContractAdminMsg, privKey key.PrivateKey) (wasmtypes.MsgUpdateAdmin, error) {
-	msg := wasmtypes.MsgUpdateAdmin{
-		Sender:   util.GetAddrByPrivKey(privKey).String(),
-		Contract: setContractAdminMsg.ContractAddress,
-		NewAdmin: setContractAdminMsg.NewAdmin,
-	}
-
-	if err := msg.ValidateBasic(); err != nil {
-		return wasmtypes.MsgUpdateAdmin{}, err
-	}
-
-	return msg, nil
-}
-
-// Parsing - migrate
-func parseMigrateArgs(migrateMsg types.MigrateMsg, privKey key.PrivateKey) (wasmtypes.MsgMigrateContract, error) {
-	return wasmtypes.MsgMigrateContract{
-		Sender:   util.GetAddrByPrivKey(privKey).String(),
-		Contract: migrateMsg.ContractAddress,
-		CodeID:   util.FromStringToUint64(migrateMsg.CodeId),
-		Msg:      []byte(migrateMsg.MigrateMsg),
-	}, nil
-}
-
 // Parsing - query contract
 func parseQueryArgs(queryMsgData types.QueryMsg,
 	sender sdk.AccAddress) (wasmtypes.QuerySmartContractStateRequest, error) {
@@ -232,65 +197,6 @@ func parseQueryArgs(queryMsgData types.QueryMsg,
 		Address:   queryMsgData.ContractAddress,
 		QueryData: queryData,
 	}, nil
-}
-
-// Parsing - list code
-func parseListcodeArgs() wasmtypes.QueryCodesRequest {
-	return wasmtypes.QueryCodesRequest{
-		Pagination: core.PageRequest,
-	}
-}
-
-// Parsing - list contract by code
-func parseListContractByCodeArgs(listContractByCodeMsgData types.ListContractByCodeMsg) wasmtypes.QueryContractsByCodeRequest {
-	return wasmtypes.QueryContractsByCodeRequest{
-		CodeId:     util.FromStringToUint64(listContractByCodeMsgData.CodeId),
-		Pagination: core.PageRequest,
-	}
-}
-
-// Parsing - download
-func parseDownloadArgs(downloadMsgData types.DownloadMsg) wasmtypes.QueryCodeRequest {
-	return wasmtypes.QueryCodeRequest{
-		CodeId: util.FromStringToUint64(downloadMsgData.CodeId),
-	}
-}
-
-// Parsing - code info
-func parseCodeInfoArgs(codeInfoMsgData types.CodeInfoMsg) wasmtypes.QueryCodeRequest {
-	return wasmtypes.QueryCodeRequest{
-		CodeId: util.FromStringToUint64(codeInfoMsgData.CodeId),
-	}
-}
-
-// Parsing - contract info
-func parseContractInfoArgs(contractInfoMsgData types.ContractInfoMsg) wasmtypes.QueryContractInfoRequest {
-	return wasmtypes.QueryContractInfoRequest{
-		Address: contractInfoMsgData.ContractAddress,
-	}
-}
-
-// Parsing - contract state all
-func parseContractStateAllArgs(contractStateAllMsgData types.ContractStateAllMsg) wasmtypes.QueryAllContractStateRequest {
-	return wasmtypes.QueryAllContractStateRequest{
-		Address:    contractStateAllMsgData.ContractAddress,
-		Pagination: core.PageRequest,
-	}
-}
-
-// Parsing - history
-func parseContractHistoryArgs(contractHistoryMsgData types.ContractHistoryMsg) wasmtypes.QueryContractHistoryRequest {
-	return wasmtypes.QueryContractHistoryRequest{
-		Address:    contractHistoryMsgData.ContractAddress,
-		Pagination: core.PageRequest,
-	}
-}
-
-// Parsing - pinned
-func parsePinnedArgs() wasmtypes.QueryPinnedCodesRequest {
-	return wasmtypes.QueryPinnedCodesRequest{
-		Pagination: core.PageRequest,
-	}
 }
 
 // Parsing - libwasmvm version

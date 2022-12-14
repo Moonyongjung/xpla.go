@@ -331,7 +331,7 @@ func (xplac *XplaClient) QueryEvidence(queryEvidenceMsg ...types.QueryEvidenceMs
 
 // Call(as query) solidity contract.
 func (xplac *XplaClient) CallSolidityContract(callSolContractMsg types.CallSolContractMsg) *XplaClient {
-	msg, err := mevm.MakeCallSolContractMsg(callSolContractMsg)
+	msg, err := mevm.MakeCallSolContractMsg(callSolContractMsg, xplac.GetPrivateKey().PubKey().Address().String())
 	if err != nil {
 		xplac.Err = err
 		return xplac
@@ -498,7 +498,7 @@ func (xplac *XplaClient) EthGetBlockTransactionCount(ethGetBlockTransactionCount
 
 // Query estimate gas.
 func (xplac *XplaClient) EstimateGas(invokeSolContractMsg types.InvokeSolContractMsg) *XplaClient {
-	msg, err := mevm.MakeEstimateGasSolMsg(invokeSolContractMsg)
+	msg, err := mevm.MakeEstimateGasSolMsg(invokeSolContractMsg, xplac.GetPrivateKey().PubKey().Address().String())
 	if err != nil {
 		xplac.Err = err
 		return xplac

@@ -25,10 +25,10 @@ func queryByGrpcBank(i IXplaClient) (string, error) {
 	switch {
 	// Bank balances
 	case i.Ixplac.GetMsgType() == mbank.BankAllBalancesMsgType:
-		convertMsg, _ := i.Ixplac.GetMsg().(*banktypes.QueryAllBalancesRequest)
+		convertMsg, _ := i.Ixplac.GetMsg().(banktypes.QueryAllBalancesRequest)
 		res, err = queryClient.AllBalances(
 			i.Ixplac.GetContext(),
-			convertMsg,
+			&convertMsg,
 		)
 		if err != nil {
 			return "", err
@@ -36,10 +36,10 @@ func queryByGrpcBank(i IXplaClient) (string, error) {
 
 	// Bank balance
 	case i.Ixplac.GetMsgType() == mbank.BankBalanceMsgType:
-		convertMsg, _ := i.Ixplac.GetMsg().(*banktypes.QueryBalanceRequest)
+		convertMsg, _ := i.Ixplac.GetMsg().(banktypes.QueryBalanceRequest)
 		res, err = queryClient.Balance(
 			i.Ixplac.GetContext(),
-			convertMsg,
+			&convertMsg,
 		)
 		if err != nil {
 			return "", err
@@ -113,13 +113,13 @@ func queryByLcdBank(i IXplaClient) (string, error) {
 	switch {
 	// Bank balances
 	case i.Ixplac.GetMsgType() == mbank.BankAllBalancesMsgType:
-		convertMsg, _ := i.Ixplac.GetMsg().(*banktypes.QueryAllBalancesRequest)
+		convertMsg, _ := i.Ixplac.GetMsg().(banktypes.QueryAllBalancesRequest)
 		url = url + util.MakeQueryLabels(bankBalancesLabel, convertMsg.Address)
 
 	// Bank balance
 	case i.Ixplac.GetMsgType() == mbank.BankBalanceMsgType:
 		// not supported now.
-		convertMsg, _ := i.Ixplac.GetMsg().(*banktypes.QueryBalanceRequest)
+		convertMsg, _ := i.Ixplac.GetMsg().(banktypes.QueryBalanceRequest)
 		url = url + util.MakeQueryLabels(bankBalancesLabel, convertMsg.Address, convertMsg.Denom)
 
 	// Bank denominations metadata

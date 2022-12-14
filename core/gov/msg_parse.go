@@ -16,11 +16,11 @@ import (
 )
 
 // Parsing - submit proposal
-func parseSubmitProposalArgs(submitProposalMsg types.SubmitProposalMsg, privKey key.PrivateKey) (*govtypes.MsgSubmitProposal, error) {
+func parseSubmitProposalArgs(submitProposalMsg types.SubmitProposalMsg, privKey key.PrivateKey) (govtypes.MsgSubmitProposal, error) {
 	proposer := util.GetAddrByPrivKey(privKey)
 	amount, err := sdk.ParseCoinsNormalized(util.DenomAdd(submitProposalMsg.Deposit))
 	if err != nil {
-		return nil, err
+		return govtypes.MsgSubmitProposal{}, err
 	}
 
 	content := govtypes.ContentFromProposalType(
@@ -31,56 +31,56 @@ func parseSubmitProposalArgs(submitProposalMsg types.SubmitProposalMsg, privKey 
 
 	msg, err := govtypes.NewMsgSubmitProposal(content, amount, proposer)
 	if err != nil {
-		return nil, err
+		return govtypes.MsgSubmitProposal{}, err
 	}
 
-	return msg, nil
+	return *msg, nil
 }
 
 // Parsing - deposit
-func parseGovDepositArgs(govDepositMsg types.GovDepositMsg, privKey key.PrivateKey) (*govtypes.MsgDeposit, error) {
+func parseGovDepositArgs(govDepositMsg types.GovDepositMsg, privKey key.PrivateKey) (govtypes.MsgDeposit, error) {
 	proposalId := util.FromStringToUint64(govDepositMsg.ProposalID)
 	from := util.GetAddrByPrivKey(privKey)
 	amount, err := sdk.ParseCoinsNormalized(util.DenomAdd(govDepositMsg.Deposit))
 	if err != nil {
-		return nil, err
+		return govtypes.MsgDeposit{}, err
 	}
 
 	msg := govtypes.NewMsgDeposit(from, proposalId, amount)
 
-	return msg, nil
+	return *msg, nil
 }
 
 // Parsing - vote
-func parseVoteArgs(voteMsg types.VoteMsg, privKey key.PrivateKey) (*govtypes.MsgVote, error) {
+func parseVoteArgs(voteMsg types.VoteMsg, privKey key.PrivateKey) (govtypes.MsgVote, error) {
 	proposalId := util.FromStringToUint64(voteMsg.ProposalID)
 	from := util.GetAddrByPrivKey(privKey)
 	byteVoteOption, err := govtypes.VoteOptionFromString(govutils.NormalizeVoteOption(voteMsg.Option))
 	if err != nil {
-		return nil, err
+		return govtypes.MsgVote{}, err
 	}
 
 	msg := govtypes.NewMsgVote(from, proposalId, byteVoteOption)
-	return msg, nil
+	return *msg, nil
 }
 
 // Parsing - weighted vote
-func parseWeightedVoteArgs(weightedVoteMsg types.WeightedVoteMsg, privKey key.PrivateKey) (*govtypes.MsgVoteWeighted, error) {
+func parseWeightedVoteArgs(weightedVoteMsg types.WeightedVoteMsg, privKey key.PrivateKey) (govtypes.MsgVoteWeighted, error) {
 	proposalId := util.FromStringToUint64(weightedVoteMsg.ProposalID)
 	from := util.GetAddrByPrivKey(privKey)
 
 	options, err := weightedVoteOptionConverting(weightedVoteMsg)
 	if err != nil {
-		return nil, err
+		return govtypes.MsgVoteWeighted{}, err
 	}
 
 	msg := govtypes.NewMsgVoteWeighted(from, proposalId, options)
 	err = msg.ValidateBasic()
 	if err != nil {
-		return nil, err
+		return govtypes.MsgVoteWeighted{}, err
 	}
 
-	return msg, nil
+	return *msg, nil
 }
 
 // Parsing - proposal
@@ -331,15 +331,6 @@ func parseQueryVotesArgs(queryVoteMsg types.QueryVoteMsg, grpcConn grpc.ClientCo
 		propStatus = govtypes.ProposalStatus(govtypes.ProposalStatus_value[propStatusString])
 	}
 
-	// res, err := queryClient.Proposal(
-	// 	ctx,
-	// 	&govtypes.QueryProposalRequest{ProposalId: proposalId},
-	// )
-	// if err != nil {
-	// 	return govtypes.QueryVoteRequest{}, "", err
-	// }
-
-	// status := res.GetProposal().Status
 	if !(propStatus == govtypes.StatusVotingPeriod || propStatus == govtypes.StatusDepositPeriod) {
 		params := govtypes.NewQueryProposalVotesParams(proposalId, 0, 0)
 		return params, "notPassed", nil

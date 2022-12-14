@@ -2,9 +2,7 @@ package client
 
 import (
 	"encoding/base64"
-	"math/big"
 
-	"github.com/Moonyongjung/xpla.go/client/module"
 	mevm "github.com/Moonyongjung/xpla.go/core/evm"
 	"github.com/Moonyongjung/xpla.go/key"
 	"github.com/Moonyongjung/xpla.go/types"
@@ -21,14 +19,6 @@ import (
 	authcli "github.com/cosmos/cosmos-sdk/x/auth/client/cli"
 	authsigning "github.com/cosmos/cosmos-sdk/x/auth/signing"
 )
-
-type deploySolTx struct {
-	ChainId  *big.Int
-	Nonce    *big.Int
-	Value    *big.Int
-	GasLimit uint64
-	GasPrice *big.Int
-}
 
 // Create and sign a transaction before it is broadcasted to xpla chain.
 // Options required for create and sign are stored in the xpla client and reflected when the values of those options exist.
@@ -445,7 +435,7 @@ func (xplac *XplaClient) createAndSignEvmTx() ([]byte, error) {
 			return nil, err
 		}
 
-		tx := deploySolTx{
+		tx := mevm.DeploySolTx{
 			ChainId:  chainId,
 			Nonce:    nonce,
 			Value:    value,
@@ -462,7 +452,7 @@ func (xplac *XplaClient) createAndSignEvmTx() ([]byte, error) {
 
 	case xplac.MsgType == mevm.EvmInvokeSolContractMsgType:
 		convertMsg, _ := xplac.Msg.(types.InvokeSolContractMsg)
-		invokeByteData, err := module.GetAbiPack(convertMsg.ContractFuncCallName, convertMsg.Args...)
+		invokeByteData, err := util.GetAbiPack(convertMsg.ContractFuncCallName, convertMsg.Args...)
 		if err != nil {
 			return nil, err
 		}

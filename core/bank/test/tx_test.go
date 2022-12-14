@@ -99,12 +99,12 @@ func SimulateMsgSend(ak banktypes.AccountKeeper, bk keeper.Keeper) simtypes.Oper
 			return simtypes.NoOpMsg(banktypes.ModuleName, banktypes.TypeMsgSend, err.Error()), nil, err
 		}
 
-		err = sendMsgSend(r, app, bk, ak, msg, ctx, chainID, []cryptotypes.PrivKey{from.PrivKey})
+		err = sendMsgSend(r, app, bk, ak, &msg, ctx, chainID, []cryptotypes.PrivKey{from.PrivKey})
 		if err != nil {
 			return simtypes.NoOpMsg(banktypes.ModuleName, msg.Type(), "invalid transfers"), nil, err
 		}
 
-		return simtypes.NewOperationMsg(msg, true, "", nil), nil, nil
+		return simtypes.NewOperationMsg(&msg, true, "", nil), nil, nil
 	}
 }
 

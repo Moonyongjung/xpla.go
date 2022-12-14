@@ -4,7 +4,6 @@ import (
 	"encoding/hex"
 	"fmt"
 
-	"github.com/Moonyongjung/xpla.go/core"
 	"github.com/Moonyongjung/xpla.go/key"
 	"github.com/Moonyongjung/xpla.go/types"
 	"github.com/Moonyongjung/xpla.go/util"
@@ -134,7 +133,7 @@ func parseCreateValidatorArgs(
 }
 
 // Parsing - edit validator
-func parseEditValidatorArgs(editValidatorMsg types.EditValidatorMsg, privKey key.PrivateKey) (*stakingtypes.MsgEditValidator, error) {
+func parseEditValidatorArgs(editValidatorMsg types.EditValidatorMsg, privKey key.PrivateKey) (stakingtypes.MsgEditValidator, error) {
 	moniker := editValidatorMsg.Moniker
 	identity := editValidatorMsg.Identity
 	website := editValidatorMsg.Website
@@ -148,7 +147,7 @@ func parseEditValidatorArgs(editValidatorMsg types.EditValidatorMsg, privKey key
 	if commisionRate != "" {
 		rate, err := sdk.NewDecFromStr(commisionRate)
 		if err != nil {
-			return nil, util.LogErr(err)
+			return stakingtypes.MsgEditValidator{}, util.LogErr(err)
 		}
 		newRate = &rate
 	}
@@ -159,7 +158,7 @@ func parseEditValidatorArgs(editValidatorMsg types.EditValidatorMsg, privKey key
 	if minSelfDelegation != "" {
 		msb, ok := sdk.NewIntFromString(minSelfDelegation)
 		if !ok {
-			return nil, util.LogErr("minimum self delegation must be a positive integer")
+			return stakingtypes.MsgEditValidator{}, util.LogErr("minimum self delegation must be a positive integer")
 		}
 		newMinSelfDelegation = &msb
 	}
@@ -168,170 +167,61 @@ func parseEditValidatorArgs(editValidatorMsg types.EditValidatorMsg, privKey key
 
 	msg := stakingtypes.NewMsgEditValidator(sdk.ValAddress(addr), description, newRate, newMinSelfDelegation)
 
-	return msg, nil
+	return *msg, nil
 }
 
 // Parsing - delegate
-func parseDelegateArgs(delegateMsg types.DelegateMsg, privKey key.PrivateKey) (*stakingtypes.MsgDelegate, error) {
+func parseDelegateArgs(delegateMsg types.DelegateMsg, privKey key.PrivateKey) (stakingtypes.MsgDelegate, error) {
 	amount, err := sdk.ParseCoinNormalized(util.DenomAdd(delegateMsg.Amount))
 	if err != nil {
-		return nil, err
+		return stakingtypes.MsgDelegate{}, err
 	}
 	delAddr := util.GetAddrByPrivKey(privKey)
 	valAddr, err := sdk.ValAddressFromBech32(delegateMsg.ValAddr)
 	if err != nil {
-		return nil, err
+		return stakingtypes.MsgDelegate{}, err
 	}
 
 	msg := stakingtypes.NewMsgDelegate(delAddr, valAddr, amount)
 
-	return msg, nil
-}
-
-// Parsing - redelegate
-func parseRedelegateArgs(redelegateMsg types.RedelegateMsg, privKey key.PrivateKey) (*stakingtypes.MsgBeginRedelegate, error) {
-	amount, err := sdk.ParseCoinNormalized(util.DenomAdd(redelegateMsg.Amount))
-	if err != nil {
-		return nil, err
-	}
-	delAddr := util.GetAddrByPrivKey(privKey)
-	valSrcAddr, err := sdk.ValAddressFromBech32(redelegateMsg.ValSrcAddr)
-	if err != nil {
-		return nil, err
-	}
-	valDstAddr, err := sdk.ValAddressFromBech32(redelegateMsg.ValDstAddr)
-	if err != nil {
-		return nil, err
-	}
-
-	msg := stakingtypes.NewMsgBeginRedelegate(delAddr, valSrcAddr, valDstAddr, amount)
-	return msg, nil
+	return *msg, nil
 }
 
 // Parsing - unbond
-func parseUnbondArgs(unbondMsg types.UnbondMsg, privKey key.PrivateKey) (*stakingtypes.MsgUndelegate, error) {
+func parseUnbondArgs(unbondMsg types.UnbondMsg, privKey key.PrivateKey) (stakingtypes.MsgUndelegate, error) {
 	amount, err := sdk.ParseCoinNormalized(util.DenomAdd(unbondMsg.Amount))
 	if err != nil {
-		return nil, err
+		return stakingtypes.MsgUndelegate{}, err
 	}
 	delAddr := util.GetAddrByPrivKey(privKey)
 	valAddr, err := sdk.ValAddressFromBech32(unbondMsg.ValAddr)
 	if err != nil {
-		return nil, err
+		return stakingtypes.MsgUndelegate{}, err
 	}
 
 	msg := stakingtypes.NewMsgUndelegate(delAddr, valAddr, amount)
 
-	return msg, nil
+	return *msg, nil
 }
 
-// Parsing - validator
-func parseQueryValidatorsArgs() (stakingtypes.QueryValidatorsRequest, error) {
-	return stakingtypes.QueryValidatorsRequest{
-		Pagination: core.PageRequest,
-	}, nil
-}
+// Parsing - redelegate
+func parseRedelegateArgs(redelegateMsg types.RedelegateMsg, privKey key.PrivateKey) (stakingtypes.MsgBeginRedelegate, error) {
+	amount, err := sdk.ParseCoinNormalized(util.DenomAdd(redelegateMsg.Amount))
+	if err != nil {
+		return stakingtypes.MsgBeginRedelegate{}, err
+	}
+	delAddr := util.GetAddrByPrivKey(privKey)
+	valSrcAddr, err := sdk.ValAddressFromBech32(redelegateMsg.ValSrcAddr)
+	if err != nil {
+		return stakingtypes.MsgBeginRedelegate{}, err
+	}
+	valDstAddr, err := sdk.ValAddressFromBech32(redelegateMsg.ValDstAddr)
+	if err != nil {
+		return stakingtypes.MsgBeginRedelegate{}, err
+	}
 
-// Parsing - validators
-func parseQueryValidatorArgs(queryValidatorMsg types.QueryValidatorMsg) (stakingtypes.QueryValidatorRequest, error) {
-	return stakingtypes.QueryValidatorRequest{
-		ValidatorAddr: queryValidatorMsg.ValidatorAddr,
-	}, nil
-}
-
-// Parsing - query delegation
-func parseQueryDelegationArgs(queryDelegationMsg types.QueryDelegationMsg) (stakingtypes.QueryDelegationRequest, error) {
-	delAddr := queryDelegationMsg.DelegatorAddr
-	valAddr := queryDelegationMsg.ValidatorAddr
-
-	return stakingtypes.QueryDelegationRequest{
-		DelegatorAddr: delAddr,
-		ValidatorAddr: valAddr,
-	}, nil
-}
-
-// Parsing - query delegations
-func parseQueryDelegationsArgs(queryDelegationMsg types.QueryDelegationMsg) (stakingtypes.QueryDelegatorDelegationsRequest, error) {
-	delAddr := queryDelegationMsg.DelegatorAddr
-
-	return stakingtypes.QueryDelegatorDelegationsRequest{
-		DelegatorAddr: delAddr,
-		Pagination:    core.PageRequest,
-	}, nil
-}
-
-// Parsing - query delegations to
-func parseQueryDelegationsToArgs(queryDelegationMsg types.QueryDelegationMsg) (stakingtypes.QueryValidatorDelegationsRequest, error) {
-	valAddr := queryDelegationMsg.ValidatorAddr
-
-	return stakingtypes.QueryValidatorDelegationsRequest{
-		ValidatorAddr: valAddr,
-		Pagination:    core.PageRequest,
-	}, nil
-}
-
-// Parsing - query unbonding delegation
-func parseQueryUnbondingDelegationArgs(queryUnbondingDelegationMsg types.QueryUnbondingDelegationMsg) (stakingtypes.QueryUnbondingDelegationRequest, error) {
-	delAddr := queryUnbondingDelegationMsg.DelegatorAddr
-	valAddr := queryUnbondingDelegationMsg.ValidatorAddr
-
-	return stakingtypes.QueryUnbondingDelegationRequest{
-		DelegatorAddr: delAddr,
-		ValidatorAddr: valAddr,
-	}, nil
-}
-
-// Parsing - query unbonding delegations
-func parseQueryUnbondingDelegationsArgs(queryUnbondingDelegationMsg types.QueryUnbondingDelegationMsg) (stakingtypes.QueryDelegatorUnbondingDelegationsRequest, error) {
-	delAddr := queryUnbondingDelegationMsg.DelegatorAddr
-
-	return stakingtypes.QueryDelegatorUnbondingDelegationsRequest{
-		DelegatorAddr: delAddr,
-		Pagination:    core.PageRequest,
-	}, nil
-}
-
-// Parsing - query unbonding delegations from
-func parseQueryUnbondingDelegationsFromArgs(queryUnbondingDelegationMsg types.QueryUnbondingDelegationMsg) (stakingtypes.QueryValidatorUnbondingDelegationsRequest, error) {
-	valAddr := queryUnbondingDelegationMsg.ValidatorAddr
-
-	return stakingtypes.QueryValidatorUnbondingDelegationsRequest{
-		ValidatorAddr: valAddr,
-		Pagination:    core.PageRequest,
-	}, nil
-}
-
-// Parsing - query redelegation
-func parseQueryRedelegationArgs(queryRedelegationMsg types.QueryRedelegationMsg) (stakingtypes.QueryRedelegationsRequest, error) {
-	delAddr := queryRedelegationMsg.DelegatorAddr
-	valSrcAddr := queryRedelegationMsg.SrcValidatorAddr
-	valDstAddr := queryRedelegationMsg.DstValidatorAddr
-
-	return stakingtypes.QueryRedelegationsRequest{
-		DelegatorAddr:    delAddr,
-		DstValidatorAddr: valDstAddr,
-		SrcValidatorAddr: valSrcAddr,
-	}, nil
-}
-
-// Parsing - query redelegations
-func parseQueryRedelegationsArgs(queryRedelegationMsg types.QueryRedelegationMsg) (stakingtypes.QueryRedelegationsRequest, error) {
-	delAddr := queryRedelegationMsg.DelegatorAddr
-
-	return stakingtypes.QueryRedelegationsRequest{
-		DelegatorAddr: delAddr,
-		Pagination:    core.PageRequest,
-	}, nil
-}
-
-// Parsing - query redelegations from
-func parseQueryRedelegationsFromArgs(queryRedelegationMsg types.QueryRedelegationMsg) (stakingtypes.QueryRedelegationsRequest, error) {
-	valSrcAddr := queryRedelegationMsg.SrcValidatorAddr
-
-	return stakingtypes.QueryRedelegationsRequest{
-		SrcValidatorAddr: valSrcAddr,
-		Pagination:       core.PageRequest,
-	}, nil
+	msg := stakingtypes.NewMsgBeginRedelegate(delAddr, valSrcAddr, valDstAddr, amount)
+	return *msg, nil
 }
 
 // Parsing - historical
@@ -343,16 +233,6 @@ func parseHistoricalInfoArgs(historicalMsg types.HistoricalInfoMsg) (stakingtype
 	}
 
 	return stakingtypes.QueryHistoricalInfoRequest{Height: heightInt}, nil
-}
-
-// Parsing - staking pool
-func parseQueryStakingPoolArgs() (stakingtypes.QueryPoolRequest, error) {
-	return stakingtypes.QueryPoolRequest{}, nil
-}
-
-// Parsing - staking params
-func parseQueryStakingParamsArgs() (stakingtypes.QueryParamsRequest, error) {
-	return stakingtypes.QueryParamsRequest{}, nil
 }
 
 // Build commission rate
@@ -391,6 +271,9 @@ func initializedNodeValidatorString(nodeKey string, privValKey string) (string, 
 
 	nodeKeyType := new(NodeKey)
 	err := tmjson.Unmarshal([]byte(nodeKey), nodeKeyType)
+	if err != nil {
+		return "", nil, err
+	}
 
 	nodeID := hex.EncodeToString(nodeKeyType.PrivKey.PubKey().Address())
 

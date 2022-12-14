@@ -36,10 +36,10 @@ func MakeInvokeSolContractMsg(InvokeSolContractMsg types.InvokeSolContractMsg) (
 }
 
 // (Query) make msg - call solidity contract
-func MakeCallSolContractMsg(callSolContractMsg types.CallSolContractMsg) (types.CallSolContractMsg, error) {
-	msg, err := parseCallSolContractArgs(callSolContractMsg)
+func MakeCallSolContractMsg(callSolContractMsg types.CallSolContractMsg, byteAddress string) (CallSolContractParseMsg, error) {
+	msg, err := parseCallSolContractArgs(callSolContractMsg, byteAddress)
 	if err != nil {
-		return types.CallSolContractMsg{}, err
+		return CallSolContractParseMsg{}, err
 	}
 
 	return msg, nil
@@ -96,10 +96,10 @@ func MakeEthGetBlockTransactionCountMsg(ethGetBlockTransactionCountMsg types.Eth
 }
 
 // (Query) make msg - sol contract estimate gas
-func MakeEstimateGasSolMsg(invokeSolContractMsg types.InvokeSolContractMsg) (types.InvokeSolContractMsg, error) {
-	msg, err := parseEstimateGasSolArgs(invokeSolContractMsg)
+func MakeEstimateGasSolMsg(invokeSolContractMsg types.InvokeSolContractMsg, byteAddress string) (CallSolContractParseMsg, error) {
+	msg, err := parseEstimateGasSolArgs(invokeSolContractMsg, byteAddress)
 	if err != nil {
-		return types.InvokeSolContractMsg{}, err
+		return CallSolContractParseMsg{}, err
 	}
 
 	return msg, nil

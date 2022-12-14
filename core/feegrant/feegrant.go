@@ -7,10 +7,10 @@ import (
 )
 
 // (Tx) make msg - fee grant
-func MakeFeeGrantMsg(feeGrantMsg types.FeeGrantMsg, privKey key.PrivateKey) (*feegrant.MsgGrantAllowance, error) {
+func MakeFeeGrantMsg(feeGrantMsg types.FeeGrantMsg, privKey key.PrivateKey) (feegrant.MsgGrantAllowance, error) {
 	msg, err := parseFeeGrantArgs(feeGrantMsg, privKey)
 	if err != nil {
-		return nil, err
+		return feegrant.MsgGrantAllowance{}, err
 	}
 
 	return msg, nil

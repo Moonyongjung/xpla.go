@@ -5,7 +5,8 @@ import (
 	"encoding/hex"
 	"errors"
 
-	wasm "github.com/CosmWasm/wasmd/x/wasm/types"
+	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
+	"github.com/Moonyongjung/xpla.go/core"
 	"github.com/Moonyongjung/xpla.go/key"
 	"github.com/Moonyongjung/xpla.go/types"
 	"github.com/Moonyongjung/xpla.go/util"
@@ -13,122 +14,122 @@ import (
 )
 
 // (Tx) make msg - store code
-func MakeStoreCodeMsg(storeMsg types.StoreMsg, addr sdk.AccAddress) (wasm.MsgStoreCode, error) {
+func MakeStoreCodeMsg(storeMsg types.StoreMsg, addr sdk.AccAddress) (wasmtypes.MsgStoreCode, error) {
 	msg, err := parseStoreCodeArgs(storeMsg, addr)
 	if err != nil {
-		return wasm.MsgStoreCode{}, util.LogErr(err)
+		return wasmtypes.MsgStoreCode{}, util.LogErr(err)
 	}
 
 	if err = msg.ValidateBasic(); err != nil {
-		return wasm.MsgStoreCode{}, util.LogErr(err)
+		return wasmtypes.MsgStoreCode{}, util.LogErr(err)
 	}
 
 	return msg, nil
 }
 
 // (Tx) make msg - instantiate
-func MakeInstantiateMsg(instantiateMsg types.InstantiateMsg, addr sdk.AccAddress) (wasm.MsgInstantiateContract, error) {
+func MakeInstantiateMsg(instantiateMsg types.InstantiateMsg, addr sdk.AccAddress) (wasmtypes.MsgInstantiateContract, error) {
 	if (types.InstantiateMsg{}) == instantiateMsg {
-		return wasm.MsgInstantiateContract{}, util.LogErr("Empty request or type of parameter is not correct")
+		return wasmtypes.MsgInstantiateContract{}, util.LogErr("Empty request or type of parameter is not correct")
 	}
 
 	if instantiateMsg.CodeId == "" ||
 		instantiateMsg.Amount == "" ||
 		instantiateMsg.Label == "" ||
 		instantiateMsg.InitMsg == "" {
-		return wasm.MsgInstantiateContract{}, util.LogErr("Empty mandatory parameters")
+		return wasmtypes.MsgInstantiateContract{}, util.LogErr("Empty mandatory parameters")
 	}
 
 	msg, err := parseInstantiateArgs(instantiateMsg, addr)
 	if err != nil {
-		return wasm.MsgInstantiateContract{}, util.LogErr(err)
+		return wasmtypes.MsgInstantiateContract{}, util.LogErr(err)
 	}
 
 	if err = msg.ValidateBasic(); err != nil {
-		return wasm.MsgInstantiateContract{}, util.LogErr(err)
+		return wasmtypes.MsgInstantiateContract{}, util.LogErr(err)
 	}
 
 	return msg, nil
 }
 
 // (Tx) make msg - execute
-func MakeExecuteMsg(executeMsg types.ExecuteMsg, addr sdk.AccAddress) (wasm.MsgExecuteContract, error) {
+func MakeExecuteMsg(executeMsg types.ExecuteMsg, addr sdk.AccAddress) (wasmtypes.MsgExecuteContract, error) {
 	if (types.ExecuteMsg{}) == executeMsg {
-		return wasm.MsgExecuteContract{}, util.LogErr("Empty request or type of parameter is not correct")
+		return wasmtypes.MsgExecuteContract{}, util.LogErr("Empty request or type of parameter is not correct")
 	}
 
 	msg, err := parseExecuteArgs(executeMsg, addr)
 	if err != nil {
 		util.LogErr(err)
-		return wasm.MsgExecuteContract{}, err
+		return wasmtypes.MsgExecuteContract{}, err
 	}
 
 	if err = msg.ValidateBasic(); err != nil {
 		util.LogErr(err)
-		return wasm.MsgExecuteContract{}, err
+		return wasmtypes.MsgExecuteContract{}, err
 	}
 
 	return msg, nil
 }
 
 // (Tx) make msg - clear contract admin
-func MakeClearContractAdminMsg(clearContractAdminMsg types.ClearContractAdminMsg, privKey key.PrivateKey) (wasm.MsgClearAdmin, error) {
-	msg, err := parseClearContractAdminArgs(clearContractAdminMsg, privKey)
-	if err != nil {
-		return wasm.MsgClearAdmin{}, err
-	}
-
-	return msg, nil
+func MakeClearContractAdminMsg(clearContractAdminMsg types.ClearContractAdminMsg, privKey key.PrivateKey) (wasmtypes.MsgClearAdmin, error) {
+	return wasmtypes.MsgClearAdmin{
+		Sender:   util.GetAddrByPrivKey(privKey).String(),
+		Contract: clearContractAdminMsg.ContractAddress,
+	}, nil
 }
 
 // (Tx) make msg - set contract admin
-func MakeSetContractAdmintMsg(setContractAdminMsg types.SetContractAdminMsg, privKey key.PrivateKey) (wasm.MsgUpdateAdmin, error) {
-	msg, err := parseSetContractAdminArgs(setContractAdminMsg, privKey)
-	if err != nil {
-		return wasm.MsgUpdateAdmin{}, err
-	}
-
-	return msg, nil
+func MakeSetContractAdmintMsg(setContractAdminMsg types.SetContractAdminMsg, privKey key.PrivateKey) (wasmtypes.MsgUpdateAdmin, error) {
+	return wasmtypes.MsgUpdateAdmin{
+		Sender:   util.GetAddrByPrivKey(privKey).String(),
+		Contract: setContractAdminMsg.ContractAddress,
+		NewAdmin: setContractAdminMsg.NewAdmin,
+	}, nil
 }
 
 // (Tx) make msg - migrate
-func MakeMigrateMsg(migrateMsg types.MigrateMsg, privKey key.PrivateKey) (wasm.MsgMigrateContract, error) {
-	msg, err := parseMigrateArgs(migrateMsg, privKey)
-	if err != nil {
-		return wasm.MsgMigrateContract{}, err
-	}
-
-	return msg, nil
+func MakeMigrateMsg(migrateMsg types.MigrateMsg, privKey key.PrivateKey) (wasmtypes.MsgMigrateContract, error) {
+	return wasmtypes.MsgMigrateContract{
+		Sender:   util.GetAddrByPrivKey(privKey).String(),
+		Contract: migrateMsg.ContractAddress,
+		CodeID:   util.FromStringToUint64(migrateMsg.CodeId),
+		Msg:      []byte(migrateMsg.MigrateMsg),
+	}, nil
 }
 
 // (Query) make msg - query contract
-func MakeQueryMsg(queryMsg types.QueryMsg, addr sdk.AccAddress) (wasm.QuerySmartContractStateRequest, error) {
+func MakeQueryMsg(queryMsg types.QueryMsg, addr sdk.AccAddress) (wasmtypes.QuerySmartContractStateRequest, error) {
 	if (types.QueryMsg{}) == queryMsg {
-		return wasm.QuerySmartContractStateRequest{}, util.LogErr("Empty request or type of parameter is not correct")
+		return wasmtypes.QuerySmartContractStateRequest{}, util.LogErr("Empty request or type of parameter is not correct")
 	}
 
 	msg, err := parseQueryArgs(queryMsg, addr)
 	if err != nil {
 		util.LogErr(err)
-		return wasm.QuerySmartContractStateRequest{}, err
+		return wasmtypes.QuerySmartContractStateRequest{}, err
 	}
 
 	return msg, nil
 }
 
 // (Query) make msg - list code
-func MakeListcodeMsg() (wasm.QueryCodesRequest, error) {
-	msg := parseListcodeArgs()
-	return msg, nil
+func MakeListcodeMsg() (wasmtypes.QueryCodesRequest, error) {
+	return wasmtypes.QueryCodesRequest{
+		Pagination: core.PageRequest,
+	}, nil
 }
 
 // (Query) make msg - list contract by code
-func MakeListContractByCodeMsg(listContractByCodeMsg types.ListContractByCodeMsg) (wasm.QueryContractsByCodeRequest, error) {
+func MakeListContractByCodeMsg(listContractByCodeMsg types.ListContractByCodeMsg) (wasmtypes.QueryContractsByCodeRequest, error) {
 	if (types.ListContractByCodeMsg{}) == listContractByCodeMsg {
-		return wasm.QueryContractsByCodeRequest{}, util.LogErr("Empty request or type of parameter is not correct")
+		return wasmtypes.QueryContractsByCodeRequest{}, util.LogErr("Empty request or type of parameter is not correct")
 	}
-	msg := parseListContractByCodeArgs(listContractByCodeMsg)
-	return msg, nil
+	return wasmtypes.QueryContractsByCodeRequest{
+		CodeId:     util.FromStringToUint64(listContractByCodeMsg.CodeId),
+		Pagination: core.PageRequest,
+	}, nil
 }
 
 // (Query) make msg - download
@@ -137,52 +138,61 @@ func MakeDownloadMsg(downloadMsg types.DownloadMsg) ([]interface{}, error) {
 	if (types.DownloadMsg{}) == downloadMsg {
 		return nil, util.LogErr("Empty request or type of parameter is not correct")
 	}
-	msg := parseDownloadArgs(downloadMsg)
+	msg := wasmtypes.QueryCodeRequest{
+		CodeId: util.FromStringToUint64(downloadMsg.CodeId),
+	}
 	msgInterfaceSlice = append(msgInterfaceSlice, msg)
 	msgInterfaceSlice = append(msgInterfaceSlice, downloadMsg.DownloadFileName)
 	return msgInterfaceSlice, nil
 }
 
 // (Query) make msg - code info
-func MakeCodeInfoMsg(codeInfoMsg types.CodeInfoMsg) (wasm.QueryCodeRequest, error) {
+func MakeCodeInfoMsg(codeInfoMsg types.CodeInfoMsg) (wasmtypes.QueryCodeRequest, error) {
 	if (types.CodeInfoMsg{}) == codeInfoMsg {
-		return wasm.QueryCodeRequest{}, util.LogErr("Empty request or type of parameter is not correct")
+		return wasmtypes.QueryCodeRequest{}, util.LogErr("Empty request or type of parameter is not correct")
 	}
-	msg := parseCodeInfoArgs(codeInfoMsg)
-	return msg, nil
+	return wasmtypes.QueryCodeRequest{
+		CodeId: util.FromStringToUint64(codeInfoMsg.CodeId),
+	}, nil
 }
 
 // (Query) make msg - contract info
-func MakeContractInfoMsg(contractInfoMsg types.ContractInfoMsg) (wasm.QueryContractInfoRequest, error) {
+func MakeContractInfoMsg(contractInfoMsg types.ContractInfoMsg) (wasmtypes.QueryContractInfoRequest, error) {
 	if (types.ContractInfoMsg{}) == contractInfoMsg {
-		return wasm.QueryContractInfoRequest{}, util.LogErr("Empty request or type of parameter is not correct")
+		return wasmtypes.QueryContractInfoRequest{}, util.LogErr("Empty request or type of parameter is not correct")
 	}
-	msg := parseContractInfoArgs(contractInfoMsg)
-	return msg, nil
+	return wasmtypes.QueryContractInfoRequest{
+		Address: contractInfoMsg.ContractAddress,
+	}, nil
 }
 
 // (Query) make msg - contract state all
-func MakeContractStateAllMsg(contractStateAllMsg types.ContractStateAllMsg) (wasm.QueryAllContractStateRequest, error) {
+func MakeContractStateAllMsg(contractStateAllMsg types.ContractStateAllMsg) (wasmtypes.QueryAllContractStateRequest, error) {
 	if (types.ContractStateAllMsg{}) == contractStateAllMsg {
-		return wasm.QueryAllContractStateRequest{}, util.LogErr("Empty request or type of parameter is not correct")
+		return wasmtypes.QueryAllContractStateRequest{}, util.LogErr("Empty request or type of parameter is not correct")
 	}
-	msg := parseContractStateAllArgs(contractStateAllMsg)
-	return msg, nil
+	return wasmtypes.QueryAllContractStateRequest{
+		Address:    contractStateAllMsg.ContractAddress,
+		Pagination: core.PageRequest,
+	}, nil
 }
 
 // (Query) make msg - history
-func MakeContractHistoryMsg(contractHistoryMsg types.ContractHistoryMsg) (wasm.QueryContractHistoryRequest, error) {
+func MakeContractHistoryMsg(contractHistoryMsg types.ContractHistoryMsg) (wasmtypes.QueryContractHistoryRequest, error) {
 	if (types.ContractHistoryMsg{}) == contractHistoryMsg {
-		return wasm.QueryContractHistoryRequest{}, util.LogErr("Empty request or type of parameter is not correct")
+		return wasmtypes.QueryContractHistoryRequest{}, util.LogErr("Empty request or type of parameter is not correct")
 	}
-	msg := parseContractHistoryArgs(contractHistoryMsg)
-	return msg, nil
+	return wasmtypes.QueryContractHistoryRequest{
+		Address:    contractHistoryMsg.ContractAddress,
+		Pagination: core.PageRequest,
+	}, nil
 }
 
 // (Query) make msg - pinned
-func MakePinnedMsg() (wasm.QueryPinnedCodesRequest, error) {
-	msg := parsePinnedArgs()
-	return msg, nil
+func MakePinnedMsg() (wasmtypes.QueryPinnedCodesRequest, error) {
+	return wasmtypes.QueryPinnedCodesRequest{
+		Pagination: core.PageRequest,
+	}, nil
 }
 
 // (Query) make msg - libwasmvm version

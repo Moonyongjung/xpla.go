@@ -3,7 +3,6 @@ package module
 import (
 	"context"
 
-	mevm "github.com/Moonyongjung/xpla.go/core/evm"
 	"github.com/Moonyongjung/xpla.go/key"
 	"github.com/Moonyongjung/xpla.go/util"
 	cmclient "github.com/cosmos/cosmos-sdk/client"
@@ -53,45 +52,6 @@ type ModuleClient interface {
 
 func NewIXplaClient(moduleClient ModuleClient, qt uint8) *IXplaClient {
 	return &IXplaClient{Ixplac: moduleClient, QueryType: qt}
-}
-
-// For invoke(as execute) contract, parameters are packed by using ABI.
-func GetAbiPack(callName string, args ...interface{}) ([]byte, error) {
-	contractAbi, err := mevm.XplaSolContractMetaData.GetAbi()
-	if err != nil {
-		return nil, err
-	}
-
-	var abiByteData []byte
-
-	if args == nil {
-		abiByteData, err = contractAbi.Pack(callName)
-		if err != nil {
-			return nil, err
-		}
-	} else {
-		abiByteData, err = contractAbi.Pack(callName, args...)
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	return abiByteData, nil
-}
-
-// After call(as query) solidity contract, the response of chain is unpacked by ABI.
-func GetAbiUnpack(callName string, data []byte) ([]interface{}, error) {
-	contractAbi, err := mevm.XplaSolContractMetaData.GetAbi()
-	if err != nil {
-		return nil, err
-	}
-
-	unpacked, err := contractAbi.Unpack(callName, data)
-	if err != nil {
-		return nil, err
-	}
-
-	return unpacked, nil
 }
 
 // Print protobuf message by using cosmos sdk codec.

@@ -77,7 +77,7 @@ func broadcastTxEvm(xplac *XplaClient, txBytes []byte, broadcastMode string, evm
 		return checkEvmBroadcastMode(broadcastMode, evmClient, &signedTx)
 
 	case xplac.MsgType == mevm.EvmDeploySolContractMsgType:
-		var deployTx deploySolTx
+		var deployTx mevm.DeploySolTx
 
 		err := json.Unmarshal(txBytes, &deployTx)
 		if err != nil {
@@ -98,7 +98,7 @@ func broadcastTxEvm(xplac *XplaClient, txBytes []byte, broadcastMode string, evm
 		contractAuth.GasLimit = deployTx.GasLimit
 		contractAuth.GasPrice = deployTx.GasPrice
 
-		_, transaction, _, err := mevm.DeployXplaSolContract(contractAuth, evmClient.Client)
+		_, transaction, _, err := util.DeployXplaSolContract(contractAuth, evmClient.Client)
 		if err != nil {
 			return nil, err
 		}

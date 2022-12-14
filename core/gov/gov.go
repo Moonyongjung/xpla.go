@@ -11,40 +11,40 @@ import (
 )
 
 // (Tx) make msg - submit proposal
-func MakeSubmitProposalMsg(submitProposalMsg types.SubmitProposalMsg, privKey key.PrivateKey) (*govtypes.MsgSubmitProposal, error) {
+func MakeSubmitProposalMsg(submitProposalMsg types.SubmitProposalMsg, privKey key.PrivateKey) (govtypes.MsgSubmitProposal, error) {
 	msg, err := parseSubmitProposalArgs(submitProposalMsg, privKey)
 	if err != nil {
-		return nil, err
+		return govtypes.MsgSubmitProposal{}, err
 	}
 
 	return msg, nil
 }
 
 // (Tx) make msg - deposit
-func MakeGovDepositMsg(govDepositMsg types.GovDepositMsg, privKey key.PrivateKey) (*govtypes.MsgDeposit, error) {
+func MakeGovDepositMsg(govDepositMsg types.GovDepositMsg, privKey key.PrivateKey) (govtypes.MsgDeposit, error) {
 	msg, err := parseGovDepositArgs(govDepositMsg, privKey)
 	if err != nil {
-		return nil, err
+		return govtypes.MsgDeposit{}, err
 	}
 
 	return msg, nil
 }
 
 // (Tx) make msg - vote
-func MakeVoteMsg(voteMsg types.VoteMsg, privKey key.PrivateKey) (*govtypes.MsgVote, error) {
+func MakeVoteMsg(voteMsg types.VoteMsg, privKey key.PrivateKey) (govtypes.MsgVote, error) {
 	msg, err := parseVoteArgs(voteMsg, privKey)
 	if err != nil {
-		return nil, err
+		return govtypes.MsgVote{}, err
 	}
 
 	return msg, nil
 }
 
 // (Tx) make msg - weighted vote
-func MakeWeightedVoteMsg(weightedVoteMsg types.WeightedVoteMsg, privKey key.PrivateKey) (*govtypes.MsgVoteWeighted, error) {
+func MakeWeightedVoteMsg(weightedVoteMsg types.WeightedVoteMsg, privKey key.PrivateKey) (govtypes.MsgVoteWeighted, error) {
 	msg, err := parseWeightedVoteArgs(weightedVoteMsg, privKey)
 	if err != nil {
-		return nil, err
+		return govtypes.MsgVoteWeighted{}, err
 	}
 
 	return msg, nil

@@ -162,7 +162,7 @@ func SimulateMsgGrantAllowance(ak feegrant.AccountKeeper, bk feegrant.BankKeeper
 			App:             app,
 			TxGen:           util.MakeEncodingConfig().TxConfig,
 			Cdc:             nil,
-			Msg:             msg,
+			Msg:             &msg,
 			MsgType:         TypeMsgGrantAllowance,
 			Context:         ctx,
 			SimAccount:      granter,

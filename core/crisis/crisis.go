@@ -8,10 +8,10 @@ import (
 )
 
 // (Tx) make msg - invariant broken
-func MakeInvariantRouteMsg(invariantBrokenMsg types.InvariantBrokenMsg, privKey key.PrivateKey) (*crisistypes.MsgVerifyInvariant, error) {
+func MakeInvariantRouteMsg(invariantBrokenMsg types.InvariantBrokenMsg, privKey key.PrivateKey) (crisistypes.MsgVerifyInvariant, error) {
 	msg, err := parseInvariantBrokenArgs(invariantBrokenMsg, privKey)
 	if err != nil {
-		return nil, err
+		return crisistypes.MsgVerifyInvariant{}, err
 	}
 
 	return msg, nil

@@ -1,6 +1,9 @@
 package evm
 
 import (
+	"math/big"
+
+	"github.com/ethereum/go-ethereum"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/rpc"
 )
@@ -39,10 +42,23 @@ const (
 	EvmEthCoinbaseMsgType                       = "eth-coinbase"
 )
 
+type CallSolContractParseMsg struct {
+	CallMsg  ethereum.CallMsg
+	CallName string
+}
+
 type EthNewFilterParseMsg struct {
 	BlockHash *common.Hash     `json:"blockHash,omitempty"`
 	FromBlock *rpc.BlockNumber `json:"fromBlock"`
 	ToBlock   *rpc.BlockNumber `json:"toBlock"`
 	Addresses interface{}      `json:"address"`
 	Topics    []interface{}    `json:"topics"`
+}
+
+type DeploySolTx struct {
+	ChainId  *big.Int
+	Nonce    *big.Int
+	Value    *big.Int
+	GasLimit uint64
+	GasPrice *big.Int
 }

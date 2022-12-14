@@ -13,14 +13,14 @@ import (
 )
 
 // Parsing - param change
-func parseProposalParamChangeArgs(paramChangeMsg types.ParamChangeMsg, privKey key.PrivateKey, encodingConfig params.EncodingConfig) (*govtypes.MsgSubmitProposal, error) {
+func parseProposalParamChangeArgs(paramChangeMsg types.ParamChangeMsg, privKey key.PrivateKey, encodingConfig params.EncodingConfig) (govtypes.MsgSubmitProposal, error) {
 	var proposal paramscutils.ParamChangeProposalJSON
 	var err error
 
 	if paramChangeMsg.JsonFilePath != "" {
 		proposal, err = paramscutils.ParseParamChangeProposalJSON(encodingConfig.Amino, paramChangeMsg.JsonFilePath)
 		if err != nil {
-			return nil, err
+			return govtypes.MsgSubmitProposal{}, err
 		}
 	} else {
 		proposal.Title = paramChangeMsg.Title
@@ -31,7 +31,7 @@ func parseProposalParamChangeArgs(paramChangeMsg types.ParamChangeMsg, privKey k
 		for _, change := range paramChangeMsg.Changes {
 			var targetJson paramscutils.ParamChangeJSON
 			if err := encodingConfig.Amino.UnmarshalJSON([]byte(change), &targetJson); err != nil {
-				return nil, err
+				return govtypes.MsgSubmitProposal{}, err
 			}
 			paramChangeJsons = append(paramChangeJsons, targetJson)
 		}
@@ -41,7 +41,7 @@ func parseProposalParamChangeArgs(paramChangeMsg types.ParamChangeMsg, privKey k
 
 	deposit, err := sdk.ParseCoinsNormalized(util.DenomAdd(proposal.Deposit))
 	if err != nil {
-		return nil, err
+		return govtypes.MsgSubmitProposal{}, err
 	}
 
 	from := util.GetAddrByPrivKey(privKey)
@@ -51,16 +51,8 @@ func parseProposalParamChangeArgs(paramChangeMsg types.ParamChangeMsg, privKey k
 
 	msg, err := govtypes.NewMsgSubmitProposal(content, deposit, from)
 	if err != nil {
-		return nil, err
+		return govtypes.MsgSubmitProposal{}, err
 	}
 
-	return msg, nil
-}
-
-// Parsing - subspace
-func parseQueryParamsSubspaceArgs(subspaceMsg types.SubspaceMsg) (paramsproposal.QueryParamsRequest, error) {
-	return paramsproposal.QueryParamsRequest{
-		Subspace: subspaceMsg.Subspace,
-		Key:      subspaceMsg.Key,
-	}, nil
+	return *msg, nil
 }

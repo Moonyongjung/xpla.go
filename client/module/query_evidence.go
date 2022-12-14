@@ -24,10 +24,10 @@ func queryByGrpcEvidence(i IXplaClient) (string, error) {
 	switch {
 	// Query all evidences
 	case i.Ixplac.GetMsgType() == mevidence.EvidenceQueryAllMsgType:
-		convertMsg, _ := i.Ixplac.GetMsg().(*evidencetypes.QueryAllEvidenceRequest)
+		convertMsg, _ := i.Ixplac.GetMsg().(evidencetypes.QueryAllEvidenceRequest)
 		res, err = queryClient.AllEvidence(
 			i.Ixplac.GetContext(),
-			convertMsg,
+			&convertMsg,
 		)
 		if err != nil {
 			return "", err
@@ -35,10 +35,10 @@ func queryByGrpcEvidence(i IXplaClient) (string, error) {
 
 	// Query evidence
 	case i.Ixplac.GetMsgType() == mevidence.EvidenceQueryMsgType:
-		convertMsg, _ := i.Ixplac.GetMsg().(*evidencetypes.QueryEvidenceRequest)
+		convertMsg, _ := i.Ixplac.GetMsg().(evidencetypes.QueryEvidenceRequest)
 		res, err = queryClient.Evidence(
 			i.Ixplac.GetContext(),
-			convertMsg,
+			&convertMsg,
 		)
 		if err != nil {
 			return "", err
@@ -70,7 +70,7 @@ func queryByLcdEvidence(i IXplaClient) (string, error) {
 
 	// Query evidence
 	case i.Ixplac.GetMsgType() == mevidence.EvidenceQueryMsgType:
-		convertMsg, _ := i.Ixplac.GetMsg().(*evidencetypes.QueryEvidenceRequest)
+		convertMsg, _ := i.Ixplac.GetMsg().(evidencetypes.QueryEvidenceRequest)
 
 		url = url + util.MakeQueryLabels(evidenceEvidenceLabel, convertMsg.EvidenceHash.String())
 

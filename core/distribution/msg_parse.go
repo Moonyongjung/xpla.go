@@ -17,26 +17,26 @@ import (
 )
 
 // Parsing - fund community pool
-func parseFundCommunityPoolArgs(fundCommunityPoolMsg types.FundCommunityPoolMsg, privKey key.PrivateKey) (*disttypes.MsgFundCommunityPool, error) {
+func parseFundCommunityPoolArgs(fundCommunityPoolMsg types.FundCommunityPoolMsg, privKey key.PrivateKey) (disttypes.MsgFundCommunityPool, error) {
 	depositorAddr := util.GetAddrByPrivKey(privKey)
 	amount, err := sdk.ParseCoinsNormalized(util.DenomAdd(fundCommunityPoolMsg.Amount))
 	if err != nil {
-		return nil, err
+		return disttypes.MsgFundCommunityPool{}, err
 	}
 
 	msg := disttypes.NewMsgFundCommunityPool(amount, depositorAddr)
-	return msg, nil
+	return *msg, nil
 }
 
 // Parsing - proposal community pool
-func parseProposalCommunityPoolSpendArgs(communityPoolSpendMsg types.CommunityPoolSpendMsg, privKey key.PrivateKey, encodingConfig params.EncodingConfig) (*govtypes.MsgSubmitProposal, error) {
+func parseProposalCommunityPoolSpendArgs(communityPoolSpendMsg types.CommunityPoolSpendMsg, privKey key.PrivateKey, encodingConfig params.EncodingConfig) (govtypes.MsgSubmitProposal, error) {
 	var proposal disttypes.CommunityPoolSpendProposalWithDeposit
 	var err error
 
 	if communityPoolSpendMsg.JsonFilePath != "" {
 		proposal, err = distcli.ParseCommunityPoolSpendProposalWithDeposit(encodingConfig.Marshaler, communityPoolSpendMsg.JsonFilePath)
 		if err != nil {
-			return nil, err
+			return govtypes.MsgSubmitProposal{}, err
 		}
 	} else {
 		proposal.Title = communityPoolSpendMsg.Title
@@ -48,28 +48,28 @@ func parseProposalCommunityPoolSpendArgs(communityPoolSpendMsg types.CommunityPo
 
 	amount, err := sdk.ParseCoinsNormalized(util.DenomAdd(proposal.Amount))
 	if err != nil {
-		return nil, err
+		return govtypes.MsgSubmitProposal{}, err
 	}
 
 	deposit, err := sdk.ParseCoinsNormalized(util.DenomAdd(proposal.Deposit))
 	if err != nil {
-		return nil, err
+		return govtypes.MsgSubmitProposal{}, err
 	}
 
 	from := util.GetAddrByPrivKey(privKey)
 	recpAddr, err := sdk.AccAddressFromBech32(proposal.Recipient)
 	if err != nil {
-		return nil, err
+		return govtypes.MsgSubmitProposal{}, err
 	}
 
 	content := disttypes.NewCommunityPoolSpendProposal(proposal.Title, proposal.Description, recpAddr, amount)
 
 	msg, err := govtypes.NewMsgSubmitProposal(content, deposit, from)
 	if err != nil {
-		return nil, err
+		return govtypes.MsgSubmitProposal{}, err
 	}
 
-	return msg, nil
+	return *msg, nil
 }
 
 // Parsing - withdraw rewards
@@ -127,21 +127,16 @@ func parseWithdrawAllRewardsArgs(privKey key.PrivateKey, grpcConn grpc.ClientCon
 }
 
 // Parsing - set withdraw addr
-func parseSetWithdrawAddrArgs(setWithdrawAddrMsg types.SetwithdrawAddrMsg, privKey key.PrivateKey) (*disttypes.MsgSetWithdrawAddress, error) {
+func parseSetWithdrawAddrArgs(setWithdrawAddrMsg types.SetwithdrawAddrMsg, privKey key.PrivateKey) (disttypes.MsgSetWithdrawAddress, error) {
 	delAddr := util.GetAddrByPrivKey(privKey)
 	withdrawAddr, err := sdk.AccAddressFromBech32(setWithdrawAddrMsg.WithdrawAddr)
 	if err != nil {
-		return nil, err
+		return disttypes.MsgSetWithdrawAddress{}, err
 	}
 
 	msg := disttypes.NewMsgSetWithdrawAddress(delAddr, withdrawAddr)
 
-	return msg, nil
-}
-
-// Parsing - distribution params
-func parseQueryDistributionParamsArgs() (disttypes.QueryParamsRequest, error) {
-	return disttypes.QueryParamsRequest{}, nil
+	return *msg, nil
 }
 
 // Parsing - validator outstanding rewards
@@ -172,7 +167,7 @@ func parseQueryDistCommissionArgs(queryDistCommissionMsg types.QueryDistCommissi
 func parseDistSlashesArgs(queryDistSlashesMsg types.QueryDistSlashesMsg) (disttypes.QueryValidatorSlashesRequest, error) {
 	valAddr, err := sdk.ValAddressFromBech32(queryDistSlashesMsg.ValidatorAddr)
 	if err != nil {
-		return disttypes.QueryValidatorSlashesRequest{}, nil
+		return disttypes.QueryValidatorSlashesRequest{}, err
 	}
 	startHeightNumber := util.FromStringToUint64(queryDistSlashesMsg.StartHeight)
 	endHeightNumber := util.FromStringToUint64(queryDistSlashesMsg.EndHeight)
@@ -199,18 +194,4 @@ func parseQueryDistRewardsArgs(queryDistRewardsMsg types.QueryDistRewardsMsg) (d
 		DelegatorAddress: delAddr,
 		ValidatorAddress: valAddr.String(),
 	}, nil
-}
-
-// parsing - total distribution rewards
-func parseQueryDistTotalRewardsArgs(queryDistRewardsMsg types.QueryDistRewardsMsg) (disttypes.QueryDelegationTotalRewardsRequest, error) {
-	delAddr := queryDistRewardsMsg.DelegatorAddr
-
-	return disttypes.QueryDelegationTotalRewardsRequest{
-		DelegatorAddress: delAddr,
-	}, nil
-}
-
-// Parsing - community pool
-func parseQueryCommunityPoolArgs() (disttypes.QueryCommunityPoolRequest, error) {
-	return disttypes.QueryCommunityPoolRequest{}, nil
 }

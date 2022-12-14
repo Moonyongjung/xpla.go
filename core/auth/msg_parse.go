@@ -4,37 +4,16 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/Moonyongjung/xpla.go/core"
 	"github.com/Moonyongjung/xpla.go/types"
 	"github.com/Moonyongjung/xpla.go/util"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/rest"
-	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	tmtypes "github.com/tendermint/tendermint/types"
 )
 
-// Parsing - auth params
-func ParseAuthParamArgs() (authtypes.QueryParamsRequest, error) {
-	return authtypes.QueryParamsRequest{}, nil
-}
-
-// Parsing - auth account
-func parseQueryAccAddressArgs(queryAccAddresMsg types.QueryAccAddressMsg) (authtypes.QueryAccountRequest, error) {
-	return authtypes.QueryAccountRequest{
-		Address: queryAccAddresMsg.Address,
-	}, nil
-}
-
-// Parsing - auth accounts
-func parseQueryAccountsArgs() (authtypes.QueryAccountsRequest, error) {
-	return authtypes.QueryAccountsRequest{
-		Pagination: core.PageRequest,
-	}, nil
-}
-
 // Parsing - transaction by evnets
-func parseTxsByEventsArgs(txsByEventsMsg types.QueryTxsByEventsMsg) ([]string, error) {
+func parseTxsByEventsArgs(txsByEventsMsg types.QueryTxsByEventsMsg) (QueryTxsByEventParseMsg, error) {
 	eventFormat := "{eventType}.{eventAttribute}={value}"
 	eventsRaw := txsByEventsMsg.Events
 	eventsStr := strings.Trim(eventsRaw, "'")
@@ -57,9 +36,9 @@ func parseTxsByEventsArgs(txsByEventsMsg types.QueryTxsByEventsMsg) ([]string, e
 
 	for _, event := range events {
 		if !strings.Contains(event, "=") {
-			return []string{}, util.LogErr("invalid event; event", event, "should be of the format:", eventFormat)
+			return QueryTxsByEventParseMsg{}, util.LogErr("invalid event; event", event, "should be of the format:", eventFormat)
 		} else if strings.Count(event, "=") > 1 {
-			return []string{}, util.LogErr("invalid event; event", event, "should be of the format:", eventFormat)
+			return QueryTxsByEventParseMsg{}, util.LogErr("invalid event; event", event, "should be of the format:", eventFormat)
 		}
 
 		tokens := strings.Split(event, "=")
@@ -72,23 +51,32 @@ func parseTxsByEventsArgs(txsByEventsMsg types.QueryTxsByEventsMsg) ([]string, e
 		tmEvents = append(tmEvents, event)
 	}
 
-	tmEvents = append(tmEvents, txsByEventsMsg.Page)
-	tmEvents = append(tmEvents, txsByEventsMsg.Limit)
+	queryTxsByEventParseMsg := QueryTxsByEventParseMsg{
+		TmEvents: tmEvents,
+		Page:     util.FromStringToInt(txsByEventsMsg.Page),
+		Limit:    util.FromStringToInt(txsByEventsMsg.Limit),
+	}
 
-	return tmEvents, nil
+	return queryTxsByEventParseMsg, nil
 }
 
 // Parsing - transaction
-func parseQueryTxArgs(queryTxMsg types.QueryTxMsg) ([]string, error) {
+func parseQueryTxArgs(queryTxMsg types.QueryTxMsg) (QueryTxParseMsg, error) {
+	var queryTxParseMsg QueryTxParseMsg
+
 	if queryTxMsg.Type == "" || queryTxMsg.Type == "hash" {
 		if queryTxMsg.Value == "" {
-			return []string{}, util.LogErr("argument should be a tx hash")
+			return QueryTxParseMsg{}, util.LogErr("argument should be a tx hash")
 		}
-		return []string{queryTxMsg.Value, "hash"}, nil
+
+		queryTxParseMsg.TmEvents = []string{queryTxMsg.Value}
+		queryTxParseMsg.TxType = "hash"
+
+		return queryTxParseMsg, nil
 
 	} else if queryTxMsg.Type == "signature" {
 		if queryTxMsg.Value == "" {
-			return nil, fmt.Errorf("argument should be comma-separated signatures")
+			return QueryTxParseMsg{}, fmt.Errorf("argument should be comma-separated signatures")
 		}
 		sigParts := strings.Split(queryTxMsg.Value, ",")
 
@@ -97,21 +85,26 @@ func parseQueryTxArgs(queryTxMsg types.QueryTxMsg) ([]string, error) {
 			tmEvents[i] = fmt.Sprintf("%s.%s='%s'", sdk.EventTypeTx, sdk.AttributeKeySignature, sig)
 		}
 
-		tmEvents = append(tmEvents, queryTxMsg.Type)
-		return tmEvents, nil
+		queryTxParseMsg.TmEvents = tmEvents
+		queryTxParseMsg.TxType = queryTxMsg.Type
+
+		return queryTxParseMsg, nil
 
 	} else if queryTxMsg.Type == "acc_seq" {
 		if queryTxMsg.Value == "" {
-			return []string{}, util.LogErr("`acc_seq` type takes an argument '<addr>/<seq>'")
+			return QueryTxParseMsg{}, util.LogErr("`acc_seq` type takes an argument '<addr>/<seq>'")
 		}
 
 		tmEvents := []string{
 			fmt.Sprintf("%s.%s='%s'", sdk.EventTypeTx, sdk.AttributeKeyAccountSequence, queryTxMsg.Value),
 		}
-		tmEvents = append(tmEvents, queryTxMsg.Type)
-		return tmEvents, nil
+
+		queryTxParseMsg.TmEvents = tmEvents
+		queryTxParseMsg.TxType = queryTxMsg.Type
+
+		return queryTxParseMsg, nil
 
 	} else {
-		return []string{}, util.LogErr("Unknown type")
+		return QueryTxParseMsg{}, util.LogErr("Unknown type")
 	}
 }

@@ -55,8 +55,8 @@ func setTxBuilderMsg(xplac *XplaClient) (cmclient.TxBuilder, error) {
 
 	// Authz module
 	if xplac.MsgType == mauthz.AuthzGrantMsgType {
-		convertMsg, _ := xplac.Msg.(*authz.MsgGrant)
-		builder.SetMsgs(convertMsg)
+		convertMsg, _ := xplac.Msg.(authz.MsgGrant)
+		builder.SetMsgs(&convertMsg)
 
 	} else if xplac.MsgType == mauthz.AuthzRevokeMsgType {
 		convertMsg, _ := xplac.Msg.(authz.MsgRevoke)
@@ -68,22 +68,22 @@ func setTxBuilderMsg(xplac *XplaClient) (cmclient.TxBuilder, error) {
 
 		// Bank module
 	} else if xplac.MsgType == mbank.BankSendMsgType {
-		convertMsg, _ := xplac.Msg.(*banktypes.MsgSend)
-		builder.SetMsgs(convertMsg)
+		convertMsg, _ := xplac.Msg.(banktypes.MsgSend)
+		builder.SetMsgs(&convertMsg)
 
 		// Crisis module
 	} else if xplac.MsgType == mcrisis.CrisisInvariantBrokenMsgType {
-		convertMsg, _ := xplac.Msg.(*crisistypes.MsgVerifyInvariant)
-		builder.SetMsgs(convertMsg)
+		convertMsg, _ := xplac.Msg.(crisistypes.MsgVerifyInvariant)
+		builder.SetMsgs(&convertMsg)
 
 		// Distribution module
 	} else if xplac.MsgType == mdist.DistributionFundCommunityPoolMsgType {
-		convertMsg, _ := xplac.Msg.(*disttypes.MsgFundCommunityPool)
-		builder.SetMsgs(convertMsg)
+		convertMsg, _ := xplac.Msg.(disttypes.MsgFundCommunityPool)
+		builder.SetMsgs(&convertMsg)
 
 	} else if xplac.MsgType == mdist.DistributionProposalCommunityPoolSpendMsgType {
-		convertMsg, _ := xplac.Msg.(*govtypes.MsgSubmitProposal)
-		builder.SetMsgs(convertMsg)
+		convertMsg, _ := xplac.Msg.(govtypes.MsgSubmitProposal)
+		builder.SetMsgs(&convertMsg)
 
 	} else if xplac.MsgType == mdist.DistributionWithdrawRewardsMsgType {
 		convertMsg, _ := xplac.Msg.([]sdk.Msg)
@@ -94,13 +94,13 @@ func setTxBuilderMsg(xplac *XplaClient) (cmclient.TxBuilder, error) {
 		builder.SetMsgs(convertMsg...)
 
 	} else if xplac.MsgType == mdist.DistributionSetWithdrawAddrMsgType {
-		convertMsg, _ := xplac.Msg.(*disttypes.MsgSetWithdrawAddress)
-		builder.SetMsgs(convertMsg)
+		convertMsg, _ := xplac.Msg.(disttypes.MsgSetWithdrawAddress)
+		builder.SetMsgs(&convertMsg)
 
 		// Feegrant module
 	} else if xplac.MsgType == mfeegrant.FeegrantGrantMsgType {
-		convertMsg, _ := xplac.Msg.(*feegrant.MsgGrantAllowance)
-		builder.SetMsgs(convertMsg)
+		convertMsg, _ := xplac.Msg.(feegrant.MsgGrantAllowance)
+		builder.SetMsgs(&convertMsg)
 
 	} else if xplac.MsgType == mfeegrant.FeegrantRevokeGrantMsgType {
 		convertMsg, _ := xplac.Msg.(feegrant.MsgRevokeAllowance)
@@ -108,35 +108,35 @@ func setTxBuilderMsg(xplac *XplaClient) (cmclient.TxBuilder, error) {
 
 		// Gov module
 	} else if xplac.MsgType == mgov.GovSubmitProposalMsgType {
-		convertMsg, _ := xplac.Msg.(*govtypes.MsgSubmitProposal)
-		builder.SetMsgs(convertMsg)
+		convertMsg, _ := xplac.Msg.(govtypes.MsgSubmitProposal)
+		builder.SetMsgs(&convertMsg)
 
 	} else if xplac.MsgType == mgov.GovDepositMsgType {
-		convertMsg, _ := xplac.Msg.(*govtypes.MsgDeposit)
-		builder.SetMsgs(convertMsg)
+		convertMsg, _ := xplac.Msg.(govtypes.MsgDeposit)
+		builder.SetMsgs(&convertMsg)
 
 	} else if xplac.MsgType == mgov.GovVoteMsgType {
-		convertMsg, _ := xplac.Msg.(*govtypes.MsgVote)
-		builder.SetMsgs(convertMsg)
+		convertMsg, _ := xplac.Msg.(govtypes.MsgVote)
+		builder.SetMsgs(&convertMsg)
 
 	} else if xplac.MsgType == mgov.GovWeightedVoteMsgType {
-		convertMsg, _ := xplac.Msg.(*govtypes.MsgVoteWeighted)
-		builder.SetMsgs(convertMsg)
+		convertMsg, _ := xplac.Msg.(govtypes.MsgVoteWeighted)
+		builder.SetMsgs(&convertMsg)
 
 		// Params module
 	} else if xplac.MsgType == mparams.ParamsProposalParamChangeMsgType {
-		convertMsg, _ := xplac.Msg.(*govtypes.MsgSubmitProposal)
-		builder.SetMsgs(convertMsg)
+		convertMsg, _ := xplac.Msg.(govtypes.MsgSubmitProposal)
+		builder.SetMsgs(&convertMsg)
 
 		// Reward module
 	} else if xplac.MsgType == mreward.RewardFundFeeCollectorMsgType {
-		convertMsg, _ := xplac.Msg.(*rewardtypes.MsgFundFeeCollector)
-		builder.SetMsgs(convertMsg)
+		convertMsg, _ := xplac.Msg.(rewardtypes.MsgFundFeeCollector)
+		builder.SetMsgs(&convertMsg)
 
 		// slashing module
 	} else if xplac.MsgType == mslashing.SlahsingUnjailMsgType {
-		convertMsg, _ := xplac.Msg.(*slashingtypes.MsgUnjail)
-		builder.SetMsgs(convertMsg)
+		convertMsg, _ := xplac.Msg.(slashingtypes.MsgUnjail)
+		builder.SetMsgs(&convertMsg)
 
 		// Staking module
 	} else if xplac.MsgType == mstaking.StakingCreateValidatorMsgType {
@@ -144,29 +144,29 @@ func setTxBuilderMsg(xplac *XplaClient) (cmclient.TxBuilder, error) {
 		builder.SetMsgs(convertMsg)
 
 	} else if xplac.MsgType == mstaking.StakingEditValidatorMsgType {
-		convertMsg, _ := xplac.Msg.(*stakingtypes.MsgEditValidator)
-		builder.SetMsgs(convertMsg)
+		convertMsg, _ := xplac.Msg.(stakingtypes.MsgEditValidator)
+		builder.SetMsgs(&convertMsg)
 
 	} else if xplac.MsgType == mstaking.StakingDelegateMsgType {
-		convertMsg, _ := xplac.Msg.(*stakingtypes.MsgDelegate)
-		builder.SetMsgs(convertMsg)
+		convertMsg, _ := xplac.Msg.(stakingtypes.MsgDelegate)
+		builder.SetMsgs(&convertMsg)
 
 	} else if xplac.MsgType == mstaking.StakingUnbondMsgType {
-		convertMsg, _ := xplac.Msg.(*stakingtypes.MsgUndelegate)
-		builder.SetMsgs(convertMsg)
+		convertMsg, _ := xplac.Msg.(stakingtypes.MsgUndelegate)
+		builder.SetMsgs(&convertMsg)
 
 	} else if xplac.MsgType == mstaking.StakingRedelegateMsgType {
-		convertMsg, _ := xplac.Msg.(*stakingtypes.MsgBeginRedelegate)
-		builder.SetMsgs(convertMsg)
+		convertMsg, _ := xplac.Msg.(stakingtypes.MsgBeginRedelegate)
+		builder.SetMsgs(&convertMsg)
 
 		// Upgrade module
 	} else if xplac.MsgType == mupgrade.UpgradeProposalSoftwareUpgradeMsgType {
-		convertMsg, _ := xplac.Msg.(*govtypes.MsgSubmitProposal)
-		builder.SetMsgs(convertMsg)
+		convertMsg, _ := xplac.Msg.(govtypes.MsgSubmitProposal)
+		builder.SetMsgs(&convertMsg)
 
 	} else if xplac.MsgType == mupgrade.UpgradeCancelSoftwareUpgradeMsgType {
-		convertMsg, _ := xplac.Msg.(*govtypes.MsgSubmitProposal)
-		builder.SetMsgs(convertMsg)
+		convertMsg, _ := xplac.Msg.(govtypes.MsgSubmitProposal)
+		builder.SetMsgs(&convertMsg)
 
 		// Wasm module
 	} else if xplac.MsgType == mwasm.WasmStoreMsgType {

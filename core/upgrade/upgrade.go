@@ -9,20 +9,20 @@ import (
 )
 
 // (Tx) make msg - software upgrade
-func MakeProposalSoftwareUpgradeMsg(softwareUpgradeMsg types.SoftwareUpgradeMsg, privKey key.PrivateKey) (*govtypes.MsgSubmitProposal, error) {
+func MakeProposalSoftwareUpgradeMsg(softwareUpgradeMsg types.SoftwareUpgradeMsg, privKey key.PrivateKey) (govtypes.MsgSubmitProposal, error) {
 	msg, err := parseProposalSoftwareUpgradeArgs(softwareUpgradeMsg, privKey)
 	if err != nil {
-		return nil, err
+		return govtypes.MsgSubmitProposal{}, err
 	}
 
 	return msg, nil
 }
 
 // (Tx) make msg - cancel software upgrade
-func MakeCancelSoftwareUpgradeMsg(cancelSoftwareUpgradeMsg types.CancelSoftwareUpgradeMsg, privKey key.PrivateKey) (*govtypes.MsgSubmitProposal, error) {
+func MakeCancelSoftwareUpgradeMsg(cancelSoftwareUpgradeMsg types.CancelSoftwareUpgradeMsg, privKey key.PrivateKey) (govtypes.MsgSubmitProposal, error) {
 	msg, err := parseCancelSoftwareUpgradeArgs(cancelSoftwareUpgradeMsg, privKey)
 	if err != nil {
-		return nil, err
+		return govtypes.MsgSubmitProposal{}, err
 	}
 
 	return msg, nil
@@ -30,40 +30,24 @@ func MakeCancelSoftwareUpgradeMsg(cancelSoftwareUpgradeMsg types.CancelSoftwareU
 
 // (Query) make msg - applied
 func MakeAppliedMsg(appliedMsg types.AppliedMsg) (upgradetypes.QueryAppliedPlanRequest, error) {
-	msg, err := parseAppliedArgs(appliedMsg)
-	if err != nil {
-		return upgradetypes.QueryAppliedPlanRequest{}, err
-	}
-
-	return msg, nil
+	return upgradetypes.QueryAppliedPlanRequest{
+		Name: appliedMsg.UpgradeName,
+	}, nil
 }
 
 // (Query) make msg - module version
 func MakeQueryModuleVersionMsg(queryModulesVersionMsg types.QueryModulesVersionMsg) (upgradetypes.QueryModuleVersionsRequest, error) {
-	msg, err := parseQueryModulesVersionsArgs(queryModulesVersionMsg)
-	if err != nil {
-		return upgradetypes.QueryModuleVersionsRequest{}, err
-	}
-
-	return msg, nil
+	return upgradetypes.QueryModuleVersionsRequest{
+		ModuleName: queryModulesVersionMsg.ModuleName,
+	}, nil
 }
 
 // (Query) make msg - all module versions
 func MakeQueryAllModuleVersionMsg() (upgradetypes.QueryModuleVersionsRequest, error) {
-	msg, err := parseQueryAllModulesVersionsArgs()
-	if err != nil {
-		return upgradetypes.QueryModuleVersionsRequest{}, err
-	}
-
-	return msg, nil
+	return upgradetypes.QueryModuleVersionsRequest{}, nil
 }
 
 // (Query) make msg - plan
 func MakePlanMsg() (upgradetypes.QueryCurrentPlanRequest, error) {
-	msg, err := parsePlanArgs()
-	if err != nil {
-		return upgradetypes.QueryCurrentPlanRequest{}, err
-	}
-
-	return msg, nil
+	return upgradetypes.QueryCurrentPlanRequest{}, nil
 }

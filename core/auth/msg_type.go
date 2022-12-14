@@ -8,3 +8,14 @@ const (
 	AuthQueryTxsByEventsMsgType = "query-txs-by-events"
 	AuthQueryTxMsgType          = "query-tx"
 )
+
+type QueryTxsByEventParseMsg struct {
+	TmEvents []string
+	Page     int
+	Limit    int
+}
+
+type QueryTxParseMsg struct {
+	TmEvents []string
+	TxType   string
+}
