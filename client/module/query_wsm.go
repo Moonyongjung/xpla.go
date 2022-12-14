@@ -2,7 +2,7 @@ package module
 
 import (
 	"encoding/base64"
-	"io/ioutil"
+	"os"
 	"strings"
 
 	mwasm "github.com/Moonyongjung/xpla.go/core/wasm"
@@ -72,7 +72,7 @@ func queryByGrpcWasm(i IXplaClient) (string, error) {
 		if err != nil {
 			return "", err
 		}
-		ioutil.WriteFile(downloadFileName, res.Data, 0o600)
+		os.WriteFile(downloadFileName, res.Data, 0o600)
 		return "download complete", nil
 
 	// Wasm code info
