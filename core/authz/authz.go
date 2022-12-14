@@ -8,10 +8,10 @@ import (
 )
 
 // (Tx) make msg - authz grant
-func MakeAuthzGrantMsg(authzGrantMsg types.AuthzGrantMsg, privKey key.PrivateKey) (*authz.MsgGrant, error) {
+func MakeAuthzGrantMsg(authzGrantMsg types.AuthzGrantMsg, privKey key.PrivateKey) (authz.MsgGrant, error) {
 	msg, err := parseAuthzGrantArgs(authzGrantMsg, privKey)
 	if err != nil {
-		return nil, err
+		return authz.MsgGrant{}, err
 	}
 
 	return msg, nil

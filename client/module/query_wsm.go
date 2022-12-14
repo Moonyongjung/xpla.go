@@ -2,11 +2,12 @@ package module
 
 import (
 	"encoding/base64"
-	"io/ioutil"
+	"os"
 	"strings"
 
 	mwasm "github.com/Moonyongjung/xpla.go/core/wasm"
 	"github.com/Moonyongjung/xpla.go/types"
+	"github.com/Moonyongjung/xpla.go/types/errors"
 	"github.com/Moonyongjung/xpla.go/util"
 
 	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
@@ -33,7 +34,7 @@ func queryByGrpcWasm(i IXplaClient) (string, error) {
 			&convertMsg,
 		)
 		if err != nil {
-			return "", err
+			return "", util.LogErr(errors.ErrGrpcRequest, err)
 		}
 
 	// Wasm list code
@@ -44,7 +45,7 @@ func queryByGrpcWasm(i IXplaClient) (string, error) {
 			&convertMsg,
 		)
 		if err != nil {
-			return "", err
+			return "", util.LogErr(errors.ErrGrpcRequest, err)
 		}
 
 	// Wasm list contract by code
@@ -55,7 +56,7 @@ func queryByGrpcWasm(i IXplaClient) (string, error) {
 			&convertMsg,
 		)
 		if err != nil {
-			return "", err
+			return "", util.LogErr(errors.ErrGrpcRequest, err)
 		}
 
 	// Wasm download
@@ -70,9 +71,9 @@ func queryByGrpcWasm(i IXplaClient) (string, error) {
 			&convertMsg,
 		)
 		if err != nil {
-			return "", err
+			return "", util.LogErr(errors.ErrGrpcRequest, err)
 		}
-		ioutil.WriteFile(downloadFileName, res.Data, 0o600)
+		os.WriteFile(downloadFileName, res.Data, 0o600)
 		return "download complete", nil
 
 	// Wasm code info
@@ -83,7 +84,7 @@ func queryByGrpcWasm(i IXplaClient) (string, error) {
 			&convertMsg,
 		)
 		if err != nil {
-			return "", err
+			return "", util.LogErr(errors.ErrGrpcRequest, err)
 		}
 
 	// Wasm contract info
@@ -94,7 +95,7 @@ func queryByGrpcWasm(i IXplaClient) (string, error) {
 			&convertMsg,
 		)
 		if err != nil {
-			return "", err
+			return "", util.LogErr(errors.ErrGrpcRequest, err)
 		}
 
 	// Wasm contract state all
@@ -105,7 +106,7 @@ func queryByGrpcWasm(i IXplaClient) (string, error) {
 			&convertMsg,
 		)
 		if err != nil {
-			return "", err
+			return "", util.LogErr(errors.ErrGrpcRequest, err)
 		}
 
 	// Wasm contract history
@@ -116,7 +117,7 @@ func queryByGrpcWasm(i IXplaClient) (string, error) {
 			&convertMsg,
 		)
 		if err != nil {
-			return "", err
+			return "", util.LogErr(errors.ErrGrpcRequest, err)
 		}
 
 	// Wasm pinned
@@ -127,7 +128,7 @@ func queryByGrpcWasm(i IXplaClient) (string, error) {
 			&convertMsg,
 		)
 		if err != nil {
-			return "", err
+			return "", util.LogErr(errors.ErrGrpcRequest, err)
 		}
 
 	// Wasm libwasmvm version
@@ -136,7 +137,7 @@ func queryByGrpcWasm(i IXplaClient) (string, error) {
 		return convertMsg, nil
 
 	default:
-		return "", util.LogErr("invalid msg type")
+		return "", util.LogErr(errors.ErrInvalidMsgType, i.Ixplac.GetMsgType())
 	}
 
 	out, err = printProto(i, res)
@@ -180,8 +181,7 @@ func queryByLcdWasm(i IXplaClient) (string, error) {
 
 	// Wasm download
 	case i.Ixplac.GetMsgType() == mwasm.WasmDownloadMsgType:
-
-		return "", util.LogErr("unsupported download wasm file by using LCD. query delegations of a delegator")
+		return "", util.LogErr(errors.ErrNotSupport, "unsupported download wasm file by using LCD. query delegations of a delegator")
 
 	// Wasm code info
 	case i.Ixplac.GetMsgType() == mwasm.WasmCodeInfoMsgType:
@@ -218,7 +218,7 @@ func queryByLcdWasm(i IXplaClient) (string, error) {
 		return convertMsg, nil
 
 	default:
-		return "", util.LogErr("invalid msg type")
+		return "", util.LogErr(errors.ErrInvalidMsgType, i.Ixplac.GetMsgType())
 	}
 
 	out, err := util.CtxHttpClient("GET", i.Ixplac.GetLcdURL()+url, nil, i.Ixplac.GetContext())

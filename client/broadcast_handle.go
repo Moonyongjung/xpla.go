@@ -6,7 +6,9 @@ import (
 
 	mevm "github.com/Moonyongjung/xpla.go/core/evm"
 	"github.com/Moonyongjung/xpla.go/types"
+	"github.com/Moonyongjung/xpla.go/types/errors"
 	"github.com/Moonyongjung/xpla.go/util"
+
 	txtypes "github.com/cosmos/cosmos-sdk/types/tx"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	evmtypes "github.com/ethereum/go-ethereum/core/types"
@@ -25,7 +27,7 @@ func broadcastTx(xplac *XplaClient, txBytes []byte, mode txtypes.BroadcastMode) 
 	if xplac.Opts.GrpcURL == "" {
 		reqBytes, err := json.Marshal(broadcastReq)
 		if err != nil {
-			return nil, util.LogErr(err, "failed to marshal")
+			return nil, util.LogErr(errors.ErrFailedToMarshal, err)
 		}
 
 		out, err := util.CtxHttpClient("POST", xplac.Opts.LcdURL+broadcastUrl, reqBytes, xplac.Context)
@@ -36,12 +38,12 @@ func broadcastTx(xplac *XplaClient, txBytes []byte, mode txtypes.BroadcastMode) 
 		var broadcastTxResponse txtypes.BroadcastTxResponse
 		err = xplac.EncodingConfig.Marshaler.UnmarshalJSON(out, &broadcastTxResponse)
 		if err != nil {
-			return nil, util.LogErr(err, "failed to unmarshal response")
+			return nil, util.LogErr(errors.ErrFailedToUnmarshal, err)
 		}
 
 		txResponse := broadcastTxResponse.TxResponse
 		if txResponse.Code != 0 {
-			return &xplaTxRes, util.LogErr("tx failed with code", txResponse.Code, ":", txResponse.RawLog)
+			return &xplaTxRes, util.LogErr(errors.ErrTxFailed, "with code", txResponse.Code, ":", txResponse.RawLog)
 		}
 
 		xplaTxRes.Response = txResponse
@@ -49,7 +51,7 @@ func broadcastTx(xplac *XplaClient, txBytes []byte, mode txtypes.BroadcastMode) 
 		txClient := txtypes.NewServiceClient(xplac.Grpc)
 		txResponse, err := txClient.BroadcastTx(xplac.Context, &broadcastReq)
 		if err != nil {
-			return nil, err
+			return nil, util.LogErr(errors.ErrGrpcRequest, err)
 		}
 		xplaTxRes.Response = txResponse.TxResponse
 	}
@@ -66,47 +68,47 @@ func broadcastTxEvm(xplac *XplaClient, txBytes []byte, broadcastMode string, evm
 		var signedTx evmtypes.Transaction
 		err := signedTx.UnmarshalJSON(txBytes)
 		if err != nil {
-			return nil, err
+			return nil, util.LogErr(errors.ErrFailedToUnmarshal, err)
 		}
 
 		err = evmClient.Client.SendTransaction(evmClient.Ctx, &signedTx)
 		if err != nil {
-			return nil, err
+			return nil, util.LogErr(errors.ErrEvmRpcRequest, err)
 		}
 
 		return checkEvmBroadcastMode(broadcastMode, evmClient, &signedTx)
 
 	case xplac.MsgType == mevm.EvmDeploySolContractMsgType:
-		var deployTx deploySolTx
+		var deployTx mevm.DeploySolTx
 
 		err := json.Unmarshal(txBytes, &deployTx)
 		if err != nil {
-			return nil, err
+			return nil, util.LogErr(errors.ErrFailedToUnmarshal, err)
 		}
 
 		ethPrivKey, err := toECDSA(xplac.Opts.PrivateKey)
 		if err != nil {
-			return nil, err
+			return nil, util.LogErr(errors.ErrCannotConvert, err)
 		}
 
 		contractAuth, err := bind.NewKeyedTransactorWithChainID(ethPrivKey, deployTx.ChainId)
 		if err != nil {
-			return nil, err
+			return nil, util.LogErr(errors.ErrInsufficientParams, err)
 		}
 		contractAuth.Nonce = deployTx.Nonce
 		contractAuth.Value = deployTx.Value
 		contractAuth.GasLimit = deployTx.GasLimit
 		contractAuth.GasPrice = deployTx.GasPrice
 
-		_, transaction, _, err := mevm.DeployXplaSolContract(contractAuth, evmClient.Client)
+		_, transaction, _, err := util.DeployXplaSolContract(contractAuth, evmClient.Client)
 		if err != nil {
-			return nil, err
+			return nil, util.LogErr(errors.ErrEvmRpcRequest, err)
 		}
 
 		return checkEvmBroadcastMode(broadcastMode, evmClient, transaction)
 
 	default:
-		return nil, util.LogErr("invalid evm msg type")
+		return nil, util.LogErr(errors.ErrInvalidMsgType, "invalid EVM msg type:", xplac.MsgType)
 	}
 }
 
@@ -136,7 +138,7 @@ func waitTxReceipt(evmClient *util.EvmClient, signedTx *evmtypes.Transaction) (*
 		if err != nil {
 			count = count - 1
 			if count < 0 {
-				return nil, err
+				return nil, util.LogErr(errors.ErrEvmRpcRequest, "cannot receive the transaction receipt in count time is", count)
 			}
 			time.Sleep(time.Second * 1)
 		} else {

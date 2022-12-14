@@ -10,6 +10,7 @@ import (
 	"github.com/Moonyongjung/xpla.go/core"
 	mdist "github.com/Moonyongjung/xpla.go/core/distribution"
 	"github.com/Moonyongjung/xpla.go/types"
+	"github.com/Moonyongjung/xpla.go/types/errors"
 	"github.com/Moonyongjung/xpla.go/util"
 	"github.com/Moonyongjung/xpla.go/util/testutil"
 
@@ -560,7 +561,7 @@ func NewPubKeyFromHex(pk string) (cryptotypes.PubKey, error) {
 		panic(err)
 	}
 	if len(pkBytes) != ed25519.PubKeySize {
-		return nil, util.LogErr("invalid pubkey size")
+		return nil, util.LogErr(errors.ErrInvalidRequest, "invalid pubkey size")
 	}
 	return &ed25519.PubKey{Key: pkBytes}, nil
 }

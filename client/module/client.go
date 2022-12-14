@@ -3,8 +3,8 @@ package module
 import (
 	"context"
 
-	mevm "github.com/Moonyongjung/xpla.go/core/evm"
 	"github.com/Moonyongjung/xpla.go/key"
+	"github.com/Moonyongjung/xpla.go/types/errors"
 	"github.com/Moonyongjung/xpla.go/util"
 	cmclient "github.com/cosmos/cosmos-sdk/client"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -55,50 +55,11 @@ func NewIXplaClient(moduleClient ModuleClient, qt uint8) *IXplaClient {
 	return &IXplaClient{Ixplac: moduleClient, QueryType: qt}
 }
 
-// For invoke(as execute) contract, parameters are packed by using ABI.
-func GetAbiPack(callName string, args ...interface{}) ([]byte, error) {
-	contractAbi, err := mevm.XplaSolContractMetaData.GetAbi()
-	if err != nil {
-		return nil, err
-	}
-
-	var abiByteData []byte
-
-	if args == nil {
-		abiByteData, err = contractAbi.Pack(callName)
-		if err != nil {
-			return nil, err
-		}
-	} else {
-		abiByteData, err = contractAbi.Pack(callName, args...)
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	return abiByteData, nil
-}
-
-// After call(as query) solidity contract, the response of chain is unpacked by ABI.
-func GetAbiUnpack(callName string, data []byte) ([]interface{}, error) {
-	contractAbi, err := mevm.XplaSolContractMetaData.GetAbi()
-	if err != nil {
-		return nil, err
-	}
-
-	unpacked, err := contractAbi.Unpack(callName, data)
-	if err != nil {
-		return nil, err
-	}
-
-	return unpacked, nil
-}
-
 // Print protobuf message by using cosmos sdk codec.
 func printProto(i IXplaClient, toPrint proto.Message) ([]byte, error) {
 	out, err := i.Ixplac.GetEncoding().Marshaler.MarshalJSON(toPrint)
 	if err != nil {
-		return nil, err
+		return nil, util.LogErr(errors.ErrFailedToMarshal, err)
 	}
 	return out, nil
 }
@@ -107,7 +68,7 @@ func printProto(i IXplaClient, toPrint proto.Message) ([]byte, error) {
 func printObjectLegacy(i IXplaClient, toPrint interface{}) ([]byte, error) {
 	out, err := i.Ixplac.GetEncoding().Amino.MarshalJSON(toPrint)
 	if err != nil {
-		return nil, err
+		return nil, util.LogErr(errors.ErrFailedToMarshal, err)
 	}
 	return out, nil
 }
@@ -116,7 +77,7 @@ func printObjectLegacy(i IXplaClient, toPrint interface{}) ([]byte, error) {
 func clientForQuery(i IXplaClient) (cmclient.Context, error) {
 	client, err := cmclient.NewClientFromNode(i.Ixplac.GetRpc())
 	if err != nil {
-		return cmclient.Context{}, err
+		return cmclient.Context{}, util.LogErr(errors.ErrSdkClient, err)
 	}
 
 	clientCtx, err := util.NewClient()

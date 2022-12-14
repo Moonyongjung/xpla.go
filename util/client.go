@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/Moonyongjung/xpla.go/types"
+	"github.com/Moonyongjung/xpla.go/types/errors"
 	cmclient "github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/tx"
 	"github.com/cosmos/cosmos-sdk/crypto/keyring"
@@ -29,7 +30,7 @@ func NewClient() (cmclient.Context, error) {
 	encodingConfig := MakeEncodingConfig()
 	clientKeyring, err := NewKeyring(BackendMemory, "")
 	if err != nil {
-		return cmclient.Context{}, err
+		return cmclient.Context{}, LogErr(errors.ErrKeyNotFound, err)
 	}
 
 	clientCtx = clientCtx.
@@ -63,7 +64,7 @@ func NewEvmClient(evmRpcUrl string, ctx context.Context) (*EvmClient, error) {
 	httpDefaultTransport := http.DefaultTransport
 	defaultTransportPointer, ok := httpDefaultTransport.(*http.Transport)
 	if !ok {
-		return nil, LogErr("default transport pointer err")
+		return nil, LogErr(errors.ErrInvalidRequest, "default transport pointer err")
 	}
 	defaultTransport := *defaultTransportPointer
 	defaultTransport.DisableKeepAlives = true
@@ -71,7 +72,7 @@ func NewEvmClient(evmRpcUrl string, ctx context.Context) (*EvmClient, error) {
 	httpClient := &http.Client{Transport: &defaultTransport}
 	rpcClient, err := erpc.DialHTTPWithClient(evmRpcUrl, httpClient)
 	if err != nil {
-		return nil, err
+		return nil, LogErr(errors.ErrEvmRpcRequest, err)
 	}
 
 	ethClient := ethclient.NewClient(rpcClient)
@@ -90,7 +91,7 @@ func NewKeyring(backendType string, keyringPath string) (keyring.Keyring, error)
 			hd.EthSecp256k1Option(),
 		)
 		if err != nil {
-			return nil, err
+			return nil, LogErr(errors.ErrKeyNotFound, err)
 		}
 
 		return k, nil
@@ -104,12 +105,12 @@ func NewKeyring(backendType string, keyringPath string) (keyring.Keyring, error)
 			hd.EthSecp256k1Option(),
 		)
 		if err != nil {
-			return nil, err
+			return nil, LogErr(errors.ErrKeyNotFound, err)
 		}
 
 		return k, nil
 	} else {
-		return nil, LogErr("invalid keyring backend type")
+		return nil, LogErr(errors.ErrInvalidMsgType, "invalid keyring backend type")
 	}
 }
 
@@ -133,26 +134,26 @@ func CtxHttpClient(methodType string, url string, reqBody []byte, ctx context.Co
 	if methodType == "GET" {
 		resp, err = ctxhttp.Get(ctx, httpClient, url)
 		if err != nil {
-			return nil, LogErr(err, "failed GET method")
+			return nil, LogErr(errors.ErrHttpRequest, "failed GET method", err)
 		}
 	} else if methodType == "POST" {
 		resp, err = ctxhttp.Post(ctx, httpClient, url, "application/json", bytes.NewBuffer(reqBody))
 		if err != nil {
-			return nil, LogErr(err, "failed POST method")
+			return nil, LogErr(errors.ErrHttpRequest, "failed POST method", err)
 		}
 	} else {
-		return nil, LogErr(err, "not correct method")
+		return nil, LogErr(errors.ErrHttpRequest, "not correct method", err)
 	}
 
 	defer resp.Body.Close()
 
 	out, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return nil, LogErr(err, "failed to read response")
+		return nil, LogErr(errors.ErrHttpRequest, "failed to read response", err)
 	}
 
 	if resp.StatusCode != 200 {
-		return nil, LogErr(resp.StatusCode, ":", string(out))
+		return nil, LogErr(errors.ErrHttpRequest, resp.StatusCode, ":", string(out))
 	}
 
 	return out, nil

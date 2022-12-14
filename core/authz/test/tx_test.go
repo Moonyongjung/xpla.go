@@ -9,6 +9,7 @@ import (
 	mauthz "github.com/Moonyongjung/xpla.go/core/authz"
 	"github.com/Moonyongjung/xpla.go/key"
 	"github.com/Moonyongjung/xpla.go/types"
+	"github.com/Moonyongjung/xpla.go/types/errors"
 	"github.com/Moonyongjung/xpla.go/util"
 	"github.com/Moonyongjung/xpla.go/util/testutil"
 
@@ -228,7 +229,7 @@ func SimulateMsgGrant(ak authz.AccountKeeper, bk authz.BankKeeper, _ keeper.Keep
 		txCfg := util.MakeEncodingConfig().TxConfig
 		tx, err := testutil.GenTx(
 			txCfg,
-			[]sdk.Msg{msg},
+			[]sdk.Msg{&msg},
 			fees,
 			testutil.DefaultTestGenTxGas,
 			chainID,
@@ -242,9 +243,9 @@ func SimulateMsgGrant(ak authz.AccountKeeper, bk authz.BankKeeper, _ keeper.Keep
 
 		_, _, err = app.Deliver(txCfg.TxEncoder(), tx)
 		if err != nil {
-			return simtypes.NoOpMsg(authz.ModuleName, sdk.MsgTypeURL(msg), "unable to deliver tx"), nil, err
+			return simtypes.NoOpMsg(authz.ModuleName, sdk.MsgTypeURL(&msg), "unable to deliver tx"), nil, err
 		}
-		return simtypes.NewOperationMsg(msg, true, "", nil), nil, err
+		return simtypes.NewOperationMsg(&msg, true, "", nil), nil, err
 	}
 }
 
@@ -271,7 +272,7 @@ func SimulateMsgRevoke(ak authz.AccountKeeper, bk authz.BankKeeper, k keeper.Kee
 
 		granterAcc, ok := simtypes.FindAccount(accs, granterAddr)
 		if !ok {
-			return simtypes.NoOpMsg(authz.ModuleName, TypeMsgRevoke, "account not found"), nil, util.LogErr("account not found")
+			return simtypes.NoOpMsg(authz.ModuleName, TypeMsgRevoke, "account not found"), nil, util.LogErr(errors.ErrInvalidRequest, "account not found")
 		}
 
 		spendableCoins := bk.SpendableCoins(ctx, granterAddr)
@@ -346,11 +347,11 @@ func SimulateMsgExec(ak authz.AccountKeeper, bk authz.BankKeeper, k keeper.Keepe
 
 		grantee, ok := simtypes.FindAccount(accs, granteeAddr)
 		if !ok {
-			return simtypes.NoOpMsg(authz.ModuleName, TypeMsgRevoke, "Account not found"), nil, util.LogErr("grantee account not found")
+			return simtypes.NoOpMsg(authz.ModuleName, TypeMsgRevoke, "Account not found"), nil, util.LogErr(errors.ErrInvalidRequest, "grantee account not found")
 		}
 
 		if _, ok := simtypes.FindAccount(accs, granterAddr); !ok {
-			return simtypes.NoOpMsg(authz.ModuleName, TypeMsgRevoke, "Account not found"), nil, util.LogErr("granter account not found")
+			return simtypes.NoOpMsg(authz.ModuleName, TypeMsgRevoke, "Account not found"), nil, util.LogErr(errors.ErrInvalidRequest, "granter account not found")
 		}
 
 		granterspendableCoins := bk.SpendableCoins(ctx, granterAddr)

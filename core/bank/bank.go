@@ -1,76 +1,71 @@
 package bank
 
 import (
+	"github.com/Moonyongjung/xpla.go/core"
 	"github.com/Moonyongjung/xpla.go/key"
 	"github.com/Moonyongjung/xpla.go/types"
+	"github.com/Moonyongjung/xpla.go/types/errors"
 	"github.com/Moonyongjung/xpla.go/util"
-	bank "github.com/cosmos/cosmos-sdk/x/bank/types"
+
+	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 )
 
 // (Tx) make msg - bank send
-func MakeBankSendMsg(bankSendMsg types.BankSendMsg, privKey key.PrivateKey) (*bank.MsgSend, error) {
+func MakeBankSendMsg(bankSendMsg types.BankSendMsg, privKey key.PrivateKey) (banktypes.MsgSend, error) {
 	msg, err := parseBankSendArgs(bankSendMsg, privKey)
 	if err != nil {
-		return nil, err
+		return banktypes.MsgSend{}, err
 	}
 
 	return msg, nil
 }
 
 // (Query) make msg - all balances
-func MakeBankAllBalancesMsg(bankBalancesMsg types.BankBalancesMsg) (*bank.QueryAllBalancesRequest, error) {
+func MakeBankAllBalancesMsg(bankBalancesMsg types.BankBalancesMsg) (banktypes.QueryAllBalancesRequest, error) {
 	if (types.BankBalancesMsg{}) == bankBalancesMsg {
-		return &bank.QueryAllBalancesRequest{}, util.LogErr("Empty request or type of parameter is not correct")
+		return banktypes.QueryAllBalancesRequest{}, util.LogErr(errors.ErrInsufficientParams, "Empty request or type of parameter is not correct")
 	}
 
 	msg, err := parseBankAllBalancesArgs(bankBalancesMsg)
 	if err != nil {
-		return &bank.QueryAllBalancesRequest{}, err
+		return banktypes.QueryAllBalancesRequest{}, err
 	}
 
 	return msg, nil
 }
 
 // (Query) make msg - balance
-func MakeBankBalanceMsg(bankBalancesMsg types.BankBalancesMsg) (*bank.QueryBalanceRequest, error) {
+func MakeBankBalanceMsg(bankBalancesMsg types.BankBalancesMsg) (banktypes.QueryBalanceRequest, error) {
 	if (types.BankBalancesMsg{}) == bankBalancesMsg {
-		return &bank.QueryBalanceRequest{}, util.LogErr("Empty request or type of parameter is not correct")
+		return banktypes.QueryBalanceRequest{}, util.LogErr(errors.ErrInsufficientParams, "Empty request or type of parameter is not correct")
 	}
 
 	msg, err := parseBankBalanceArgs(bankBalancesMsg)
 	if err != nil {
-		return &bank.QueryBalanceRequest{}, err
+		return banktypes.QueryBalanceRequest{}, err
 	}
 
 	return msg, nil
 }
 
 // (Query) make msg - denominations metadata
-func MakeDenomsMetaDataMsg() (bank.QueryDenomsMetadataRequest, error) {
-	msg := parseDenomsMetaDataArgs()
-	return msg, nil
+func MakeDenomsMetaDataMsg() (banktypes.QueryDenomsMetadataRequest, error) {
+	return banktypes.QueryDenomsMetadataRequest{}, nil
 }
 
 // (Query) make msg - denomination metadata
-func MakeDenomMetaDataMsg(denomMetadataMsg types.DenomMetadataMsg) (bank.QueryDenomMetadataRequest, error) {
-	msg := parseDenomMetaDataArgs(denomMetadataMsg)
-	return msg, nil
+func MakeDenomMetaDataMsg(denomMetadataMsg types.DenomMetadataMsg) (banktypes.QueryDenomMetadataRequest, error) {
+	return banktypes.QueryDenomMetadataRequest{
+		Denom: denomMetadataMsg.Denom,
+	}, nil
 }
 
 // (Query) make msg - total supply
-func MakeTotalSupplyMsg() (bank.QueryTotalSupplyRequest, error) {
-	msg, err := parseTotalArgs()
-	if err != nil {
-		return bank.QueryTotalSupplyRequest{}, err
-	}
-	return msg, nil
+func MakeTotalSupplyMsg() (banktypes.QueryTotalSupplyRequest, error) {
+	return banktypes.QueryTotalSupplyRequest{Pagination: core.PageRequest}, nil
 }
 
 // (Query) make msg - supply of
-func MakeSupplyOfMsg(totalMsg types.TotalMsg) (bank.QuerySupplyOfRequest, error) {
-	msg, err := parseSupplyOfArgs(totalMsg)
-	if err != nil {
-		return bank.QuerySupplyOfRequest{}, err
-	}
-	return msg, nil
+func MakeSupplyOfMsg(totalMsg types.TotalMsg) (banktypes.QuerySupplyOfRequest, error) {
+	return banktypes.QuerySupplyOfRequest{Denom: totalMsg.Denom}, nil
 }

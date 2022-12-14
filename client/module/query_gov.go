@@ -3,6 +3,7 @@ package module
 import (
 	mgov "github.com/Moonyongjung/xpla.go/core/gov"
 	"github.com/Moonyongjung/xpla.go/types"
+	"github.com/Moonyongjung/xpla.go/types/errors"
 	"github.com/Moonyongjung/xpla.go/util"
 
 	govv1beta1 "cosmossdk.io/api/cosmos/gov/v1beta1"
@@ -32,7 +33,7 @@ func queryByGrpcGov(i IXplaClient) (string, error) {
 			&convertMsg,
 		)
 		if err != nil {
-			return "", err
+			return "", util.LogErr(errors.ErrGrpcRequest, err)
 		}
 
 	// Gov proposals
@@ -43,7 +44,7 @@ func queryByGrpcGov(i IXplaClient) (string, error) {
 			&convertMsg,
 		)
 		if err != nil {
-			return "", err
+			return "", util.LogErr(errors.ErrGrpcRequest, err)
 		}
 
 	// Gov deposit parameter
@@ -59,7 +60,7 @@ func queryByGrpcGov(i IXplaClient) (string, error) {
 
 		resByTxQuery, err := govutils.QueryDepositByTxQuery(clientCtx, convertMsg)
 		if err != nil {
-			return "", err
+			return "", util.LogErr(errors.ErrGrpcRequest, err)
 		}
 		clientCtx.Codec.MustUnmarshalJSON(resByTxQuery, &deposit)
 		res = &deposit
@@ -72,7 +73,7 @@ func queryByGrpcGov(i IXplaClient) (string, error) {
 			&convertMsg,
 		)
 		if err != nil {
-			return "", err
+			return "", util.LogErr(errors.ErrGrpcRequest, err)
 		}
 
 	// Gov deposits parameter
@@ -87,7 +88,7 @@ func queryByGrpcGov(i IXplaClient) (string, error) {
 
 		resByTxQuery, err := govutils.QueryDepositsByTxQuery(clientCtx, convertMsg)
 		if err != nil {
-			return "", err
+			return "", util.LogErr(errors.ErrGrpcRequest, err)
 		}
 		clientCtx.Codec.MustUnmarshalJSON(resByTxQuery, &deposit)
 		res = &deposit
@@ -100,7 +101,7 @@ func queryByGrpcGov(i IXplaClient) (string, error) {
 			&convertMsg,
 		)
 		if err != nil {
-			return "", err
+			return "", util.LogErr(errors.ErrGrpcRequest, err)
 		}
 
 	// Gov tally
@@ -111,7 +112,7 @@ func queryByGrpcGov(i IXplaClient) (string, error) {
 			&convertMsg,
 		)
 		if err != nil {
-			return "", err
+			return "", util.LogErr(errors.ErrGrpcRequest, err)
 		}
 
 	// Gov params
@@ -121,7 +122,7 @@ func queryByGrpcGov(i IXplaClient) (string, error) {
 			&govtypes.QueryParamsRequest{ParamsType: "voting"},
 		)
 		if err != nil {
-			return "", err
+			return "", util.LogErr(errors.ErrGrpcRequest, err)
 		}
 
 		tallyRes, err := queryClient.Params(
@@ -129,7 +130,7 @@ func queryByGrpcGov(i IXplaClient) (string, error) {
 			&govtypes.QueryParamsRequest{ParamsType: "tallying"},
 		)
 		if err != nil {
-			return "", err
+			return "", util.LogErr(errors.ErrGrpcRequest, err)
 		}
 
 		depositRes, err := queryClient.Params(
@@ -137,7 +138,7 @@ func queryByGrpcGov(i IXplaClient) (string, error) {
 			&govtypes.QueryParamsRequest{ParamsType: "deposit"},
 		)
 		if err != nil {
-			return "", err
+			return "", util.LogErr(errors.ErrGrpcRequest, err)
 		}
 
 		govAllParams := govtypes.NewParams(
@@ -148,7 +149,7 @@ func queryByGrpcGov(i IXplaClient) (string, error) {
 
 		bytes, err := util.JsonMarshalData(govAllParams)
 		if err != nil {
-			return "", err
+			return "", util.LogErr(errors.ErrFailedToMarshal, err)
 		}
 		return string(bytes), nil
 
@@ -160,12 +161,12 @@ func queryByGrpcGov(i IXplaClient) (string, error) {
 			&convertMsg,
 		)
 		if err != nil {
-			return "", err
+			return "", util.LogErr(errors.ErrGrpcRequest, err)
 		}
 
 		bytes, err := util.JsonMarshalData(resParams.GetVotingParams())
 		if err != nil {
-			return "", err
+			return "", util.LogErr(errors.ErrFailedToMarshal, err)
 		}
 		return string(bytes), nil
 
@@ -177,12 +178,12 @@ func queryByGrpcGov(i IXplaClient) (string, error) {
 			&convertMsg,
 		)
 		if err != nil {
-			return "", err
+			return "", util.LogErr(errors.ErrGrpcRequest, err)
 		}
 
 		bytes, err := util.JsonMarshalData(resParams.GetTallyParams())
 		if err != nil {
-			return "", err
+			return "", util.LogErr(errors.ErrFailedToMarshal, err)
 		}
 		return string(bytes), nil
 
@@ -194,12 +195,12 @@ func queryByGrpcGov(i IXplaClient) (string, error) {
 			&convertMsg,
 		)
 		if err != nil {
-			return "", err
+			return "", util.LogErr(errors.ErrGrpcRequest, err)
 		}
 
 		bytes, err := util.JsonMarshalData(resParams.GetDepositParams())
 		if err != nil {
-			return "", err
+			return "", util.LogErr(errors.ErrFailedToMarshal, err)
 		}
 		return string(bytes), nil
 
@@ -215,12 +216,12 @@ func queryByGrpcGov(i IXplaClient) (string, error) {
 
 		prop, err := govutils.QueryProposerByTxQuery(clientCtx, proposalId)
 		if err != nil {
-			return "", err
+			return "", util.LogErr(errors.ErrGrpcRequest, err)
 		}
 
 		bytes, err := util.JsonMarshalData(prop)
 		if err != nil {
-			return "", err
+			return "", util.LogErr(errors.ErrFailedToMarshal, err)
 		}
 		return string(bytes), nil
 
@@ -232,7 +233,7 @@ func queryByGrpcGov(i IXplaClient) (string, error) {
 			&convertMsg,
 		)
 		if err != nil {
-			return "", err
+			return "", util.LogErr(errors.ErrGrpcRequest, err)
 		}
 
 		clientCtx, err := clientForQuery(i)
@@ -242,7 +243,7 @@ func queryByGrpcGov(i IXplaClient) (string, error) {
 
 		voterAddr, err := sdk.AccAddressFromBech32(convertMsg.Voter)
 		if err != nil {
-			return "", err
+			return "", util.LogErr(errors.ErrParse, err)
 		}
 
 		vote := resVote.GetVote()
@@ -250,11 +251,11 @@ func queryByGrpcGov(i IXplaClient) (string, error) {
 			params := govtypes.NewQueryVoteParams(convertMsg.ProposalId, voterAddr)
 			resByTxQuery, err := govutils.QueryVoteByTxQuery(clientCtx, params)
 			if err != nil {
-				return "", err
+				return "", util.LogErr(errors.ErrGrpcRequest, err)
 			}
 
 			if err := clientCtx.Codec.UnmarshalJSON(resByTxQuery, &vote); err != nil {
-				return "", err
+				return "", util.LogErr(errors.ErrFailedToUnmarshal, err)
 			}
 		}
 
@@ -269,7 +270,7 @@ func queryByGrpcGov(i IXplaClient) (string, error) {
 		}
 		resByTxQuery, err := govutils.QueryVotesByTxQuery(clientCtx, convertMsg)
 		if err != nil {
-			return "", err
+			return "", util.LogErr(errors.ErrGrpcRequest, err)
 		}
 
 		var votes govtypes.Votes
@@ -277,7 +278,7 @@ func queryByGrpcGov(i IXplaClient) (string, error) {
 		clientCtx.LegacyAmino.MustUnmarshalJSON(resByTxQuery, &votes)
 		out, err := printObjectLegacy(i, votes)
 		if err != nil {
-			return "", err
+			return "", util.LogErr(errors.ErrParse, err)
 		}
 		return string(out), nil
 
@@ -289,11 +290,11 @@ func queryByGrpcGov(i IXplaClient) (string, error) {
 			&convertMsg,
 		)
 		if err != nil {
-			return "", err
+			return "", util.LogErr(errors.ErrGrpcRequest, err)
 		}
 
 	default:
-		return "", util.LogErr("invalid msg type")
+		return "", util.LogErr(errors.ErrInvalidMsgType, i.Ixplac.GetMsgType())
 	}
 
 	out, err = printProto(i, res)
@@ -358,7 +359,7 @@ func queryByLcdGov(i IXplaClient) (string, error) {
 
 	// Gov params
 	case i.Ixplac.GetMsgType() == mgov.GovQueryGovParamsMsgType:
-		return "", util.LogErr("unsupported querying all gov params by using LCD. query each parameter(voting|tallying|deposit)")
+		return "", util.LogErr(errors.ErrNotSupport, "unsupported querying all gov params by using LCD. query each parameter(voting|tallying|deposit)")
 
 	// Gov params of voting
 	case i.Ixplac.GetMsgType() == mgov.GovQueryGovParamVotingMsgType:
@@ -380,7 +381,7 @@ func queryByLcdGov(i IXplaClient) (string, error) {
 
 	// Gov proposer
 	case i.Ixplac.GetMsgType() == mgov.GovQueryProposerMsgType:
-		return "", util.LogErr("unsupported querying proposer by using LCD")
+		return "", util.LogErr(errors.ErrNotSupport, "unsupported querying proposer by using LCD")
 
 	// Gov vote
 	case i.Ixplac.GetMsgType() == mgov.GovQueryVoteMsgType:
@@ -401,7 +402,7 @@ func queryByLcdGov(i IXplaClient) (string, error) {
 		url = url + util.MakeQueryLabels(govProposalsLabel, util.FromUint64ToString(convertMsg.ProposalId), govVotesLabel)
 
 	default:
-		return "", util.LogErr("invalid msg type")
+		return "", util.LogErr(errors.ErrInvalidMsgType, i.Ixplac.GetMsgType())
 	}
 
 	out, err := util.CtxHttpClient("GET", i.Ixplac.GetLcdURL()+url, nil, i.Ixplac.GetContext())

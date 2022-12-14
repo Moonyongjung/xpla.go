@@ -3,6 +3,7 @@ package module
 import (
 	mauthz "github.com/Moonyongjung/xpla.go/core/authz"
 	"github.com/Moonyongjung/xpla.go/types"
+	"github.com/Moonyongjung/xpla.go/types/errors"
 	"github.com/Moonyongjung/xpla.go/util"
 
 	authzv1beta1 "cosmossdk.io/api/cosmos/authz/v1beta1"
@@ -30,7 +31,7 @@ func queryByGrpcAuthz(i IXplaClient) (string, error) {
 			&convertMsg,
 		)
 		if err != nil {
-			return "", err
+			return "", util.LogErr(errors.ErrGrpcRequest, err)
 		}
 
 	// Authz grant by grantee
@@ -41,7 +42,7 @@ func queryByGrpcAuthz(i IXplaClient) (string, error) {
 			&convertMsg,
 		)
 		if err != nil {
-			return "", err
+			return "", util.LogErr(errors.ErrGrpcRequest, err)
 		}
 
 	// Authz grant by granter
@@ -52,11 +53,11 @@ func queryByGrpcAuthz(i IXplaClient) (string, error) {
 			&convertMsg,
 		)
 		if err != nil {
-			return "", err
+			return "", util.LogErr(errors.ErrGrpcRequest, err)
 		}
 
 	default:
-		return "", util.LogErr("invalid msg type")
+		return "", util.LogErr(errors.ErrInvalidMsgType, i.Ixplac.GetMsgType())
 	}
 
 	out, err = printProto(i, res)
@@ -102,7 +103,7 @@ func queryByLcdAuthz(i IXplaClient) (string, error) {
 		url = url + util.MakeQueryLabels(authzGrantsLabel, "granter", granter)
 
 	default:
-		return "", util.LogErr("invalid msg type")
+		return "", util.LogErr(errors.ErrInvalidMsgType, i.Ixplac.GetMsgType())
 	}
 
 	out, err := util.CtxHttpClient("GET", i.Ixplac.GetLcdURL()+url, nil, i.Ixplac.GetContext())

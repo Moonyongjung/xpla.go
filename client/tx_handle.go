@@ -19,6 +19,7 @@ import (
 	mwasm "github.com/Moonyongjung/xpla.go/core/wasm"
 	"github.com/Moonyongjung/xpla.go/key"
 	"github.com/Moonyongjung/xpla.go/types"
+	"github.com/Moonyongjung/xpla.go/types/errors"
 	"github.com/Moonyongjung/xpla.go/util"
 
 	"github.com/CosmWasm/wasmd/x/wasm"
@@ -55,8 +56,8 @@ func setTxBuilderMsg(xplac *XplaClient) (cmclient.TxBuilder, error) {
 
 	// Authz module
 	if xplac.MsgType == mauthz.AuthzGrantMsgType {
-		convertMsg, _ := xplac.Msg.(*authz.MsgGrant)
-		builder.SetMsgs(convertMsg)
+		convertMsg, _ := xplac.Msg.(authz.MsgGrant)
+		builder.SetMsgs(&convertMsg)
 
 	} else if xplac.MsgType == mauthz.AuthzRevokeMsgType {
 		convertMsg, _ := xplac.Msg.(authz.MsgRevoke)
@@ -68,22 +69,22 @@ func setTxBuilderMsg(xplac *XplaClient) (cmclient.TxBuilder, error) {
 
 		// Bank module
 	} else if xplac.MsgType == mbank.BankSendMsgType {
-		convertMsg, _ := xplac.Msg.(*banktypes.MsgSend)
-		builder.SetMsgs(convertMsg)
+		convertMsg, _ := xplac.Msg.(banktypes.MsgSend)
+		builder.SetMsgs(&convertMsg)
 
 		// Crisis module
 	} else if xplac.MsgType == mcrisis.CrisisInvariantBrokenMsgType {
-		convertMsg, _ := xplac.Msg.(*crisistypes.MsgVerifyInvariant)
-		builder.SetMsgs(convertMsg)
+		convertMsg, _ := xplac.Msg.(crisistypes.MsgVerifyInvariant)
+		builder.SetMsgs(&convertMsg)
 
 		// Distribution module
 	} else if xplac.MsgType == mdist.DistributionFundCommunityPoolMsgType {
-		convertMsg, _ := xplac.Msg.(*disttypes.MsgFundCommunityPool)
-		builder.SetMsgs(convertMsg)
+		convertMsg, _ := xplac.Msg.(disttypes.MsgFundCommunityPool)
+		builder.SetMsgs(&convertMsg)
 
 	} else if xplac.MsgType == mdist.DistributionProposalCommunityPoolSpendMsgType {
-		convertMsg, _ := xplac.Msg.(*govtypes.MsgSubmitProposal)
-		builder.SetMsgs(convertMsg)
+		convertMsg, _ := xplac.Msg.(govtypes.MsgSubmitProposal)
+		builder.SetMsgs(&convertMsg)
 
 	} else if xplac.MsgType == mdist.DistributionWithdrawRewardsMsgType {
 		convertMsg, _ := xplac.Msg.([]sdk.Msg)
@@ -94,13 +95,13 @@ func setTxBuilderMsg(xplac *XplaClient) (cmclient.TxBuilder, error) {
 		builder.SetMsgs(convertMsg...)
 
 	} else if xplac.MsgType == mdist.DistributionSetWithdrawAddrMsgType {
-		convertMsg, _ := xplac.Msg.(*disttypes.MsgSetWithdrawAddress)
-		builder.SetMsgs(convertMsg)
+		convertMsg, _ := xplac.Msg.(disttypes.MsgSetWithdrawAddress)
+		builder.SetMsgs(&convertMsg)
 
 		// Feegrant module
 	} else if xplac.MsgType == mfeegrant.FeegrantGrantMsgType {
-		convertMsg, _ := xplac.Msg.(*feegrant.MsgGrantAllowance)
-		builder.SetMsgs(convertMsg)
+		convertMsg, _ := xplac.Msg.(feegrant.MsgGrantAllowance)
+		builder.SetMsgs(&convertMsg)
 
 	} else if xplac.MsgType == mfeegrant.FeegrantRevokeGrantMsgType {
 		convertMsg, _ := xplac.Msg.(feegrant.MsgRevokeAllowance)
@@ -108,35 +109,35 @@ func setTxBuilderMsg(xplac *XplaClient) (cmclient.TxBuilder, error) {
 
 		// Gov module
 	} else if xplac.MsgType == mgov.GovSubmitProposalMsgType {
-		convertMsg, _ := xplac.Msg.(*govtypes.MsgSubmitProposal)
-		builder.SetMsgs(convertMsg)
+		convertMsg, _ := xplac.Msg.(govtypes.MsgSubmitProposal)
+		builder.SetMsgs(&convertMsg)
 
 	} else if xplac.MsgType == mgov.GovDepositMsgType {
-		convertMsg, _ := xplac.Msg.(*govtypes.MsgDeposit)
-		builder.SetMsgs(convertMsg)
+		convertMsg, _ := xplac.Msg.(govtypes.MsgDeposit)
+		builder.SetMsgs(&convertMsg)
 
 	} else if xplac.MsgType == mgov.GovVoteMsgType {
-		convertMsg, _ := xplac.Msg.(*govtypes.MsgVote)
-		builder.SetMsgs(convertMsg)
+		convertMsg, _ := xplac.Msg.(govtypes.MsgVote)
+		builder.SetMsgs(&convertMsg)
 
 	} else if xplac.MsgType == mgov.GovWeightedVoteMsgType {
-		convertMsg, _ := xplac.Msg.(*govtypes.MsgVoteWeighted)
-		builder.SetMsgs(convertMsg)
+		convertMsg, _ := xplac.Msg.(govtypes.MsgVoteWeighted)
+		builder.SetMsgs(&convertMsg)
 
 		// Params module
 	} else if xplac.MsgType == mparams.ParamsProposalParamChangeMsgType {
-		convertMsg, _ := xplac.Msg.(*govtypes.MsgSubmitProposal)
-		builder.SetMsgs(convertMsg)
+		convertMsg, _ := xplac.Msg.(govtypes.MsgSubmitProposal)
+		builder.SetMsgs(&convertMsg)
 
 		// Reward module
 	} else if xplac.MsgType == mreward.RewardFundFeeCollectorMsgType {
-		convertMsg, _ := xplac.Msg.(*rewardtypes.MsgFundFeeCollector)
-		builder.SetMsgs(convertMsg)
+		convertMsg, _ := xplac.Msg.(rewardtypes.MsgFundFeeCollector)
+		builder.SetMsgs(&convertMsg)
 
 		// slashing module
 	} else if xplac.MsgType == mslashing.SlahsingUnjailMsgType {
-		convertMsg, _ := xplac.Msg.(*slashingtypes.MsgUnjail)
-		builder.SetMsgs(convertMsg)
+		convertMsg, _ := xplac.Msg.(slashingtypes.MsgUnjail)
+		builder.SetMsgs(&convertMsg)
 
 		// Staking module
 	} else if xplac.MsgType == mstaking.StakingCreateValidatorMsgType {
@@ -144,29 +145,29 @@ func setTxBuilderMsg(xplac *XplaClient) (cmclient.TxBuilder, error) {
 		builder.SetMsgs(convertMsg)
 
 	} else if xplac.MsgType == mstaking.StakingEditValidatorMsgType {
-		convertMsg, _ := xplac.Msg.(*stakingtypes.MsgEditValidator)
-		builder.SetMsgs(convertMsg)
+		convertMsg, _ := xplac.Msg.(stakingtypes.MsgEditValidator)
+		builder.SetMsgs(&convertMsg)
 
 	} else if xplac.MsgType == mstaking.StakingDelegateMsgType {
-		convertMsg, _ := xplac.Msg.(*stakingtypes.MsgDelegate)
-		builder.SetMsgs(convertMsg)
+		convertMsg, _ := xplac.Msg.(stakingtypes.MsgDelegate)
+		builder.SetMsgs(&convertMsg)
 
 	} else if xplac.MsgType == mstaking.StakingUnbondMsgType {
-		convertMsg, _ := xplac.Msg.(*stakingtypes.MsgUndelegate)
-		builder.SetMsgs(convertMsg)
+		convertMsg, _ := xplac.Msg.(stakingtypes.MsgUndelegate)
+		builder.SetMsgs(&convertMsg)
 
 	} else if xplac.MsgType == mstaking.StakingRedelegateMsgType {
-		convertMsg, _ := xplac.Msg.(*stakingtypes.MsgBeginRedelegate)
-		builder.SetMsgs(convertMsg)
+		convertMsg, _ := xplac.Msg.(stakingtypes.MsgBeginRedelegate)
+		builder.SetMsgs(&convertMsg)
 
 		// Upgrade module
 	} else if xplac.MsgType == mupgrade.UpgradeProposalSoftwareUpgradeMsgType {
-		convertMsg, _ := xplac.Msg.(*govtypes.MsgSubmitProposal)
-		builder.SetMsgs(convertMsg)
+		convertMsg, _ := xplac.Msg.(govtypes.MsgSubmitProposal)
+		builder.SetMsgs(&convertMsg)
 
 	} else if xplac.MsgType == mupgrade.UpgradeCancelSoftwareUpgradeMsgType {
-		convertMsg, _ := xplac.Msg.(*govtypes.MsgSubmitProposal)
-		builder.SetMsgs(convertMsg)
+		convertMsg, _ := xplac.Msg.(govtypes.MsgSubmitProposal)
+		builder.SetMsgs(&convertMsg)
 
 		// Wasm module
 	} else if xplac.MsgType == mwasm.WasmStoreMsgType {
@@ -194,7 +195,7 @@ func setTxBuilderMsg(xplac *XplaClient) (cmclient.TxBuilder, error) {
 		builder.SetMsgs(&convertMsg)
 
 	} else {
-		return nil, util.LogErr("invalid message type")
+		return nil, util.LogErr(errors.ErrInvalidMsgType, xplac.MsgType)
 	}
 
 	return builder, nil
@@ -251,7 +252,7 @@ func txSignRound(xplac *XplaClient,
 
 	err := builder.SetSignatures(sigsV2...)
 	if err != nil {
-		return err
+		return util.LogErr(errors.ErrParse, err)
 	}
 
 	sigsV2 = []signing.SignatureV2{}
@@ -270,7 +271,7 @@ func txSignRound(xplac *XplaClient,
 			accSeqs[i],
 		)
 		if err != nil {
-			return err
+			return util.LogErr(errors.ErrParse, err)
 		}
 
 		sigsV2 = append(sigsV2, sigV2)
@@ -278,7 +279,7 @@ func txSignRound(xplac *XplaClient,
 
 	err = builder.SetSignatures(sigsV2...)
 	if err != nil {
-		return err
+		return util.LogErr(errors.ErrParse, err)
 	}
 
 	return nil
@@ -306,11 +307,11 @@ func evmTxSignRound(xplac *XplaClient,
 
 	signedTx, err := evmtypes.SignTx(tx, signer, ethPrivKey)
 	if err != nil {
-		return nil, err
+		return nil, util.LogErr(errors.ErrParse, err)
 	}
 	txbytes, err := signedTx.MarshalJSON()
 	if err != nil {
-		return nil, err
+		return nil, util.LogErr(errors.ErrFailedToMarshal, err)
 	}
 
 	return txbytes, nil
@@ -320,7 +321,7 @@ func evmTxSignRound(xplac *XplaClient,
 func readTxAndInitContexts(clientCtx cmclient.Context, filename string) (cmclient.Context, tx.Factory, sdk.Tx, error) {
 	stdTx, err := authclient.ReadTxFromFile(clientCtx, filename)
 	if err != nil {
-		return clientCtx, tx.Factory{}, nil, err
+		return clientCtx, tx.Factory{}, nil, util.LogErr(errors.ErrParse, err)
 	}
 
 	txFactory := util.NewFactory(clientCtx)
@@ -334,7 +335,7 @@ func marshalSignatureJSON(txConfig cmclient.TxConfig, txBldr cmclient.TxBuilder,
 	if signatureOnly {
 		sigs, err := parsedTx.GetSignaturesV2()
 		if err != nil {
-			return nil, err
+			return nil, util.LogErr(errors.ErrParse, err)
 		}
 		return txConfig.MarshalSignatureJSON(sigs)
 	}
@@ -361,10 +362,10 @@ func getMultisigInfo(clientCtx cmclient.Context, name string) (keyring.Info, err
 	kb := clientCtx.Keyring
 	multisigInfo, err := kb.Key(name)
 	if err != nil {
-		return nil, util.LogErr(err, "error getting keybase multisig account")
+		return nil, util.LogErr(errors.ErrKeyNotFound, "error getting keybase multisig account", err)
 	}
 	if multisigInfo.GetType() != keyring.TypeMulti {
-		return nil, util.LogErr(name, "must be of type", keyring.TypeMulti, ":", multisigInfo.GetType())
+		return nil, util.LogErr(errors.ErrInvalidMsgType, name, "must be of type", keyring.TypeMulti, ":", multisigInfo.GetType())
 	}
 
 	return multisigInfo, nil

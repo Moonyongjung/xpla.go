@@ -18,6 +18,7 @@ import (
 	mupgrade "github.com/Moonyongjung/xpla.go/core/upgrade"
 	mwasm "github.com/Moonyongjung/xpla.go/core/wasm"
 	"github.com/Moonyongjung/xpla.go/types"
+	"github.com/Moonyongjung/xpla.go/types/errors"
 	"github.com/Moonyongjung/xpla.go/util"
 )
 
@@ -32,11 +33,11 @@ func (xplac *XplaClient) Query() (string, error) {
 	if xplac.GetGrpcUrl() == "" && xplac.GetLcdURL() == "" {
 		if xplac.Module == mevm.EvmModule {
 			if xplac.GetEvmRpc() == "" {
-				return "", util.LogErr("evm JSON-RPC URL must exist")
+				return "", util.LogErr(errors.ErrNotSatisfiedOptions, "evm JSON-RPC URL must exist")
 			}
 
 		} else {
-			return "", util.LogErr("at least one of the gRPC URL & LCD URL must exist for query")
+			return "", util.LogErr(errors.ErrNotSatisfiedOptions, "at least one of the gRPC URL or LCD URL must exist for query")
 		}
 	}
 
@@ -89,7 +90,7 @@ func (xplac *XplaClient) Query() (string, error) {
 		return ixplaClient.QueryWasm()
 
 	} else {
-		return "", util.LogErr("invalid module")
+		return "", util.LogErr(errors.ErrInvalidRequest, "invalid module")
 	}
 }
 

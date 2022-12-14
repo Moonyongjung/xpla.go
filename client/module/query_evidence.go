@@ -3,6 +3,7 @@ package module
 import (
 	mevidence "github.com/Moonyongjung/xpla.go/core/evidence"
 	"github.com/Moonyongjung/xpla.go/types"
+	"github.com/Moonyongjung/xpla.go/types/errors"
 	"github.com/Moonyongjung/xpla.go/util"
 
 	evidencev1beta1 "cosmossdk.io/api/cosmos/evidence/v1beta1"
@@ -24,28 +25,28 @@ func queryByGrpcEvidence(i IXplaClient) (string, error) {
 	switch {
 	// Query all evidences
 	case i.Ixplac.GetMsgType() == mevidence.EvidenceQueryAllMsgType:
-		convertMsg, _ := i.Ixplac.GetMsg().(*evidencetypes.QueryAllEvidenceRequest)
+		convertMsg, _ := i.Ixplac.GetMsg().(evidencetypes.QueryAllEvidenceRequest)
 		res, err = queryClient.AllEvidence(
 			i.Ixplac.GetContext(),
-			convertMsg,
+			&convertMsg,
 		)
 		if err != nil {
-			return "", err
+			return "", util.LogErr(errors.ErrGrpcRequest, err)
 		}
 
 	// Query evidence
 	case i.Ixplac.GetMsgType() == mevidence.EvidenceQueryMsgType:
-		convertMsg, _ := i.Ixplac.GetMsg().(*evidencetypes.QueryEvidenceRequest)
+		convertMsg, _ := i.Ixplac.GetMsg().(evidencetypes.QueryEvidenceRequest)
 		res, err = queryClient.Evidence(
 			i.Ixplac.GetContext(),
-			convertMsg,
+			&convertMsg,
 		)
 		if err != nil {
-			return "", err
+			return "", util.LogErr(errors.ErrGrpcRequest, err)
 		}
 
 	default:
-		return "", util.LogErr("invalid msg type")
+		return "", util.LogErr(errors.ErrInvalidMsgType, i.Ixplac.GetMsgType())
 	}
 
 	out, err = printProto(i, res)
@@ -70,12 +71,12 @@ func queryByLcdEvidence(i IXplaClient) (string, error) {
 
 	// Query evidence
 	case i.Ixplac.GetMsgType() == mevidence.EvidenceQueryMsgType:
-		convertMsg, _ := i.Ixplac.GetMsg().(*evidencetypes.QueryEvidenceRequest)
+		convertMsg, _ := i.Ixplac.GetMsg().(evidencetypes.QueryEvidenceRequest)
 
 		url = url + util.MakeQueryLabels(evidenceEvidenceLabel, convertMsg.EvidenceHash.String())
 
 	default:
-		return "", util.LogErr("invalid msg type")
+		return "", util.LogErr(errors.ErrInvalidMsgType, i.Ixplac.GetMsgType())
 	}
 
 	out, err := util.CtxHttpClient("GET", i.Ixplac.GetLcdURL()+url, nil, i.Ixplac.GetContext())

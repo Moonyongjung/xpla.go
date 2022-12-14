@@ -3,6 +3,7 @@ package module
 import (
 	mauth "github.com/Moonyongjung/xpla.go/core/auth"
 	"github.com/Moonyongjung/xpla.go/types"
+	"github.com/Moonyongjung/xpla.go/types/errors"
 	"github.com/Moonyongjung/xpla.go/util"
 
 	authv1beta1 "cosmossdk.io/api/cosmos/auth/v1beta1"
@@ -32,7 +33,7 @@ func queryByGrpcAuth(i IXplaClient) (string, error) {
 			&convertMsg,
 		)
 		if err != nil {
-			return "", err
+			return "", util.LogErr(errors.ErrGrpcRequest, err)
 		}
 
 	// Auth account
@@ -43,7 +44,7 @@ func queryByGrpcAuth(i IXplaClient) (string, error) {
 			&convertMsg,
 		)
 		if err != nil {
-			return "", err
+			return "", util.LogErr(errors.ErrGrpcRequest, err)
 		}
 
 	// Auth accounts
@@ -54,58 +55,51 @@ func queryByGrpcAuth(i IXplaClient) (string, error) {
 			&convertMsg,
 		)
 		if err != nil {
-			return "", err
+			return "", util.LogErr(errors.ErrGrpcRequest, err)
 		}
 
 	// Auth tx by event
 	case i.Ixplac.GetMsgType() == mauth.AuthQueryTxsByEventsMsgType:
 		if i.Ixplac.GetRpc() == "" {
-			return "", util.LogErr("error: need RPC URL when txs methods")
+			return "", util.LogErr(errors.ErrNotSatisfiedOptions, "query txs by events, need RPC URL when txs methods")
 		}
-		convertMsg, _ := i.Ixplac.GetMsg().([]string)
-		msgLength := len(convertMsg)
-		tmEvents := convertMsg[:msgLength-2]
-		page := util.FromStringToInt(convertMsg[msgLength-2])
-		limit := util.FromStringToInt(convertMsg[msgLength-1])
+		convertMsg, _ := i.Ixplac.GetMsg().(mauth.QueryTxsByEventParseMsg)
 		clientCtx, err := clientForQuery(i)
 		if err != nil {
 			return "", err
 		}
 
-		res, err = authtx.QueryTxsByEvents(clientCtx, tmEvents, page, limit, "")
+		res, err = authtx.QueryTxsByEvents(clientCtx, convertMsg.TmEvents, convertMsg.Page, convertMsg.Limit, "")
 		if err != nil {
-			return "", err
+			return "", util.LogErr(errors.ErrRpcRequest, err)
 		}
 
 	// Auth tx
 	case i.Ixplac.GetMsgType() == mauth.AuthQueryTxMsgType:
 		if i.Ixplac.GetRpc() == "" {
-			return "", util.LogErr("error: need RPC URL when txs methods")
+			return "", util.LogErr(errors.ErrNotSatisfiedOptions, "auth query tx msg, need RPC URL when txs methods")
 		}
-		convertMsg, _ := i.Ixplac.GetMsg().([]string)
-		msgLength := len(convertMsg)
-		tmEvents := convertMsg[:msgLength-1]
-		txType := convertMsg[msgLength-1]
+		convertMsg, _ := i.Ixplac.GetMsg().(mauth.QueryTxParseMsg)
 
 		clientCtx, err := clientForQuery(i)
 		if err != nil {
 			return "", err
 		}
 
-		if txType == "hash" {
-			res, err = authtx.QueryTx(clientCtx, tmEvents[0])
+		if convertMsg.TxType == "hash" {
+			res, err = authtx.QueryTx(clientCtx, convertMsg.TmEvents[0])
 			if err != nil {
-				return "", err
+				return "", util.LogErr(errors.ErrRpcRequest, err)
 			}
 		} else {
-			res, err = authtx.QueryTxsByEvents(clientCtx, tmEvents, rest.DefaultPage, rest.DefaultLimit, "")
+			res, err = authtx.QueryTxsByEvents(clientCtx, convertMsg.TmEvents, rest.DefaultPage, rest.DefaultLimit, "")
 			if err != nil {
-				return "", err
+				return "", util.LogErr(errors.ErrRpcRequest, err)
 			}
 		}
 
 	default:
-		return "", util.LogErr("invalid msg type")
+		return "", util.LogErr(errors.ErrInvalidMsgType, i.Ixplac.GetMsgType())
 	}
 
 	out, err = printProto(i, res)
@@ -142,38 +136,48 @@ func queryByLcdAuth(i IXplaClient) (string, error) {
 
 	// Auth tx by event
 	case i.Ixplac.GetMsgType() == mauth.AuthQueryTxsByEventsMsgType:
-		convertMsg, _ := i.Ixplac.GetMsg().([]string)
-		parsedEvent := convertMsg[0]
-		parsedPage := convertMsg[1]
-		parsedLimit := convertMsg[2]
+		convertMsg, _ := i.Ixplac.GetMsg().(mauth.QueryTxsByEventParseMsg)
+
+		if len(convertMsg.TmEvents) > 1 {
+			return "", util.LogErr(errors.ErrNotSupport, "support only one event on the LCD")
+		}
+
+		parsedEvent := convertMsg.TmEvents[0]
+		parsedPage := convertMsg.Page
+		parsedLimit := convertMsg.Limit
 
 		events := "?events=" + parsedEvent
-		page := "&pagination.page=" + parsedPage
-		limit := "&pagination.limit=" + parsedLimit
+		page := "&pagination.page=" + util.FromIntToString(parsedPage)
+		limit := "&pagination.limit=" + util.FromIntToString(parsedLimit)
 
 		url = "/cosmos/tx/v1beta1/"
 		url = url + authTxsLabel + events + page + limit
 
 	// Auth tx
 	case i.Ixplac.GetMsgType() == mauth.AuthQueryTxMsgType:
-		convertMsg, _ := i.Ixplac.GetMsg().([]string)
-		parsedValue := convertMsg[0]
-		parsedTxType := convertMsg[1]
+		convertMsg, _ := i.Ixplac.GetMsg().(mauth.QueryTxParseMsg)
+
+		if len(convertMsg.TmEvents) > 1 {
+			return "", util.LogErr(errors.ErrNotSupport, "support only one event on the LCD")
+		}
+
+		parsedValue := convertMsg.TmEvents
+		parsedTxType := convertMsg.TxType
 
 		url = "/cosmos/tx/v1beta1/"
 		if parsedTxType == "hash" {
-			url = url + util.MakeQueryLabels(authTxsLabel, parsedValue)
+			url = url + util.MakeQueryLabels(authTxsLabel, parsedValue[0])
 
 		} else if parsedTxType == "signature" {
 			// inactivate
-			return "", util.LogErr("inactivate GetTxEvent('signature') when using LCD because of sometimes generating parsing error that based64 encoded signature has '='")
+			return "", util.LogErr(errors.ErrNotSupport, "inactivate GetTxEvent('signature') when using LCD because of sometimes generating parsing error that based64 encoded signature has '='")
 			// events := "?events=" + parsedValue
 			// page := "&pagination.page=" + util.FromIntToString(rest.DefaultPage)
 			// limit := "&pagination.limit=" + util.FromIntToString(rest.DefaultLimit)
 
 			// url = url + authTxsLabel + events + page + limit
 		} else {
-			events := "?events=" + parsedValue
+			events := "?events=" + parsedValue[0]
 			page := "&pagination.page=" + util.FromIntToString(rest.DefaultPage)
 			limit := "&pagination.limit=" + util.FromIntToString(rest.DefaultLimit)
 
@@ -181,7 +185,7 @@ func queryByLcdAuth(i IXplaClient) (string, error) {
 		}
 
 	default:
-		return "", util.LogErr("invalid msg type")
+		return "", util.LogErr(errors.ErrInvalidMsgType, i.Ixplac.GetMsgType())
 	}
 
 	out, err := util.CtxHttpClient("GET", i.Ixplac.GetLcdURL()+url, nil, i.Ixplac.GetContext())

@@ -1,6 +1,7 @@
 package slashing
 
 import (
+	"github.com/Moonyongjung/xpla.go/core"
 	"github.com/Moonyongjung/xpla.go/key"
 	"github.com/Moonyongjung/xpla.go/types"
 
@@ -9,10 +10,10 @@ import (
 )
 
 // (Tx) make msg - unjail
-func MakeUnjailMsg(privKey key.PrivateKey) (*slashingtypes.MsgUnjail, error) {
+func MakeUnjailMsg(privKey key.PrivateKey) (slashingtypes.MsgUnjail, error) {
 	msg, err := parseUnjailArgs(privKey)
 	if err != nil {
-		return nil, err
+		return slashingtypes.MsgUnjail{}, err
 	}
 
 	return msg, nil
@@ -20,22 +21,14 @@ func MakeUnjailMsg(privKey key.PrivateKey) (*slashingtypes.MsgUnjail, error) {
 
 // (Query) make msg - slahsing params
 func MakeQuerySlashingParamsMsg() (slashingtypes.QueryParamsRequest, error) {
-	msg, err := parseQuerySlashingParamsArgs()
-	if err != nil {
-		return slashingtypes.QueryParamsRequest{}, nil
-	}
-
-	return msg, nil
+	return slashingtypes.QueryParamsRequest{}, nil
 }
 
 // (Query) make msg - signing infos
 func MakeQuerySigningInfosMsg() (slashingtypes.QuerySigningInfosRequest, error) {
-	msg, err := parseQuerySigingInfosArgs()
-	if err != nil {
-		return slashingtypes.QuerySigningInfosRequest{}, nil
-	}
-
-	return msg, nil
+	return slashingtypes.QuerySigningInfosRequest{
+		Pagination: core.PageRequest,
+	}, nil
 }
 
 // (Query) make msg - signing info

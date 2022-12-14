@@ -3,6 +3,7 @@ package module
 import (
 	mslashing "github.com/Moonyongjung/xpla.go/core/slashing"
 	"github.com/Moonyongjung/xpla.go/types"
+	"github.com/Moonyongjung/xpla.go/types/errors"
 	"github.com/Moonyongjung/xpla.go/util"
 
 	slashingv1beta1 "cosmossdk.io/api/cosmos/slashing/v1beta1"
@@ -30,7 +31,7 @@ func queryByGrpcSlashing(i IXplaClient) (string, error) {
 			&convertMsg,
 		)
 		if err != nil {
-			return "", err
+			return "", util.LogErr(errors.ErrGrpcRequest, err)
 		}
 
 	// Slashing signing information
@@ -41,7 +42,7 @@ func queryByGrpcSlashing(i IXplaClient) (string, error) {
 			&convertMsg,
 		)
 		if err != nil {
-			return "", err
+			return "", util.LogErr(errors.ErrGrpcRequest, err)
 		}
 
 	// Slashing signing information
@@ -52,11 +53,11 @@ func queryByGrpcSlashing(i IXplaClient) (string, error) {
 			&convertMsg,
 		)
 		if err != nil {
-			return "", err
+			return "", util.LogErr(errors.ErrGrpcRequest, err)
 		}
 
 	default:
-		return "", util.LogErr("invalid msg type")
+		return "", util.LogErr(errors.ErrInvalidMsgType, i.Ixplac.GetMsgType())
 	}
 
 	out, err = printProto(i, res)
@@ -90,7 +91,7 @@ func queryByLcdSlashing(i IXplaClient) (string, error) {
 		url = url + util.MakeQueryLabels(slashingSigningInfosLabel, convertMsg.ConsAddress)
 
 	default:
-		return "", util.LogErr("invalid msg type")
+		return "", util.LogErr(errors.ErrInvalidMsgType, i.Ixplac.GetMsgType())
 	}
 
 	out, err := util.CtxHttpClient("GET", i.Ixplac.GetLcdURL()+url, nil, i.Ixplac.GetContext())

@@ -25,7 +25,7 @@ func (suite *TestSuite) TestQueryBalance() {
 
 	mnemonic, _ := key.NewMnemonic()
 	privKey, _ := key.NewPrivKey(mnemonic)
-	addr := util.GetAddrByPrivKey(privKey)
+	addr, _ := util.GetAddrByPrivKey(privKey)
 
 	xplaCoins := sdk.NewCoins(sdk.Coin{
 		Denom:  "axpla",
@@ -38,7 +38,7 @@ func (suite *TestSuite) TestQueryBalance() {
 
 	bankBalancesMsg := types.BankBalancesMsg{}
 	msg, _ := mbank.MakeBankAllBalancesMsg(bankBalancesMsg)
-	_, err := queryClient.AllBalances(context.Background(), msg)
+	_, err := queryClient.AllBalances(context.Background(), &msg)
 	suite.Require().Error(err)
 
 	bankBalancesMsg = types.BankBalancesMsg{
@@ -46,7 +46,7 @@ func (suite *TestSuite) TestQueryBalance() {
 	}
 	msg, err = mbank.MakeBankAllBalancesMsg(bankBalancesMsg)
 	suite.Require().NoError(err)
-	res, err := queryClient.AllBalances(context.Background(), msg)
+	res, err := queryClient.AllBalances(context.Background(), &msg)
 	suite.Require().NoError(err)
 	suite.Require().NotNil(res)
 
@@ -56,7 +56,7 @@ func (suite *TestSuite) TestQueryBalance() {
 	}
 	msg2, err := mbank.MakeBankBalanceMsg(bankBalanceMsg)
 	suite.Require().NoError(err)
-	res2, err := queryClient.Balance(context.Background(), msg2)
+	res2, err := queryClient.Balance(context.Background(), &msg2)
 	suite.Require().NoError(err)
 	suite.Require().NotNil(res2)
 
@@ -66,7 +66,7 @@ func (suite *TestSuite) TestQueryBalance() {
 	app.AccountKeeper.SetAccount(ctx, acc)
 	suite.Require().NoError(testutil.FundAccount(app.BankKeeper, ctx, acc.GetAddress(), origCoins))
 
-	res, err = queryClient.AllBalances(context.Background(), msg)
+	res, err = queryClient.AllBalances(context.Background(), &msg)
 	suite.Require().NoError(err)
 	suite.Require().NotNil(res)
 }

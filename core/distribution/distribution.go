@@ -12,21 +12,21 @@ import (
 	"github.com/xpladev/xpla/app/params"
 )
 
-// (Tx) make msg - proposal community pool
-func MakeProposalCommunityPoolSpendMsg(communityPoolSpendMsg types.CommunityPoolSpendMsg, privKey key.PrivateKey, encodingConfig params.EncodingConfig) (*govtypes.MsgSubmitProposal, error) {
-	msg, err := parseProposalCommunityPoolSpendArgs(communityPoolSpendMsg, privKey, encodingConfig)
+// (Tx) make msg - fund community pool
+func MakeFundCommunityPoolMsg(fundCommunityPoolMsg types.FundCommunityPoolMsg, privKey key.PrivateKey) (disttypes.MsgFundCommunityPool, error) {
+	msg, err := parseFundCommunityPoolArgs(fundCommunityPoolMsg, privKey)
 	if err != nil {
-		return nil, err
+		return disttypes.MsgFundCommunityPool{}, err
 	}
 
 	return msg, nil
 }
 
-// (Tx) make msg - fund community pool
-func MakeFundCommunityPoolMsg(fundCommunityPoolMsg types.FundCommunityPoolMsg, privKey key.PrivateKey) (*disttypes.MsgFundCommunityPool, error) {
-	msg, err := parseFundCommunityPoolArgs(fundCommunityPoolMsg, privKey)
+// (Tx) make msg - proposal community pool
+func MakeProposalCommunityPoolSpendMsg(communityPoolSpendMsg types.CommunityPoolSpendMsg, privKey key.PrivateKey, encodingConfig params.EncodingConfig) (govtypes.MsgSubmitProposal, error) {
+	msg, err := parseProposalCommunityPoolSpendArgs(communityPoolSpendMsg, privKey, encodingConfig)
 	if err != nil {
-		return nil, err
+		return govtypes.MsgSubmitProposal{}, err
 	}
 
 	return msg, nil
@@ -53,10 +53,10 @@ func MakeWithdrawAllRewardsMsg(privKey key.PrivateKey, grpcConn grpc.ClientConn,
 }
 
 // (Tx) make msg - withdraw address
-func MakeSetWithdrawAddrMsg(setWithdrawAddrMsg types.SetwithdrawAddrMsg, privKey key.PrivateKey) (*disttypes.MsgSetWithdrawAddress, error) {
+func MakeSetWithdrawAddrMsg(setWithdrawAddrMsg types.SetwithdrawAddrMsg, privKey key.PrivateKey) (disttypes.MsgSetWithdrawAddress, error) {
 	msg, err := parseSetWithdrawAddrArgs(setWithdrawAddrMsg, privKey)
 	if err != nil {
-		return nil, err
+		return disttypes.MsgSetWithdrawAddress{}, err
 	}
 
 	return msg, nil
@@ -64,12 +64,7 @@ func MakeSetWithdrawAddrMsg(setWithdrawAddrMsg types.SetwithdrawAddrMsg, privKey
 
 // (Query) make msg - distribution params
 func MakeQueryDistributionParamsMsg() (disttypes.QueryParamsRequest, error) {
-	msg, err := parseQueryDistributionParamsArgs()
-	if err != nil {
-		return disttypes.QueryParamsRequest{}, err
-	}
-
-	return msg, nil
+	return disttypes.QueryParamsRequest{}, nil
 }
 
 // (Query) make msg - validator outstanding rewards
@@ -114,20 +109,12 @@ func MakeyQueryDistRewardsMsg(queryDistRewardsMsg types.QueryDistRewardsMsg) (di
 
 // (Query) make msg - distribution all rewards
 func MakeyQueryDistTotalRewardsMsg(queryDistRewardsMsg types.QueryDistRewardsMsg) (disttypes.QueryDelegationTotalRewardsRequest, error) {
-	msg, err := parseQueryDistTotalRewardsArgs(queryDistRewardsMsg)
-	if err != nil {
-		return disttypes.QueryDelegationTotalRewardsRequest{}, err
-	}
-
-	return msg, nil
+	return disttypes.QueryDelegationTotalRewardsRequest{
+		DelegatorAddress: queryDistRewardsMsg.DelegatorAddr,
+	}, nil
 }
 
 // (Query) make msg - community pool
 func MakeQueryCommunityPoolMsg() (disttypes.QueryCommunityPoolRequest, error) {
-	msg, err := parseQueryCommunityPoolArgs()
-	if err != nil {
-		return disttypes.QueryCommunityPoolRequest{}, err
-	}
-
-	return msg, nil
+	return disttypes.QueryCommunityPoolRequest{}, nil
 }

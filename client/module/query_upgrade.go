@@ -5,6 +5,7 @@ import (
 
 	mupgrade "github.com/Moonyongjung/xpla.go/core/upgrade"
 	"github.com/Moonyongjung/xpla.go/types"
+	"github.com/Moonyongjung/xpla.go/types/errors"
 	"github.com/Moonyongjung/xpla.go/util"
 
 	upgradev1beta1 "cosmossdk.io/api/cosmos/upgrade/v1beta1"
@@ -33,11 +34,11 @@ func queryByGrpcUpgrade(i IXplaClient) (string, error) {
 			&convertMsg,
 		)
 		if err != nil {
-			return "", err
+			return "", util.LogErr(errors.ErrGrpcRequest, err)
 		}
 
 		if appliedPlanRes.Height == 0 {
-			return "", err
+			return "", util.LogErr(errors.ErrParse, "applied plan height is 0")
 		}
 		headerData, err := appliedReturnBlockheader(appliedPlanRes, i.Ixplac.GetRpc(), i.Ixplac.GetContext())
 		if err != nil {
@@ -54,7 +55,7 @@ func queryByGrpcUpgrade(i IXplaClient) (string, error) {
 			&convertMsg,
 		)
 		if err != nil {
-			return "", err
+			return "", util.LogErr(errors.ErrGrpcRequest, err)
 		}
 
 	// Upgrade plan
@@ -65,12 +66,11 @@ func queryByGrpcUpgrade(i IXplaClient) (string, error) {
 			&convertMsg,
 		)
 		if err != nil {
-			return "", err
+			return "", util.LogErr(errors.ErrGrpcRequest, err)
 		}
 
 	default:
-		return "", util.LogErr("invalid msg type")
-
+		return "", util.LogErr(errors.ErrInvalidMsgType, i.Ixplac.GetMsgType())
 	}
 
 	out, err = printProto(i, res)
@@ -108,7 +108,7 @@ func queryByLcdUpgrade(i IXplaClient) (string, error) {
 		url = url + upgradeCurrentPlanLabel
 
 	default:
-		return "", util.LogErr("invalid msg type")
+		return "", util.LogErr(errors.ErrInvalidMsgType, i.Ixplac.GetMsgType())
 
 	}
 
@@ -122,7 +122,7 @@ func queryByLcdUpgrade(i IXplaClient) (string, error) {
 
 func appliedReturnBlockheader(res *upgradetypes.QueryAppliedPlanResponse, rpcUrl string, ctx context.Context) ([]byte, error) {
 	if rpcUrl == "" {
-		return nil, util.LogErr("need RPC URL")
+		return nil, util.LogErr(errors.ErrNotSatisfiedOptions, "need RPC URL")
 	}
 	clientCtx, err := util.NewClient()
 	if err != nil {
@@ -131,27 +131,27 @@ func appliedReturnBlockheader(res *upgradetypes.QueryAppliedPlanResponse, rpcUrl
 
 	client, err := cmclient.NewClientFromNode(rpcUrl)
 	if err != nil {
-		return nil, err
+		return nil, util.LogErr(errors.ErrSdkClient, err)
 	}
 	clientCtx = clientCtx.WithClient(client)
 
 	node, err := clientCtx.GetNode()
 	if err != nil {
-		return nil, err
+		return nil, util.LogErr(errors.ErrSdkClient, err)
 	}
 
 	headers, err := node.BlockchainInfo(ctx, res.Height, res.Height)
 	if err != nil {
-		return nil, err
+		return nil, util.LogErr(errors.ErrSdkClient, err)
 	}
 
 	if len(headers.BlockMetas) == 0 {
-		return nil, util.LogErr("no headers returns for height", res.Height)
+		return nil, util.LogErr(errors.ErrNotFound, "no headers returns for height", res.Height)
 	}
 
 	bytes, err := clientCtx.LegacyAmino.MarshalJSONIndent(headers.BlockMetas[0], "", "  ")
 	if err != nil {
-		return nil, err
+		return nil, util.LogErr(errors.ErrFailedToMarshal, err)
 	}
 
 	return bytes, nil

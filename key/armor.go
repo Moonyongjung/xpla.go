@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/Moonyongjung/xpla.go/types"
+	"github.com/Moonyongjung/xpla.go/types/errors"
 	"github.com/Moonyongjung/xpla.go/util"
 	"github.com/cosmos/cosmos-sdk/codec/legacy"
 	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
@@ -39,9 +40,8 @@ func EncryptArmorPrivKeyWithoutPassphrase(privKey cryptotypes.PrivKey) string {
 func encryptPrivKey(privKey cryptotypes.PrivKey, passphrase string) string {
 	saltBytes := crypto.CRandBytes(16)
 	key, err := bcrypt.GenerateFromPassword(saltBytes, []byte(passphrase), BcryptSecurityParameter)
-
 	if err != nil {
-		panic(util.LogErr(err, "error generating bcrypt key from passphrase"))
+		panic(util.LogErr(errors.ErrInvalidRequest, "error generating bcrypt key from passphrase", err))
 	}
 
 	key = crypto.Sha256(key) // get 32 bytes
@@ -100,20 +100,20 @@ func decodingArmoredPrivKey(armorStr string) ([]byte, []byte, map[string]string,
 	}
 
 	if blockType != blockTypePrivKey {
-		return nil, nil, nil, util.LogErr("unrecognized armor type: ", blockType)
+		return nil, nil, nil, util.LogErr(errors.ErrInvalidRequest, "unrecognized armor type: ", blockType)
 	}
 
 	if header["kdf"] != "bcrypt" {
-		return nil, nil, nil, util.LogErr("unrecognized KDF type: ", header["kdf"])
+		return nil, nil, nil, util.LogErr(errors.ErrInvalidRequest, "unrecognized KDF type: ", header["kdf"])
 	}
 
 	if header["salt"] == "" {
-		return nil, nil, nil, util.LogErr("missing salt bytes")
+		return nil, nil, nil, util.LogErr(errors.ErrInvalidRequest, "missing salt bytes")
 	}
 
 	saltBytes, err := hex.DecodeString(header["salt"])
 	if err != nil {
-		return nil, nil, nil, util.LogErr("error decoding salt: %v", err.Error())
+		return nil, nil, nil, util.LogErr(errors.ErrInvalidRequest, "error decoding salt: %v", err.Error())
 	}
 
 	return saltBytes, encBytes, header, nil
@@ -123,16 +123,16 @@ func decodingArmoredPrivKey(armorStr string) ([]byte, []byte, map[string]string,
 func decryptPrivKey(saltBytes []byte, encBytes []byte, passphrase string) (privKey cryptotypes.PrivKey, err error) {
 	key, err := bcrypt.GenerateFromPassword(saltBytes, []byte(passphrase), BcryptSecurityParameter)
 	if err != nil {
-		return privKey, util.LogErr(err, "error generating bcrypt key from passphrase")
+		return privKey, util.LogErr(errors.ErrInvalidRequest, err, "error generating bcrypt key from passphrase")
 	}
 
 	key = crypto.Sha256(key) // Get 32 bytes
 
 	privKeyBytes, err := xsalsa20symmetric.DecryptSymmetric(encBytes, key)
 	if err != nil && err.Error() == "Ciphertext decryption failed" {
-		return privKey, util.LogErr("invalid account password")
+		return privKey, util.LogErr(errors.ErrInvalidRequest, "invalid account password")
 	} else if err != nil {
-		return privKey, err
+		return privKey, util.LogErr(errors.ErrParse, err)
 	}
 
 	return legacy.PrivKeyFromBytes(privKeyBytes)

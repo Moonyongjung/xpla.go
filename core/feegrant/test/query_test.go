@@ -18,8 +18,8 @@ func (suite *TestSuite) TestFeeAllowance() {
 	k1, _ := key.NewPrivKey(m1)
 	k2, _ := key.NewPrivKey(m2)
 
-	granter := util.GetAddrByPrivKey(k1)
-	grantee := util.GetAddrByPrivKey(k2)
+	granter, _ := util.GetAddrByPrivKey(k1)
+	grantee, _ := util.GetAddrByPrivKey(k2)
 
 	var req *feegrant.QueryAllowanceRequest
 
@@ -116,8 +116,8 @@ func (suite *TestSuite) TestFeeAllowances() {
 	k1, _ := key.NewPrivKey(m1)
 	k2, _ := key.NewPrivKey(m2)
 
-	granter := util.GetAddrByPrivKey(k1)
-	grantee := util.GetAddrByPrivKey(k2)
+	granter, _ := util.GetAddrByPrivKey(k1)
+	grantee, _ := util.GetAddrByPrivKey(k2)
 
 	var req *feegrant.QueryAllowancesRequest
 
@@ -200,8 +200,8 @@ func (suite *TestSuite) TestFeeAllowancesByGranter() {
 	k1, _ := key.NewPrivKey(m1)
 	k2, _ := key.NewPrivKey(m2)
 
-	granter := util.GetAddrByPrivKey(k1)
-	grantee := util.GetAddrByPrivKey(k2)
+	granter, _ := util.GetAddrByPrivKey(k1)
+	grantee, _ := util.GetAddrByPrivKey(k2)
 
 	var req *feegrant.QueryAllowancesByGranterRequest
 

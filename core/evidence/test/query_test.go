@@ -73,7 +73,7 @@ func (suite *TestSuite) TestQueryEvidence() {
 					Hash: tmbytes.HexBytes{}.String(),
 				}
 				msg, _ := mevidence.MakeQueryEvidenceMsg(queryEvidenceMsg)
-				req = msg
+				req = &msg
 			},
 			false,
 			func(res *evidencetypes.QueryEvidenceResponse) {},
@@ -87,7 +87,7 @@ func (suite *TestSuite) TestQueryEvidence() {
 					Hash: evidence[0].Hash().String(),
 				}
 				msg, _ := mevidence.MakeQueryEvidenceMsg(queryEvidenceMsg)
-				req = msg
+				req = &msg
 			},
 			true,
 			func(res *evidencetypes.QueryEvidenceResponse) {
@@ -136,7 +136,7 @@ func (suite *TestSuite) TestQueryAllEvidence() {
 			"success without evidence",
 			func() {
 				msg, _ := mevidence.MakeQueryAllEvidenceMsg()
-				req = msg
+				req = &msg
 			},
 			true,
 			func(res *evidencetypes.QueryAllEvidenceResponse) {
@@ -158,7 +158,7 @@ func (suite *TestSuite) TestQueryAllEvidence() {
 				core.PageRequest = pr
 
 				msg, _ := mevidence.MakeQueryAllEvidenceMsg()
-				req = msg
+				req = &msg
 			},
 			true,
 			func(res *evidencetypes.QueryAllEvidenceResponse) {

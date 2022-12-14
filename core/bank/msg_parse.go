@@ -4,6 +4,7 @@ import (
 	"github.com/Moonyongjung/xpla.go/core"
 	"github.com/Moonyongjung/xpla.go/key"
 	"github.com/Moonyongjung/xpla.go/types"
+	"github.com/Moonyongjung/xpla.go/types/errors"
 	"github.com/Moonyongjung/xpla.go/util"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -11,19 +12,19 @@ import (
 )
 
 // Parsing - bank send
-func parseBankSendArgs(bankSendMsg types.BankSendMsg, privKey key.PrivateKey) (*banktypes.MsgSend, error) {
+func parseBankSendArgs(bankSendMsg types.BankSendMsg, privKey key.PrivateKey) (banktypes.MsgSend, error) {
 	denom := types.XplaDenom
 
 	if bankSendMsg.FromAddress == "" || bankSendMsg.ToAddress == "" || bankSendMsg.Amount == "" {
-		return nil, util.LogErr("No parameters")
+		return banktypes.MsgSend{}, util.LogErr(errors.ErrInsufficientParams, "no parameters")
 	}
 
 	amountBigInt, ok := sdk.NewIntFromString(util.DenomRemove(bankSendMsg.Amount))
 	if !ok {
-		return nil, util.LogErr("Wrong amount parameter")
+		return banktypes.MsgSend{}, util.LogErr(errors.ErrInvalidRequest, "Wrong amount parameter")
 	}
 
-	msg := &banktypes.MsgSend{
+	msg := banktypes.MsgSend{
 		FromAddress: bankSendMsg.FromAddress,
 		ToAddress:   bankSendMsg.ToAddress,
 		Amount:      sdk.NewCoins(sdk.NewCoin(denom, amountBigInt)),
@@ -34,45 +35,23 @@ func parseBankSendArgs(bankSendMsg types.BankSendMsg, privKey key.PrivateKey) (*
 }
 
 // Parsing - all balances
-func parseBankAllBalancesArgs(bankBalancesMsg types.BankBalancesMsg) (*banktypes.QueryAllBalancesRequest, error) {
+func parseBankAllBalancesArgs(bankBalancesMsg types.BankBalancesMsg) (banktypes.QueryAllBalancesRequest, error) {
 	addr, err := sdk.AccAddressFromBech32(bankBalancesMsg.Address)
 	if err != nil {
-		return nil, util.LogErr(err)
+		return banktypes.QueryAllBalancesRequest{}, util.LogErr(errors.ErrInvalidRequest, err)
 	}
 
-	params := banktypes.NewQueryAllBalancesRequest(addr, core.PageRequest)
+	params := *banktypes.NewQueryAllBalancesRequest(addr, core.PageRequest)
 	return params, nil
 }
 
 // Parsing - balance
-func parseBankBalanceArgs(bankBalancesMsg types.BankBalancesMsg) (*banktypes.QueryBalanceRequest, error) {
+func parseBankBalanceArgs(bankBalancesMsg types.BankBalancesMsg) (banktypes.QueryBalanceRequest, error) {
 	addr, err := sdk.AccAddressFromBech32(bankBalancesMsg.Address)
 	if err != nil {
-		return nil, util.LogErr(err)
+		return banktypes.QueryBalanceRequest{}, util.LogErr(errors.ErrInvalidRequest, err)
 	}
 
-	params := banktypes.NewQueryBalanceRequest(addr, bankBalancesMsg.Denom)
+	params := *banktypes.NewQueryBalanceRequest(addr, bankBalancesMsg.Denom)
 	return params, nil
-}
-
-// Parsing - denominations metadata
-func parseDenomsMetaDataArgs() banktypes.QueryDenomsMetadataRequest {
-	return banktypes.QueryDenomsMetadataRequest{}
-}
-
-// Parsing - denomination metadata
-func parseDenomMetaDataArgs(denomMetadataMsg types.DenomMetadataMsg) banktypes.QueryDenomMetadataRequest {
-	return banktypes.QueryDenomMetadataRequest{
-		Denom: denomMetadataMsg.Denom,
-	}
-}
-
-// Parsing - total supply
-func parseTotalArgs() (banktypes.QueryTotalSupplyRequest, error) {
-	return banktypes.QueryTotalSupplyRequest{Pagination: core.PageRequest}, nil
-}
-
-// Parsing - supply of
-func parseSupplyOfArgs(totalMsg types.TotalMsg, pageReq ...types.Pagination) (banktypes.QuerySupplyOfRequest, error) {
-	return banktypes.QuerySupplyOfRequest{Denom: totalMsg.Denom}, nil
 }

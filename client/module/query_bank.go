@@ -3,6 +3,7 @@ package module
 import (
 	mbank "github.com/Moonyongjung/xpla.go/core/bank"
 	"github.com/Moonyongjung/xpla.go/types"
+	"github.com/Moonyongjung/xpla.go/types/errors"
 	"github.com/Moonyongjung/xpla.go/util"
 
 	bankv1beta1 "cosmossdk.io/api/cosmos/bank/v1beta1"
@@ -25,24 +26,24 @@ func queryByGrpcBank(i IXplaClient) (string, error) {
 	switch {
 	// Bank balances
 	case i.Ixplac.GetMsgType() == mbank.BankAllBalancesMsgType:
-		convertMsg, _ := i.Ixplac.GetMsg().(*banktypes.QueryAllBalancesRequest)
+		convertMsg, _ := i.Ixplac.GetMsg().(banktypes.QueryAllBalancesRequest)
 		res, err = queryClient.AllBalances(
 			i.Ixplac.GetContext(),
-			convertMsg,
+			&convertMsg,
 		)
 		if err != nil {
-			return "", err
+			return "", util.LogErr(errors.ErrGrpcRequest, err)
 		}
 
 	// Bank balance
 	case i.Ixplac.GetMsgType() == mbank.BankBalanceMsgType:
-		convertMsg, _ := i.Ixplac.GetMsg().(*banktypes.QueryBalanceRequest)
+		convertMsg, _ := i.Ixplac.GetMsg().(banktypes.QueryBalanceRequest)
 		res, err = queryClient.Balance(
 			i.Ixplac.GetContext(),
-			convertMsg,
+			&convertMsg,
 		)
 		if err != nil {
-			return "", err
+			return "", util.LogErr(errors.ErrGrpcRequest, err)
 		}
 
 	// Bank denominations metadata
@@ -53,7 +54,7 @@ func queryByGrpcBank(i IXplaClient) (string, error) {
 			&convertMsg,
 		)
 		if err != nil {
-			return "", err
+			return "", util.LogErr(errors.ErrGrpcRequest, err)
 		}
 
 	// Bank denomination metadata
@@ -64,7 +65,7 @@ func queryByGrpcBank(i IXplaClient) (string, error) {
 			&convertMsg,
 		)
 		if err != nil {
-			return "", err
+			return "", util.LogErr(errors.ErrGrpcRequest, err)
 		}
 
 	// Bank total
@@ -75,7 +76,7 @@ func queryByGrpcBank(i IXplaClient) (string, error) {
 			&convertMsg,
 		)
 		if err != nil {
-			return "", err
+			return "", util.LogErr(errors.ErrGrpcRequest, err)
 		}
 
 	// Bank total supply
@@ -86,11 +87,11 @@ func queryByGrpcBank(i IXplaClient) (string, error) {
 			&convertMsg,
 		)
 		if err != nil {
-			return "", err
+			return "", util.LogErr(errors.ErrGrpcRequest, err)
 		}
 
 	default:
-		return "", util.LogErr("invalid msg type")
+		return "", util.LogErr(errors.ErrInvalidMsgType, i.Ixplac.GetMsgType())
 	}
 
 	out, err = printProto(i, res)
@@ -113,13 +114,13 @@ func queryByLcdBank(i IXplaClient) (string, error) {
 	switch {
 	// Bank balances
 	case i.Ixplac.GetMsgType() == mbank.BankAllBalancesMsgType:
-		convertMsg, _ := i.Ixplac.GetMsg().(*banktypes.QueryAllBalancesRequest)
+		convertMsg, _ := i.Ixplac.GetMsg().(banktypes.QueryAllBalancesRequest)
 		url = url + util.MakeQueryLabels(bankBalancesLabel, convertMsg.Address)
 
 	// Bank balance
 	case i.Ixplac.GetMsgType() == mbank.BankBalanceMsgType:
 		// not supported now.
-		convertMsg, _ := i.Ixplac.GetMsg().(*banktypes.QueryBalanceRequest)
+		convertMsg, _ := i.Ixplac.GetMsg().(banktypes.QueryBalanceRequest)
 		url = url + util.MakeQueryLabels(bankBalancesLabel, convertMsg.Address, convertMsg.Denom)
 
 	// Bank denominations metadata
@@ -141,7 +142,7 @@ func queryByLcdBank(i IXplaClient) (string, error) {
 		url = url + util.MakeQueryLabels(bankSupplyLabel, convertMsg.Denom)
 
 	default:
-		return "", util.LogErr("invalid msg type")
+		return "", util.LogErr(errors.ErrInvalidMsgType, i.Ixplac.GetMsgType())
 	}
 
 	out, err := util.CtxHttpClient("GET", i.Ixplac.GetLcdURL()+url, nil, i.Ixplac.GetContext())

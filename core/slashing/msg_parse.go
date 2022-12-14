@@ -1,9 +1,9 @@
 package slashing
 
 import (
-	"github.com/Moonyongjung/xpla.go/core"
 	"github.com/Moonyongjung/xpla.go/key"
 	"github.com/Moonyongjung/xpla.go/types"
+	"github.com/Moonyongjung/xpla.go/types/errors"
 	"github.com/Moonyongjung/xpla.go/util"
 
 	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
@@ -13,23 +13,15 @@ import (
 )
 
 // Parsing - unjail
-func parseUnjailArgs(privKey key.PrivateKey) (*slashingtypes.MsgUnjail, error) {
-	addr := util.GetAddrByPrivKey(privKey)
+func parseUnjailArgs(privKey key.PrivateKey) (slashingtypes.MsgUnjail, error) {
+	addr, err := util.GetAddrByPrivKey(privKey)
+	if err != nil {
+		return slashingtypes.MsgUnjail{}, util.LogErr(errors.ErrParse, err)
+	}
+
 	msg := slashingtypes.NewMsgUnjail(sdk.ValAddress(addr))
 
-	return msg, nil
-}
-
-// Parsing - slashing params
-func parseQuerySlashingParamsArgs() (slashingtypes.QueryParamsRequest, error) {
-	return slashingtypes.QueryParamsRequest{}, nil
-}
-
-// Parsing - signing infos
-func parseQuerySigingInfosArgs() (slashingtypes.QuerySigningInfosRequest, error) {
-	return slashingtypes.QuerySigningInfosRequest{
-		Pagination: core.PageRequest,
-	}, nil
+	return *msg, nil
 }
 
 // Parsing - signing info
@@ -38,7 +30,7 @@ func parseQuerySigingInfoArgs(signingInfoMsg types.SigningInfoMsg, xplacEncoding
 		var pk cryptotypes.PubKey
 		err := xplacEncodingConfig.Marshaler.UnmarshalInterfaceJSON([]byte(signingInfoMsg.ConsPubKey), &pk)
 		if err != nil {
-			return slashingtypes.QuerySigningInfoRequest{}, err
+			return slashingtypes.QuerySigningInfoRequest{}, util.LogErr(errors.ErrFailedToUnmarshal, err)
 		}
 
 		return slashingtypes.QuerySigningInfoRequest{
@@ -49,6 +41,6 @@ func parseQuerySigingInfoArgs(signingInfoMsg types.SigningInfoMsg, xplacEncoding
 			ConsAddress: signingInfoMsg.ConsAddr,
 		}, nil
 	} else {
-		return slashingtypes.QuerySigningInfoRequest{}, util.LogErr("need at least one input")
+		return slashingtypes.QuerySigningInfoRequest{}, util.LogErr(errors.ErrInsufficientParams, "need at least one input")
 	}
 }

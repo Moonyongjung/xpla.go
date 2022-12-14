@@ -5,9 +5,9 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/Moonyongjung/xpla.go/core"
 	"github.com/Moonyongjung/xpla.go/key"
 	"github.com/Moonyongjung/xpla.go/types"
+	"github.com/Moonyongjung/xpla.go/types/errors"
 	"github.com/Moonyongjung/xpla.go/util"
 
 	"github.com/CosmWasm/wasmd/x/wasm/ioutils"
@@ -26,23 +26,23 @@ const (
 // Parsing - store code
 func parseStoreCodeArgs(storeMsg types.StoreMsg, sender sdk.AccAddress) (wasmtypes.MsgStoreCode, error) {
 	if storeMsg.FilePath == "" {
-		return wasmtypes.MsgStoreCode{}, util.LogErr("filepath is empty")
+		return wasmtypes.MsgStoreCode{}, util.LogErr(errors.ErrInsufficientParams, "filepath is empty")
 	}
 
 	wasm, err := os.ReadFile(storeMsg.FilePath)
 	if err != nil {
-		return wasmtypes.MsgStoreCode{}, err
+		return wasmtypes.MsgStoreCode{}, util.LogErr(errors.ErrParse, err)
 	}
 
 	// gzip the wasm file
 	if ioutils.IsWasm(wasm) {
 		wasm, err = ioutils.GzipIt(wasm)
-
 		if err != nil {
-			return wasmtypes.MsgStoreCode{}, err
+			return wasmtypes.MsgStoreCode{}, util.LogErr(errors.ErrParse, err)
 		}
+
 	} else if !ioutils.IsGzip(wasm) {
-		return wasmtypes.MsgStoreCode{}, util.LogErr("invalid input file. Use wasm binary or gzip")
+		return wasmtypes.MsgStoreCode{}, util.LogErr(errors.ErrInvalidRequest, "invalid input file. Use wasm binary or gzip")
 	}
 
 	permission, err := instantiatePermission(storeMsg.InstantiatePermission, sender)
@@ -81,11 +81,11 @@ func instantiatePermission(permission string, sender sdk.AccAddress) (*wasmtypes
 
 	case permMethod == instantiateByAddress:
 		if onlyAddr == "" {
-			return nil, util.LogErr("invalid permission, empty address")
+			return nil, util.LogErr(errors.ErrInsufficientParams, "invalid permission, empty address")
 		}
 		addr, err := sdk.AccAddressFromBech32(onlyAddr)
 		if err != nil {
-			return nil, err
+			return nil, util.LogErr(errors.ErrParse, err)
 		}
 		x := wasmtypes.AccessTypeOnlyAddress.With(addr)
 		return &x, nil
@@ -94,7 +94,7 @@ func instantiatePermission(permission string, sender sdk.AccAddress) (*wasmtypes
 		return &wasmtypes.AllowNobody, nil
 
 	default:
-		return nil, util.LogErr("invalid permission type")
+		return nil, util.LogErr(errors.ErrInvalidMsgType, "invalid permission type")
 	}
 }
 
@@ -105,13 +105,13 @@ func parseInstantiateArgs(
 
 	rawCodeID := instantiateMsgData.CodeId
 	if rawCodeID == "" {
-		return wasmtypes.MsgInstantiateContract{}, util.LogErr("No code ID")
+		return wasmtypes.MsgInstantiateContract{}, util.LogErr(errors.ErrInsufficientParams, "no code ID")
 	}
 
 	// get the id of the code to instantiate
 	codeID, err := strconv.ParseUint(rawCodeID, 10, 64)
 	if err != nil {
-		return wasmtypes.MsgInstantiateContract{}, err
+		return wasmtypes.MsgInstantiateContract{}, util.LogErr(errors.ErrParse, err)
 	}
 
 	amountStr := instantiateMsgData.Amount
@@ -120,17 +120,17 @@ func parseInstantiateArgs(
 	}
 	amount, err := sdk.ParseCoinsNormalized(util.DenomAdd(amountStr))
 	if err != nil {
-		return wasmtypes.MsgInstantiateContract{}, util.LogErr("amount:", err)
+		return wasmtypes.MsgInstantiateContract{}, util.LogErr(errors.ErrInvalidRequest, "amount:", err)
 	}
 
 	label := instantiateMsgData.Label
 	if label == "" {
-		return wasmtypes.MsgInstantiateContract{}, util.LogErr("label is required on all contracts")
+		return wasmtypes.MsgInstantiateContract{}, util.LogErr(errors.ErrInsufficientParams, "label is required on all contracts")
 	}
 
 	initMsg := instantiateMsgData.InitMsg
 	if initMsg == "" {
-		return wasmtypes.MsgInstantiateContract{}, util.LogErr("No Init Message")
+		return wasmtypes.MsgInstantiateContract{}, util.LogErr(errors.ErrInsufficientParams, "no Init Message")
 	}
 
 	adminStr := instantiateMsgData.Admin
@@ -142,15 +142,15 @@ func parseInstantiateArgs(
 	} else if noAdminStr == "" || noAdminStr == "false" {
 		noAdminBool = false
 	} else {
-		return wasmtypes.MsgInstantiateContract{}, util.LogErr("noAdmin parameter must set \"true\" or \"false\"")
+		return wasmtypes.MsgInstantiateContract{}, util.LogErr(errors.ErrInvalidMsgType, "noAdmin parameter must set \"true\" or \"false\"")
 	}
 
 	// ensure sensible admin is set (or explicitly immutable)
 	if adminStr == "" && !noAdminBool {
-		return wasmtypes.MsgInstantiateContract{}, util.LogErr("you must set an admin or explicitly pass --no-admin to make it immutible (wasmd issue #719)")
+		return wasmtypes.MsgInstantiateContract{}, util.LogErr(errors.ErrInvalidRequest, "you must set an admin or explicitly pass --no-admin to make it immutible (wasmd issue #719)")
 	}
 	if adminStr != "" && noAdminBool {
-		return wasmtypes.MsgInstantiateContract{}, util.LogErr("you set an admin and passed --no-admin, those cannot both be true")
+		return wasmtypes.MsgInstantiateContract{}, util.LogErr(errors.ErrInvalidRequest, "you set an admin and passed --no-admin, those cannot both be true")
 	}
 
 	// build and sign the transaction, then broadcast to Tendermint
@@ -174,7 +174,7 @@ func parseExecuteArgs(executeMsgData types.ExecuteMsg,
 	}
 	amount, err := sdk.ParseCoinsNormalized(util.DenomAdd(amountStr))
 	if err != nil {
-		return wasmtypes.MsgExecuteContract{}, util.LogErr("amount:", err)
+		return wasmtypes.MsgExecuteContract{}, util.LogErr(errors.ErrInvalidRequest, "amount:", err)
 	}
 
 	return wasmtypes.MsgExecuteContract{
@@ -187,31 +187,40 @@ func parseExecuteArgs(executeMsgData types.ExecuteMsg,
 
 // Parsing - clear contract admin
 func parseClearContractAdminArgs(clearContractAdminMsg types.ClearContractAdminMsg, privKey key.PrivateKey) (wasmtypes.MsgClearAdmin, error) {
+	sender, err := util.GetAddrByPrivKey(privKey)
+	if err != nil {
+		return wasmtypes.MsgClearAdmin{}, util.LogErr(errors.ErrParse, err)
+	}
+
 	return wasmtypes.MsgClearAdmin{
-		Sender:   util.GetAddrByPrivKey(privKey).String(),
+		Sender:   sender.String(),
 		Contract: clearContractAdminMsg.ContractAddress,
 	}, nil
 }
 
 // Parsing - set contract admin
-func parseSetContractAdminArgs(setContractAdminMsg types.SetContractAdminMsg, privKey key.PrivateKey) (wasmtypes.MsgUpdateAdmin, error) {
-	msg := wasmtypes.MsgUpdateAdmin{
-		Sender:   util.GetAddrByPrivKey(privKey).String(),
+func parseSetContractAdmintArgs(setContractAdminMsg types.SetContractAdminMsg, privKey key.PrivateKey) (wasmtypes.MsgUpdateAdmin, error) {
+	sender, err := util.GetAddrByPrivKey(privKey)
+	if err != nil {
+		return wasmtypes.MsgUpdateAdmin{}, util.LogErr(errors.ErrParse, err)
+	}
+
+	return wasmtypes.MsgUpdateAdmin{
+		Sender:   sender.String(),
 		Contract: setContractAdminMsg.ContractAddress,
 		NewAdmin: setContractAdminMsg.NewAdmin,
-	}
-
-	if err := msg.ValidateBasic(); err != nil {
-		return wasmtypes.MsgUpdateAdmin{}, err
-	}
-
-	return msg, nil
+	}, nil
 }
 
 // Parsing - migrate
 func parseMigrateArgs(migrateMsg types.MigrateMsg, privKey key.PrivateKey) (wasmtypes.MsgMigrateContract, error) {
+	sender, err := util.GetAddrByPrivKey(privKey)
+	if err != nil {
+		return wasmtypes.MsgMigrateContract{}, util.LogErr(errors.ErrParse, err)
+	}
+
 	return wasmtypes.MsgMigrateContract{
-		Sender:   util.GetAddrByPrivKey(privKey).String(),
+		Sender:   sender.String(),
 		Contract: migrateMsg.ContractAddress,
 		CodeID:   util.FromStringToUint64(migrateMsg.CodeId),
 		Msg:      []byte(migrateMsg.MigrateMsg),
@@ -225,7 +234,7 @@ func parseQueryArgs(queryMsgData types.QueryMsg,
 
 	queryData, err := decoder.DecodeString(queryMsgData.QueryMsg)
 	if err != nil {
-		return wasmtypes.QuerySmartContractStateRequest{}, util.LogErr(err)
+		return wasmtypes.QuerySmartContractStateRequest{}, util.LogErr(errors.ErrParse, err)
 	}
 
 	return wasmtypes.QuerySmartContractStateRequest{
@@ -234,70 +243,11 @@ func parseQueryArgs(queryMsgData types.QueryMsg,
 	}, nil
 }
 
-// Parsing - list code
-func parseListcodeArgs() wasmtypes.QueryCodesRequest {
-	return wasmtypes.QueryCodesRequest{
-		Pagination: core.PageRequest,
-	}
-}
-
-// Parsing - list contract by code
-func parseListContractByCodeArgs(listContractByCodeMsgData types.ListContractByCodeMsg) wasmtypes.QueryContractsByCodeRequest {
-	return wasmtypes.QueryContractsByCodeRequest{
-		CodeId:     util.FromStringToUint64(listContractByCodeMsgData.CodeId),
-		Pagination: core.PageRequest,
-	}
-}
-
-// Parsing - download
-func parseDownloadArgs(downloadMsgData types.DownloadMsg) wasmtypes.QueryCodeRequest {
-	return wasmtypes.QueryCodeRequest{
-		CodeId: util.FromStringToUint64(downloadMsgData.CodeId),
-	}
-}
-
-// Parsing - code info
-func parseCodeInfoArgs(codeInfoMsgData types.CodeInfoMsg) wasmtypes.QueryCodeRequest {
-	return wasmtypes.QueryCodeRequest{
-		CodeId: util.FromStringToUint64(codeInfoMsgData.CodeId),
-	}
-}
-
-// Parsing - contract info
-func parseContractInfoArgs(contractInfoMsgData types.ContractInfoMsg) wasmtypes.QueryContractInfoRequest {
-	return wasmtypes.QueryContractInfoRequest{
-		Address: contractInfoMsgData.ContractAddress,
-	}
-}
-
-// Parsing - contract state all
-func parseContractStateAllArgs(contractStateAllMsgData types.ContractStateAllMsg) wasmtypes.QueryAllContractStateRequest {
-	return wasmtypes.QueryAllContractStateRequest{
-		Address:    contractStateAllMsgData.ContractAddress,
-		Pagination: core.PageRequest,
-	}
-}
-
-// Parsing - history
-func parseContractHistoryArgs(contractHistoryMsgData types.ContractHistoryMsg) wasmtypes.QueryContractHistoryRequest {
-	return wasmtypes.QueryContractHistoryRequest{
-		Address:    contractHistoryMsgData.ContractAddress,
-		Pagination: core.PageRequest,
-	}
-}
-
-// Parsing - pinned
-func parsePinnedArgs() wasmtypes.QueryPinnedCodesRequest {
-	return wasmtypes.QueryPinnedCodesRequest{
-		Pagination: core.PageRequest,
-	}
-}
-
 // Parsing - libwasmvm version
 func parseLibwasmvmVersionArgs() (string, error) {
 	version, err := wasmvm.LibwasmvmVersion()
 	if err != nil {
-		return "", err
+		return "", util.LogErr(errors.ErrParse, err)
 	}
 	return version, nil
 }

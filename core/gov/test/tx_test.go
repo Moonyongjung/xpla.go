@@ -268,7 +268,7 @@ func SimulateMsgSubmitProposal(
 		txGen := util.MakeEncodingConfig().TxConfig
 		tx, err := testutil.GenTx(
 			txGen,
-			[]sdk.Msg{msg},
+			[]sdk.Msg{&msg},
 			fees,
 			testutil.DefaultTestGenTxGas,
 			chainID,
@@ -285,7 +285,7 @@ func SimulateMsgSubmitProposal(
 			return simtypes.NoOpMsg(govtypes.ModuleName, msg.Type(), "unable to deliver tx"), nil, err
 		}
 
-		opMsg := simtypes.NewOperationMsg(msg, true, "", nil)
+		opMsg := simtypes.NewOperationMsg(&msg, true, "", nil)
 
 		// get the submitted proposal ID
 		proposalID, err := k.GetProposalID(ctx)
@@ -363,7 +363,7 @@ func SimulateMsgDeposit(ak govtypes.AccountKeeper, bk govtypes.BankKeeper, k kee
 			App:           app,
 			TxGen:         util.MakeEncodingConfig().TxConfig,
 			Cdc:           nil,
-			Msg:           msg,
+			Msg:           &msg,
 			MsgType:       msg.Type(),
 			Context:       ctx,
 			SimAccount:    simAccount,
@@ -450,7 +450,7 @@ func SimulateMsgVoteWeighted(ak govtypes.AccountKeeper, bk govtypes.BankKeeper, 
 			App:             app,
 			TxGen:           util.MakeEncodingConfig().TxConfig,
 			Cdc:             nil,
-			Msg:             msg,
+			Msg:             &msg,
 			MsgType:         msg.Type(),
 			Context:         ctx,
 			SimAccount:      simAccount,

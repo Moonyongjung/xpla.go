@@ -118,7 +118,7 @@ func (suite *TestSuite) TestGRPCQueryProposals() {
 
 	m1, _ := key.NewMnemonic()
 	k1, _ := key.NewPrivKey(m1)
-	addr := util.GetAddrByPrivKey(k1)
+	addr, _ := util.GetAddrByPrivKey(k1)
 
 	testProposals := []govtypes.Proposal{}
 

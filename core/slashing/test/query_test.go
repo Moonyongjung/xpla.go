@@ -95,7 +95,7 @@ func (suite *TestSuite) TestGRPCSigningInfo() {
 
 	m1, _ := key.NewMnemonic()
 	k1, _ := key.NewPrivKey(m1)
-	addr1 := util.GetAddrByPrivKey(k1)
+	addr1, _ := util.GetAddrByPrivKey(k1)
 	pubk1 := k1.PubKey().String()
 
 	newValInfo := slashingtypes.NewValidatorSigningInfo(sdk.ConsAddress(addr1), int64(5), int64(4),
