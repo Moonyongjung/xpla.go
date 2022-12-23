@@ -133,11 +133,6 @@ func parseCallSolContractArgs(callSolContractMsg types.CallSolContractMsg, byteA
 	return callSolContractParseMsg, nil
 }
 
-// Parsing - transaction by hash
-func parseGetTransactionByHashArgs(getTransactionByHashMsg types.GetTransactionByHashMsg) (types.GetTransactionByHashMsg, error) {
-	return getTransactionByHashMsg, nil
-}
-
 // Parsing - block by hash or height
 func parseGetBlockByHashHeightArgs(getBlockByHashHeightMsg types.GetBlockByHashHeightMsg) (types.GetBlockByHashHeightMsg, error) {
 	if getBlockByHashHeightMsg.BlockHash != "" && getBlockByHashHeightMsg.BlockHeight != "" {
@@ -145,21 +140,6 @@ func parseGetBlockByHashHeightArgs(getBlockByHashHeightMsg types.GetBlockByHashH
 	}
 
 	return getBlockByHashHeightMsg, nil
-}
-
-// Parsing - account info
-func parseQueryAccountInfoArgs(accountInfoMsg types.AccountInfoMsg) (types.AccountInfoMsg, error) {
-	return accountInfoMsg, nil
-}
-
-// Parsing - web3 sha3
-func parseWeb3Sha3Args(web3Sha3Msg types.Web3Sha3Msg) (types.Web3Sha3Msg, error) {
-	return web3Sha3Msg, nil
-}
-
-// Parsing - get transaction count of the block
-func parseEthGetBlockTransactionCountArgs(ethGetBlockTransactionCountMsg types.EthGetBlockTransactionCountMsg) (types.EthGetBlockTransactionCountMsg, error) {
-	return ethGetBlockTransactionCountMsg, nil
 }
 
 // Parsing - sol contract estimate gas
@@ -210,16 +190,6 @@ func parseEstimateGasSolArgs(invokeSolContractMsg types.InvokeSolContractMsg, by
 	}
 
 	return callSolContractParseMsg, nil
-}
-
-// Parsing - get transaction by block hash and index
-func parseGetTransactionByBlockHashAndIndexArgs(getTransactionByBlockHashAndIndexMsg types.GetTransactionByBlockHashAndIndexMsg) (types.GetTransactionByBlockHashAndIndexMsg, error) {
-	return getTransactionByBlockHashAndIndexMsg, nil
-}
-
-// Parsing - get transaction receipt
-func parseGetTransactionReceiptArgs(getTransactionReceiptMsg types.GetTransactionReceiptMsg) (types.GetTransactionReceiptMsg, error) {
-	return getTransactionReceiptMsg, nil
 }
 
 // Parsing - get transaction receipt
@@ -285,21 +255,6 @@ func parseEthNewFilterArgs(ethNewFilterMsg types.EthNewFilterMsg) (EthNewFilterP
 	}
 
 	return varInput, nil
-}
-
-// Parsing - uninstall filter
-func parseEthUninsatllFilterArgs(ethUninsatllFilter types.EthUninsatllFilterMsg) (types.EthUninsatllFilterMsg, error) {
-	return ethUninsatllFilter, nil
-}
-
-// Parsing - get filter changes
-func parseEthGetFilterChangesArgs(ethGetFilterChangesMsg types.EthGetFilterChangesMsg) (types.EthGetFilterChangesMsg, error) {
-	return ethGetFilterChangesMsg, nil
-}
-
-// Parsing - get filter logs
-func parseEthGetFilterLogsArgs(ethGetFilterLogsMsg types.EthGetFilterLogsMsg) (types.EthGetFilterLogsMsg, error) {
-	return ethGetFilterLogsMsg, nil
 }
 
 // Parsing - get logs
