@@ -55,7 +55,7 @@ func (i IXplaClient) QueryEvm() (string, error) {
 			return "", util.LogErr(errors.ErrEvmRpcRequest, err)
 		}
 
-		result, err := util.GetAbiUnpack(convertMsg.CallName, res)
+		result, err := util.GetAbiUnpack(convertMsg.CallName, convertMsg.ABI, convertMsg.Bytecode, res)
 		if err != nil {
 			return "", util.LogErr(errors.ErrParse, err)
 		}

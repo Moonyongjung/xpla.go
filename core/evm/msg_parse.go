@@ -7,7 +7,6 @@ import (
 	"github.com/Moonyongjung/xpla.go/util"
 
 	"github.com/ethereum/go-ethereum"
-	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/rpc"
 )
@@ -24,13 +23,13 @@ func parseSendCoinArgs(sendCoinMsg types.SendCoinMsg, privKey key.PrivateKey) (t
 }
 
 // Parsing - deploy solidity contract
-func parseDeploySolContractArgs(deploySolContractMsg types.DeploySolContractMsg) error {
+func parseDeploySolContractArgs(deploySolContractMsg types.DeploySolContractMsg) (ContractInfo, error) {
 	var err error
 	bytecode := deploySolContractMsg.Bytecode
 	if deploySolContractMsg.BytecodeJsonFilePath != "" {
 		bytecode, err = util.BytecodeParsing(deploySolContractMsg.BytecodeJsonFilePath)
 		if err != nil {
-			return util.LogErr(errors.ErrParse, err)
+			return ContractInfo{}, util.LogErr(errors.ErrParse, err)
 		}
 	}
 
@@ -38,45 +37,45 @@ func parseDeploySolContractArgs(deploySolContractMsg types.DeploySolContractMsg)
 	if deploySolContractMsg.ABIJsonFilePath != "" {
 		abi, err = util.AbiParsing(deploySolContractMsg.ABIJsonFilePath)
 		if err != nil {
-			return util.LogErr(errors.ErrParse, err)
+			return ContractInfo{}, util.LogErr(errors.ErrParse, err)
 		}
 	}
 
-	if abi == "" || bytecode == "" {
-		return util.LogErr(errors.ErrInsufficientParams, "empty parameters, need ABI and bytecode")
+	if deploySolContractMsg.Args == nil || len(deploySolContractMsg.Args) == 0 {
+		Args = nil
+	} else {
+		Args = deploySolContractMsg.Args
 	}
 
-	util.XplaSolContractMetaData = &bind.MetaData{
-		ABI: abi,
-		Bin: bytecode,
-	}
-
-	return nil
+	return ContractInfo{
+		Abi:      abi,
+		Bytecode: bytecode,
+	}, nil
 }
 
 // Parsing - invoke solidity contract
 func parseInvokeSolContractArgs(invokeSolContractMsg types.InvokeSolContractMsg) (types.InvokeSolContractMsg, error) {
 	var err error
-	bytecode := invokeSolContractMsg.Bytecode
 	if invokeSolContractMsg.BytecodeJsonFilePath != "" {
-		bytecode, err = util.BytecodeParsing(invokeSolContractMsg.BytecodeJsonFilePath)
+		invokeSolContractMsg.Bytecode, err = util.BytecodeParsing(invokeSolContractMsg.BytecodeJsonFilePath)
 		if err != nil {
 			return types.InvokeSolContractMsg{}, util.LogErr(errors.ErrParse, err)
 		}
 	}
 
-	abi := invokeSolContractMsg.ABI
 	if invokeSolContractMsg.ABIJsonFilePath != "" {
-		abi, err = util.AbiParsing(invokeSolContractMsg.ABIJsonFilePath)
+		invokeSolContractMsg.ABI, err = util.AbiParsing(invokeSolContractMsg.ABIJsonFilePath)
 		if err != nil {
 			return types.InvokeSolContractMsg{}, util.LogErr(errors.ErrParse, err)
 		}
 	}
-	invokeSolContractMsg.ContractAddress = util.FromStringToTypeHexString(invokeSolContractMsg.ContractAddress)
-	util.XplaSolContractMetaData = &bind.MetaData{
-		ABI: abi,
-		Bin: bytecode,
+	if invokeSolContractMsg.Args == nil || len(invokeSolContractMsg.Args) == 0 {
+		Args = nil
+	} else {
+		Args = invokeSolContractMsg.Args
 	}
+
+	invokeSolContractMsg.ContractAddress = util.FromStringToTypeHexString(invokeSolContractMsg.ContractAddress)
 
 	return invokeSolContractMsg, nil
 }
@@ -99,13 +98,13 @@ func parseCallSolContractArgs(callSolContractMsg types.CallSolContractMsg, byteA
 			return CallSolContractParseMsg{}, util.LogErr(errors.ErrParse, err)
 		}
 	}
-	callSolContractMsg.ContractAddress = util.FromStringToTypeHexString(callSolContractMsg.ContractAddress)
-	util.XplaSolContractMetaData = &bind.MetaData{
-		ABI: abi,
-		Bin: bytecode,
-	}
 
-	callByteData, err := util.GetAbiPack(callSolContractMsg.ContractFuncCallName, callSolContractMsg.Args...)
+	if callSolContractMsg.Args == nil || len(callSolContractMsg.Args) == 0 {
+		Args = nil
+	} else {
+		Args = callSolContractMsg.Args
+	}
+	callByteData, err := util.GetAbiPack(callSolContractMsg.ContractFuncCallName, abi, bytecode, Args...)
 	if err != nil {
 		return CallSolContractParseMsg{}, util.LogErr(errors.ErrParse, err)
 	}
@@ -128,6 +127,8 @@ func parseCallSolContractArgs(callSolContractMsg types.CallSolContractMsg, byteA
 	callSolContractParseMsg := CallSolContractParseMsg{
 		CallMsg:  msg,
 		CallName: callSolContractMsg.ContractFuncCallName,
+		ABI:      abi,
+		Bytecode: bytecode,
 	}
 
 	return callSolContractParseMsg, nil
@@ -161,12 +162,8 @@ func parseEstimateGasSolArgs(invokeSolContractMsg types.InvokeSolContractMsg, by
 		}
 	}
 	invokeSolContractMsg.ContractAddress = util.FromStringToTypeHexString(invokeSolContractMsg.ContractAddress)
-	util.XplaSolContractMetaData = &bind.MetaData{
-		ABI: abi,
-		Bin: bytecode,
-	}
 
-	callByteData, err := util.GetAbiPack(invokeSolContractMsg.ContractFuncCallName, invokeSolContractMsg.Args...)
+	callByteData, err := util.GetAbiPack(invokeSolContractMsg.ContractFuncCallName, abi, bytecode, invokeSolContractMsg.Args...)
 	if err != nil {
 		return CallSolContractParseMsg{}, util.LogErr(errors.ErrParse, err)
 	}

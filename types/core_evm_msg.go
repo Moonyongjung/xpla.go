@@ -17,6 +17,7 @@ type DeploySolContractMsg struct {
 	Bytecode             string
 	ABIJsonFilePath      string
 	BytecodeJsonFilePath string
+	Args                 []interface{}
 }
 
 type InvokeSolContractMsg struct {

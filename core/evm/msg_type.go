@@ -45,6 +45,8 @@ const (
 type CallSolContractParseMsg struct {
 	CallMsg  ethereum.CallMsg
 	CallName string
+	ABI      string
+	Bytecode string
 }
 
 type EthNewFilterParseMsg struct {
@@ -55,10 +57,19 @@ type EthNewFilterParseMsg struct {
 	Topics    []interface{}    `json:"topics"`
 }
 
+type ContractInfo struct {
+	Abi      string
+	Bytecode string
+}
+
 type DeploySolTx struct {
 	ChainId  *big.Int
 	Nonce    *big.Int
 	Value    *big.Int
 	GasLimit uint64
 	GasPrice *big.Int
+	ABI      string
+	Bytecode string
 }
+
+var Args []interface{}

@@ -162,13 +162,13 @@ func (xplac *XplaClient) EvmSendCoin(sendCoinMsg types.SendCoinMsg) *XplaClient 
 
 // Deploy soldity contract.
 func (xplac *XplaClient) DeploySolidityContract(deploySolContractMsg types.DeploySolContractMsg) *XplaClient {
-	err := mevm.MakeDeploySolContractMsg(deploySolContractMsg)
+	msg, err := mevm.MakeDeploySolContractMsg(deploySolContractMsg)
 	if err != nil {
 		xplac.Err = err
 	}
 	xplac.Module = mevm.EvmModule
 	xplac.MsgType = mevm.EvmDeploySolContractMsgType
-	xplac.Msg = nil
+	xplac.Msg = msg
 	return xplac
 }
 

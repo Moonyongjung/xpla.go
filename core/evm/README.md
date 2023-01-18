@@ -17,11 +17,25 @@ res, err := xplac.Broadcast(txbytes)
 // Select input type of ABI and bytecode.
 // It is also possible to input the entire abi and bytecode as a string type, but you can also enter a file path.
 // ABI type must be json and bytecode file must be compiled file on Remix IDE.
+
+// Constructor input arguments
+var args []interface{}
+owner := []common.Address{
+    common.HexToAddress("0xC9F0A2b814d389088a508E31fBa483E8C4372CC2"),
+    common.HexToAddress("0x41776240700C033A75A2872EF0AD32b4911e13B1"),
+    common.HexToAddress("0xaaC4758A943B2692F2daE0DE8d402aD7045A8DfB"),
+}
+required := big.NewInt(2)
+
+args = append(args, owner)
+args = append(args, required)
+
 deploySolContractMsg := types.DeploySolContractMsg{
     //ABI: `{ ABI json string type }`
     ABIJsonFilePath: "./abi.json",
     // Bytecode: "60806040523480156100......",
     BytecodeJsonFilePath: "./bytecode.json",
+    Args: args,
 }
 
 txbytes, err := xplac.DeploySolidityContract(deploySolContractMsg).CreateAndSignTx()

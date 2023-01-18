@@ -16,13 +16,13 @@ func MakeSendCoinMsg(sendCoinMsg types.SendCoinMsg, privKey key.PrivateKey) (typ
 }
 
 // (Tx) make msg - deploy solidity contract
-func MakeDeploySolContractMsg(deploySolContractMsg types.DeploySolContractMsg) error {
-	err := parseDeploySolContractArgs(deploySolContractMsg)
+func MakeDeploySolContractMsg(deploySolContractMsg types.DeploySolContractMsg) (ContractInfo, error) {
+	msg, err := parseDeploySolContractArgs(deploySolContractMsg)
 	if err != nil {
-		return err
+		return ContractInfo{}, err
 	}
 
-	return nil
+	return msg, nil
 }
 
 // (Tx) make msg - invoke solidity contract

@@ -11,6 +11,7 @@ import (
 
 	txtypes "github.com/cosmos/cosmos-sdk/types/tx"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
+	"github.com/ethereum/go-ethereum/common"
 	evmtypes "github.com/ethereum/go-ethereum/core/types"
 )
 
@@ -100,7 +101,20 @@ func broadcastTxEvm(xplac *XplaClient, txBytes []byte, broadcastMode string, evm
 		contractAuth.GasLimit = deployTx.GasLimit
 		contractAuth.GasPrice = deployTx.GasPrice
 
-		_, transaction, _, err := util.DeployXplaSolContract(contractAuth, evmClient.Client)
+		metadata := util.GetBindMetaData(deployTx.ABI, deployTx.Bytecode)
+		parsedAbi, err := metadata.GetAbi()
+		if err != nil {
+			return nil, util.LogErr(errors.ErrEvmRpcRequest, err)
+		}
+		parsedBytecode := common.FromHex(metadata.Bin)
+
+		var transaction *evmtypes.Transaction
+		if mevm.Args == nil {
+			_, transaction, _, err = bind.DeployContract(contractAuth, *parsedAbi, parsedBytecode, evmClient.Client)
+		} else {
+			_, transaction, _, err = bind.DeployContract(contractAuth, *parsedAbi, parsedBytecode, evmClient.Client, mevm.Args...)
+			mevm.Args = nil
+		}
 		if err != nil {
 			return nil, util.LogErr(errors.ErrEvmRpcRequest, err)
 		}

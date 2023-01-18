@@ -432,6 +432,7 @@ func (xplac *XplaClient) createAndSignEvmTx() ([]byte, error) {
 		return evmTxSignRound(xplac, toAddr, gasPrice, amount, nil, chainId, ethPrivKey)
 
 	case xplac.MsgType == mevm.EvmDeploySolContractMsgType:
+		convertMsg, _ := xplac.Msg.(mevm.ContractInfo)
 		nonce, err := util.FromStringToBigInt(xplac.Opts.Sequence)
 		if err != nil {
 			return nil, err
@@ -448,6 +449,8 @@ func (xplac *XplaClient) createAndSignEvmTx() ([]byte, error) {
 			Value:    value,
 			GasLimit: util.FromStringToUint64(xplac.Opts.GasLimit),
 			GasPrice: gasPrice,
+			ABI:      convertMsg.Abi,
+			Bytecode: convertMsg.Bytecode,
 		}
 
 		txbytes, err := util.JsonMarshalData(tx)
@@ -459,7 +462,10 @@ func (xplac *XplaClient) createAndSignEvmTx() ([]byte, error) {
 
 	case xplac.MsgType == mevm.EvmInvokeSolContractMsgType:
 		convertMsg, _ := xplac.Msg.(types.InvokeSolContractMsg)
-		invokeByteData, err := util.GetAbiPack(convertMsg.ContractFuncCallName, convertMsg.Args...)
+		var invokeByteData []byte
+
+		invokeByteData, err = util.GetAbiPack(convertMsg.ContractFuncCallName, convertMsg.ABI, convertMsg.Bytecode, mevm.Args...)
+		mevm.Args = nil
 		if err != nil {
 			return nil, util.LogErr(errors.ErrParse, err)
 		}
