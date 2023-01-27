@@ -202,30 +202,24 @@ func setTxBuilderMsg(xplac *XplaClient) (cmclient.TxBuilder, error) {
 }
 
 // Set information for transaction builder.
-func convertAndSetBuilder(xplac *XplaClient, builder cmclient.TxBuilder) cmclient.TxBuilder {
-	if xplac.Opts.FeeAmount != "" {
-		feeAmountDenomRemove, _ := util.FromStringToBigInt(util.DenomRemove(xplac.Opts.FeeAmount))
-		feeAmountCoin := sdk.Coin{
-			Amount: sdk.NewIntFromBigInt(feeAmountDenomRemove),
-			Denom:  types.XplaDenom,
-		}
-		feeAmountCoins := sdk.NewCoins(feeAmountCoin)
-		builder.SetFeeAmount(feeAmountCoins)
+func convertAndSetBuilder(xplac *XplaClient, builder cmclient.TxBuilder, gasLimit string, feeAmount string) cmclient.TxBuilder {
+	feeAmountDenomRemove, _ := util.FromStringToBigInt(util.DenomRemove(feeAmount))
+	feeAmountCoin := sdk.Coin{
+		Amount: sdk.NewIntFromBigInt(feeAmountDenomRemove),
+		Denom:  types.XplaDenom,
 	}
-
-	if xplac.Opts.GasLimit != "" {
-		builder.SetGasLimit(util.FromStringToUint64(xplac.Opts.GasLimit))
-	}
+	feeAmountCoins := sdk.NewCoins(feeAmountCoin)
 
 	if xplac.Opts.TimeoutHeight != "" {
 		builder.SetTimeoutHeight(util.FromStringToUint64(xplac.Opts.TimeoutHeight))
 	}
-
-	builder.SetFeeGranter(xplac.Opts.FeeGranter)
-
 	if types.Memo != "" {
 		builder.SetMemo(types.Memo)
 	}
+
+	builder.SetFeeAmount(feeAmountCoins)
+	builder.SetGasLimit(util.FromStringToUint64(gasLimit))
+	builder.SetFeeGranter(xplac.Opts.FeeGranter)
 
 	return builder
 }
@@ -289,6 +283,7 @@ func txSignRound(xplac *XplaClient,
 func evmTxSignRound(xplac *XplaClient,
 	toAddr common.Address,
 	gasPrice *big.Int,
+	gasLimit string,
 	amount *big.Int,
 	invokeByteData []byte,
 	chainId *big.Int,
@@ -298,7 +293,7 @@ func evmTxSignRound(xplac *XplaClient,
 		util.FromStringToUint64(xplac.Opts.Sequence),
 		toAddr,
 		amount,
-		util.FromStringToUint64(xplac.Opts.GasLimit),
+		util.FromStringToUint64(gasLimit),
 		gasPrice,
 		invokeByteData,
 	)
@@ -369,4 +364,42 @@ func getMultisigInfo(clientCtx cmclient.Context, name string) (keyring.Info, err
 	}
 
 	return multisigInfo, nil
+}
+
+// Calculate gas limit and fee amount
+func getGasLimitFeeAmount(xplac *XplaClient, builder cmclient.TxBuilder) (string, string, error) {
+	gasLimit := xplac.GetGasLimit()
+	if xplac.Opts.GasLimit == "" {
+		if xplac.Opts.LcdURL == "" && xplac.Opts.GrpcURL == "" {
+			gasLimit = types.DefaultGasLimit
+		} else {
+			simulate, err := xplac.Simulate(builder)
+			if err != nil {
+				return "", "", err
+			}
+			gasLimitAdjustment, err := util.GasLimitAdjustment(simulate.GasInfo.GasUsed, xplac.Opts.GasAdjustment)
+			if err != nil {
+				return "", "", err
+			}
+			gasLimit = gasLimitAdjustment
+		}
+	}
+
+	feeAmount := xplac.GetFeeAmount()
+	if xplac.Opts.FeeAmount == "" {
+		gasLimitBigInt, err := util.FromStringToBigInt(gasLimit)
+		if err != nil {
+			return "", "", err
+		}
+
+		gasPriceBigInt, err := util.FromStringToBigInt(xplac.Opts.GasPrice)
+		if err != nil {
+			return "", "", err
+		}
+
+		feeAmountBigInt := util.MulBigInt(gasLimitBigInt, gasPriceBigInt)
+		feeAmount = util.FromBigIntToString(feeAmountBigInt)
+	}
+
+	return gasLimit, feeAmount, nil
 }

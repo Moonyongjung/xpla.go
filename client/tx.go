@@ -2,6 +2,7 @@ package client
 
 import (
 	"encoding/base64"
+	"encoding/json"
 
 	mevm "github.com/Moonyongjung/xpla.go/core/evm"
 	"github.com/Moonyongjung/xpla.go/key"
@@ -60,38 +61,12 @@ func (xplac *XplaClient) CreateAndSignTx() ([]byte, error) {
 			return nil, err
 		}
 
-		if xplac.Opts.GasLimit == "" {
-			if xplac.Opts.LcdURL == "" && xplac.Opts.GrpcURL == "" {
-				xplac.WithGasLimit(types.DefaultGasLimit)
-			} else {
-				simulate, err := xplac.Simulate(builder)
-				if err != nil {
-					return nil, err
-				}
-				gasLimitAdjustment, err := util.GasLimitAdjustment(simulate.GasInfo.GasUsed, xplac.Opts.GasAdjustment)
-				if err != nil {
-					return nil, util.LogErr(errors.ErrParse, err)
-				}
-				xplac.WithGasLimit(gasLimitAdjustment)
-			}
+		gasLimit, feeAmount, err := getGasLimitFeeAmount(xplac, builder)
+		if err != nil {
+			return nil, err
 		}
 
-		if xplac.Opts.FeeAmount == "" {
-			gasLimitBigInt, err := util.FromStringToBigInt(xplac.Opts.GasLimit)
-			if err != nil {
-				return nil, err
-			}
-
-			gasPriceBigInt, err := util.FromStringToBigInt(xplac.Opts.GasPrice)
-			if err != nil {
-				return nil, err
-			}
-
-			feeAmount := util.MulBigInt(gasLimitBigInt, gasPriceBigInt)
-			xplac.WithFeeAmount(util.FromBigIntToString(feeAmount))
-		}
-
-		builder = convertAndSetBuilder(xplac, builder)
+		builder = convertAndSetBuilder(xplac, builder, gasLimit, feeAmount)
 
 		// Set default sign mode (DIRECT=1)
 		if xplac.Opts.SignMode == signing.SignMode_SIGN_MODE_UNSPECIFIED {
@@ -145,7 +120,12 @@ func (xplac *XplaClient) CreateUnsignedTx() ([]byte, error) {
 		return nil, err
 	}
 
-	builder = convertAndSetBuilder(xplac, builder)
+	gasLimit, feeAmount, err := getGasLimitFeeAmount(xplac, builder)
+	if err != nil {
+		return nil, err
+	}
+
+	builder = convertAndSetBuilder(xplac, builder, gasLimit, feeAmount)
 
 	sdkTx := builder.GetTx()
 	txBytes, err := xplac.EncodingConfig.TxConfig.TxEncoder()(sdkTx)
@@ -407,14 +387,6 @@ func (xplac *XplaClient) createAndSignEvmTx() ([]byte, error) {
 		util.LogInfo("no create output document as tx of evm")
 	}
 
-	if xplac.Opts.GasLimit == "" {
-		gasLimitAdjustment, err := util.GasLimitAdjustment(util.FromStringToUint64(util.DefaultEvmGasLimit), xplac.Opts.GasAdjustment)
-		if err != nil {
-			return nil, util.LogErr(errors.ErrParse, err)
-		}
-		xplac.WithGasLimit(gasLimitAdjustment)
-	}
-
 	gasPrice, err := util.FromStringToBigInt(xplac.Opts.GasPrice)
 	if err != nil {
 		return nil, err
@@ -422,6 +394,15 @@ func (xplac *XplaClient) createAndSignEvmTx() ([]byte, error) {
 
 	switch {
 	case xplac.MsgType == mevm.EvmSendCoinMsgType:
+		gasLimit := xplac.GetGasLimit()
+		if gasLimit == "" {
+			gasLimitAdjustment, err := util.GasLimitAdjustment(util.FromStringToUint64(util.DefaultEvmGasLimit), xplac.Opts.GasAdjustment)
+			if err != nil {
+				return nil, util.LogErr(errors.ErrParse, err)
+			}
+			gasLimit = gasLimitAdjustment
+		}
+
 		convertMsg, _ := xplac.Msg.(types.SendCoinMsg)
 		toAddr := util.FromStringToByte20Address(convertMsg.ToAddress)
 		amount, err := util.FromStringToBigInt(convertMsg.Amount)
@@ -429,9 +410,14 @@ func (xplac *XplaClient) createAndSignEvmTx() ([]byte, error) {
 			return nil, err
 		}
 
-		return evmTxSignRound(xplac, toAddr, gasPrice, amount, nil, chainId, ethPrivKey)
+		return evmTxSignRound(xplac, toAddr, gasPrice, gasLimit, amount, nil, chainId, ethPrivKey)
 
 	case xplac.MsgType == mevm.EvmDeploySolContractMsgType:
+		gasLimit := xplac.GetGasLimit()
+		if gasLimit == "" {
+			gasLimit = "0"
+		}
+
 		convertMsg, _ := xplac.Msg.(mevm.ContractInfo)
 		nonce, err := util.FromStringToBigInt(xplac.Opts.Sequence)
 		if err != nil {
@@ -447,7 +433,7 @@ func (xplac *XplaClient) createAndSignEvmTx() ([]byte, error) {
 			ChainId:  chainId,
 			Nonce:    nonce,
 			Value:    value,
-			GasLimit: util.FromStringToUint64(xplac.Opts.GasLimit),
+			GasLimit: util.FromStringToUint64(gasLimit),
 			GasPrice: gasPrice,
 			ABI:      convertMsg.Abi,
 			Bytecode: convertMsg.Bytecode,
@@ -463,7 +449,6 @@ func (xplac *XplaClient) createAndSignEvmTx() ([]byte, error) {
 	case xplac.MsgType == mevm.EvmInvokeSolContractMsgType:
 		convertMsg, _ := xplac.Msg.(types.InvokeSolContractMsg)
 		var invokeByteData []byte
-
 		invokeByteData, err = util.GetAbiPack(convertMsg.ContractFuncCallName, convertMsg.ABI, convertMsg.Bytecode, mevm.Args...)
 		mevm.Args = nil
 		if err != nil {
@@ -473,10 +458,27 @@ func (xplac *XplaClient) createAndSignEvmTx() ([]byte, error) {
 		toAddr := util.FromStringToByte20Address(convertMsg.ContractAddress)
 		amount, err := util.FromStringToBigInt("0")
 		if err != nil {
-			return nil, err
+			return nil, util.LogErr(errors.ErrEvmRpcRequest, err)
 		}
 
-		return evmTxSignRound(xplac, toAddr, gasPrice, amount, invokeByteData, chainId, ethPrivKey)
+		gasLimit := xplac.GetGasLimit()
+		if gasLimit == "" {
+			estimateGas, err := xplac.EstimateGas(convertMsg).Query()
+			if err != nil {
+				return nil, err
+			}
+			var estimateGasResponse types.EstimateGasResponse
+			json.Unmarshal([]byte(estimateGas), &estimateGasResponse)
+			xplac.MsgType = mevm.EvmInvokeSolContractMsgType
+
+			gasLimitAdjustment, err := util.GasLimitAdjustment(estimateGasResponse.EstimateGas, xplac.Opts.GasAdjustment)
+			if err != nil {
+				return nil, util.LogErr(errors.ErrParse, err)
+			}
+			gasLimit = gasLimitAdjustment
+		}
+
+		return evmTxSignRound(xplac, toAddr, gasPrice, gasLimit, amount, invokeByteData, chainId, ethPrivKey)
 
 	default:
 		return nil, util.LogErr(errors.ErrInvalidMsgType, "invalid EVM message type")

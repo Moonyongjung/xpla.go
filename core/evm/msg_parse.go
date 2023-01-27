@@ -111,7 +111,6 @@ func parseCallSolContractArgs(callSolContractMsg types.CallSolContractMsg, byteA
 
 	fromAddr := util.FromStringToByte20Address(byteAddress)
 	toAddr := util.FromStringToByte20Address(callSolContractMsg.ContractAddress)
-
 	value, err := util.FromStringToBigInt("0")
 	if err != nil {
 		return CallSolContractParseMsg{}, err
@@ -163,7 +162,13 @@ func parseEstimateGasSolArgs(invokeSolContractMsg types.InvokeSolContractMsg, by
 	}
 	invokeSolContractMsg.ContractAddress = util.FromStringToTypeHexString(invokeSolContractMsg.ContractAddress)
 
-	callByteData, err := util.GetAbiPack(invokeSolContractMsg.ContractFuncCallName, abi, bytecode, invokeSolContractMsg.Args...)
+	var callByteData []byte
+	if invokeSolContractMsg.Args == nil || len(invokeSolContractMsg.Args) == 0 {
+		callByteData, err = util.GetAbiPack(invokeSolContractMsg.ContractFuncCallName, abi, bytecode)
+	} else {
+		callByteData, err = util.GetAbiPack(invokeSolContractMsg.ContractFuncCallName, abi, bytecode, invokeSolContractMsg.Args...)
+	}
+
 	if err != nil {
 		return CallSolContractParseMsg{}, util.LogErr(errors.ErrParse, err)
 	}

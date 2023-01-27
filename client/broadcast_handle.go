@@ -106,6 +106,9 @@ func broadcastTxEvm(xplac *XplaClient, txBytes []byte, broadcastMode string, evm
 		if err != nil {
 			return nil, util.LogErr(errors.ErrEvmRpcRequest, err)
 		}
+		if parsedAbi == nil {
+			return nil, util.LogErr(errors.ErrEvmRpcRequest, "GetABI returned nil")
+		}
 		parsedBytecode := common.FromHex(metadata.Bin)
 
 		var transaction *evmtypes.Transaction

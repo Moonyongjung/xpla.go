@@ -367,8 +367,7 @@ func (i IXplaClient) QueryEvm() (string, error) {
 	// Evm call contract
 	case i.Ixplac.GetMsgType() == mevm.EvmEthEstimateGasMsgType:
 		convertMsg, _ := i.Ixplac.GetMsg().(mevm.CallSolContractParseMsg)
-
-		convertMsg.CallMsg.Gas = util.FromStringToUint64(gasLimit)
+		convertMsg.CallMsg.Gas = 0
 		convertMsg.CallMsg.GasPrice = gasPriceBigInt
 
 		res, err := evmClient.Client.EstimateGas(evmClient.Ctx, convertMsg.CallMsg)
