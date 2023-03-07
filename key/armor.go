@@ -84,7 +84,6 @@ func UnarmorDecryptPrivKeyWithoutPassphrase(armorStr string) (privKey cryptotype
 	}
 
 	privKey, err = decryptPrivKey(saltBytes, encBytes, DefaultEncryptPassphrase)
-
 	if header[headerType] == "" {
 		header[headerType] = types.DefaultXplaKeyAlgo
 	}

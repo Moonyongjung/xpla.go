@@ -19,6 +19,7 @@ var out []byte
 var res proto.Message
 var err error
 
+// Query internal XPLA client
 type IXplaClient struct {
 	Ixplac    ModuleClient
 	QueryType uint8

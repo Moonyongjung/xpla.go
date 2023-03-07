@@ -8,5 +8,5 @@ invariantBrokenMsg := types.InvariantBrokenMsg{
 }
 
 txbytes, err := xplac.InvariantBroken(invariantBrokenMsg).CreateAndSignTx()
-res, err := xplac.Braodcast(txbytes)
+res, err := xplac.Broadcast(txbytes)
 ```
