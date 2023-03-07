@@ -228,8 +228,7 @@ func parseMigrateArgs(migrateMsg types.MigrateMsg, privKey key.PrivateKey) (wasm
 }
 
 // Parsing - query contract
-func parseQueryArgs(queryMsgData types.QueryMsg,
-	sender sdk.AccAddress) (wasmtypes.QuerySmartContractStateRequest, error) {
+func parseQueryArgs(queryMsgData types.QueryMsg) (wasmtypes.QuerySmartContractStateRequest, error) {
 	decoder := NewArgDecoder(AsciiDecodeString)
 
 	queryData, err := decoder.DecodeString(queryMsgData.QueryMsg)

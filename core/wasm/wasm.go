@@ -101,12 +101,12 @@ func MakeMigrateMsg(migrateMsg types.MigrateMsg, privKey key.PrivateKey) (wasmty
 }
 
 // (Query) make msg - query contract
-func MakeQueryMsg(queryMsg types.QueryMsg, addr sdk.AccAddress) (wasmtypes.QuerySmartContractStateRequest, error) {
+func MakeQueryMsg(queryMsg types.QueryMsg) (wasmtypes.QuerySmartContractStateRequest, error) {
 	if (types.QueryMsg{}) == queryMsg {
 		return wasmtypes.QuerySmartContractStateRequest{}, util.LogErr(errors.ErrInsufficientParams, "Empty request or type of parameter is not correct")
 	}
 
-	msg, err := parseQueryArgs(queryMsg, addr)
+	msg, err := parseQueryArgs(queryMsg)
 	if err != nil {
 		return wasmtypes.QuerySmartContractStateRequest{}, err
 	}

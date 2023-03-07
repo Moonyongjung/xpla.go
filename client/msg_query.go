@@ -220,7 +220,7 @@ func (xplac *XplaClient) DistributionParams() *XplaClient {
 	return xplac
 }
 
-// Query distribution outstanding (un-withdrawn) rewards for a validator and all thier delegations.
+// Query distribution outstanding (un-withdrawn) rewards for a validator and all their delegations.
 func (xplac *XplaClient) ValidatorOutstandingRewards(validatorOutstandingRewardsMsg types.ValidatorOutstandingRewardsMsg) *XplaClient {
 	msg, err := mdist.MakeValidatorOutstandingRewardsMsg(validatorOutstandingRewardsMsg)
 	if err != nil {
@@ -1189,13 +1189,7 @@ func (xplac *XplaClient) Plan() *XplaClient {
 
 // Calls contract with given address with query data and prints the returned result.
 func (xplac *XplaClient) QueryContract(queryMsg types.QueryMsg) *XplaClient {
-	addr, err := util.GetAddrByPrivKey(xplac.Opts.PrivateKey)
-	if err != nil {
-		xplac.Err = err
-		return xplac
-	}
-
-	msg, err := mwasm.MakeQueryMsg(queryMsg, addr)
+	msg, err := mwasm.MakeQueryMsg(queryMsg)
 	if err != nil {
 		xplac.Err = err
 		return xplac
