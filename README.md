@@ -1,4 +1,4 @@
-# xpla.go-beta
+# xpla.go
 <div align="left">
   <a href="https://pkg.go.dev/github.com/Moonyongjung/xpla.go">
     <img src="https://pkg.go.dev/badge/github.com/Moonyongjung/xpla.go.svg" alt="Go Reference">
