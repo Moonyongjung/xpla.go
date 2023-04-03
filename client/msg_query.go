@@ -1164,7 +1164,85 @@ func (xplac *XplaClient) IbcChannelNextSequence(ibcChannelNextSequenceMsg types.
 		return xplac
 	}
 	xplac.Module = mibc.IbcModule
-	xplac.MsgType = mibc.IbcChannelNextSequenceReceiveMsgType
+	xplac.MsgType = mibc.IbcChannelNextSequenceMsgType
+	xplac.Msg = msg
+	return xplac
+}
+
+// Query IBC transfer denom traces
+func (xplac *XplaClient) IbcDenomTraces(ibcDenomTraceMsg ...types.IbcDenomTraceMsg) *XplaClient {
+	if len(ibcDenomTraceMsg) == 0 {
+		msg, err := mibc.MakeIbcTransferDenomTracesMsg()
+		if err != nil {
+			xplac.Err = err
+			return xplac
+		}
+		xplac.Module = mibc.IbcModule
+		xplac.MsgType = mibc.IbcTransferDenomTracesMsgType
+		xplac.Msg = msg
+	} else if len(ibcDenomTraceMsg) == 1 {
+		msg, err := mibc.MakeIbcTransferDenomTraceMsg(ibcDenomTraceMsg[0])
+		if err != nil {
+			xplac.Err = err
+			return xplac
+		}
+		xplac.Module = mibc.IbcModule
+		xplac.MsgType = mibc.IbcTransferDenomTraceMsgType
+		xplac.Msg = msg
+	} else {
+		xplac.Err = util.LogErr(errors.ErrInvalidRequest, "need only one parameter")
+	}
+	return xplac
+}
+
+// Query IBC transfer denom trace
+func (xplac *XplaClient) IbcDenomTrace(ibcDenomTraceMsg types.IbcDenomTraceMsg) *XplaClient {
+	msg, err := mibc.MakeIbcTransferDenomTraceMsg(ibcDenomTraceMsg)
+	if err != nil {
+		xplac.Err = err
+		return xplac
+	}
+	xplac.Module = mibc.IbcModule
+	xplac.MsgType = mibc.IbcTransferDenomTraceMsgType
+	xplac.Msg = msg
+	return xplac
+}
+
+// Query IBC transfer denom hash
+func (xplac *XplaClient) IbcDenomHash(ibcDenomHashMsg types.IbcDenomHashMsg) *XplaClient {
+	msg, err := mibc.MakeIbcTransferDenomHashMsg(ibcDenomHashMsg)
+	if err != nil {
+		xplac.Err = err
+		return xplac
+	}
+	xplac.Module = mibc.IbcModule
+	xplac.MsgType = mibc.IbcTransferDenomHashMsgType
+	xplac.Msg = msg
+	return xplac
+}
+
+// Query IBC transfer denom hash
+func (xplac *XplaClient) IbcEscrowAddress(ibcEscrowAddressMsg types.IbcEscrowAddressMsg) *XplaClient {
+	msg, err := mibc.MakeIbcTransferEscrowAddressMsg(ibcEscrowAddressMsg)
+	if err != nil {
+		xplac.Err = err
+		return xplac
+	}
+	xplac.Module = mibc.IbcModule
+	xplac.MsgType = mibc.IbcTransferEscrowAddressMsgType
+	xplac.Msg = msg
+	return xplac
+}
+
+// Query IBC transfer params
+func (xplac *XplaClient) IbcTransferParams() *XplaClient {
+	msg, err := mibc.MakeIbcTransferParamsMsg()
+	if err != nil {
+		xplac.Err = err
+		return xplac
+	}
+	xplac.Module = mibc.IbcModule
+	xplac.MsgType = mibc.IbcTransferParamsMsgType
 	xplac.Msg = msg
 	return xplac
 }

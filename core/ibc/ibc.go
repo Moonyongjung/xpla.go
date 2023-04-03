@@ -6,6 +6,7 @@ import (
 	"github.com/Moonyongjung/xpla.go/util"
 
 	cmclient "github.com/cosmos/cosmos-sdk/client"
+	ibctransfer "github.com/cosmos/ibc-go/v3/modules/apps/transfer/types"
 	ibcclient "github.com/cosmos/ibc-go/v3/modules/core/02-client/types"
 	ibcconnection "github.com/cosmos/ibc-go/v3/modules/core/03-connection/types"
 	ibcchannel "github.com/cosmos/ibc-go/v3/modules/core/04-channel/types"
@@ -195,4 +196,35 @@ func MakeIbcChannelNextSequenceReceiveMsg(ibcChannelNextSequenceMsg types.IbcCha
 		ChannelId: ibcChannelNextSequenceMsg.ChannelId,
 		PortId:    ibcChannelNextSequenceMsg.PortId,
 	}, nil
+}
+
+// (Query) make msg - IBC transfer denom traces
+func MakeIbcTransferDenomTracesMsg() (ibctransfer.QueryDenomTracesRequest, error) {
+	return ibctransfer.QueryDenomTracesRequest{
+		Pagination: core.PageRequest,
+	}, nil
+}
+
+// (Query) make msg - IBC transfer denom trace
+func MakeIbcTransferDenomTraceMsg(ibcDenomTraceMsg types.IbcDenomTraceMsg) (ibctransfer.QueryDenomTraceRequest, error) {
+	return ibctransfer.QueryDenomTraceRequest{
+		Hash: ibcDenomTraceMsg.HashDenom,
+	}, nil
+}
+
+// (Query) make msg - IBC transfer denom hash
+func MakeIbcTransferDenomHashMsg(ibcDenomHashMsg types.IbcDenomHashMsg) (ibctransfer.QueryDenomHashRequest, error) {
+	return ibctransfer.QueryDenomHashRequest{
+		Trace: ibcDenomHashMsg.Trace,
+	}, nil
+}
+
+// (Query) make msg - IBC transfer escrow address
+func MakeIbcTransferEscrowAddressMsg(ibcEscrowAddressMsg types.IbcEscrowAddressMsg) (types.IbcEscrowAddressMsg, error) {
+	return ibcEscrowAddressMsg, nil
+}
+
+// (Query) make msg - IBC transfer params
+func MakeIbcTransferParamsMsg() (ibctransfer.QueryParamsRequest, error) {
+	return ibctransfer.QueryParamsRequest{}, nil
 }

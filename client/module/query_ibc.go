@@ -7,6 +7,7 @@ import (
 	"github.com/Moonyongjung/xpla.go/util"
 
 	cmclient "github.com/cosmos/cosmos-sdk/client"
+	ibctransfer "github.com/cosmos/ibc-go/v3/modules/apps/transfer/types"
 	ibcclientutils "github.com/cosmos/ibc-go/v3/modules/core/02-client/client/utils"
 	ibcclient "github.com/cosmos/ibc-go/v3/modules/core/02-client/types"
 	ibcconnection "github.com/cosmos/ibc-go/v3/modules/core/03-connection/types"
@@ -26,6 +27,7 @@ func queryByGrpcIbc(i IXplaClient) (string, error) {
 	ibcclientQueryClient := ibcclient.NewQueryClient(i.Ixplac.GetGrpcClient())
 	ibcconnectionQueryClient := ibcconnection.NewQueryClient(i.Ixplac.GetGrpcClient())
 	ibccchannelQueryClient := ibcchannel.NewQueryClient(i.Ixplac.GetGrpcClient())
+	ibctransferQueryClient := ibctransfer.NewQueryClient(i.Ixplac.GetGrpcClient())
 
 	switch {
 	// IBC client states
@@ -302,6 +304,59 @@ func queryByGrpcIbc(i IXplaClient) (string, error) {
 			return "", util.LogErr(errors.ErrGrpcRequest, err)
 		}
 
+	// IBC transfer denom traces
+	case i.Ixplac.GetMsgType() == mibc.IbcTransferDenomTracesMsgType:
+
+		convertMsg, _ := i.Ixplac.GetMsg().(ibctransfer.QueryDenomTracesRequest)
+		res, err = ibctransferQueryClient.DenomTraces(
+			i.Ixplac.GetContext(),
+			&convertMsg,
+		)
+		if err != nil {
+			return "", util.LogErr(errors.ErrGrpcRequest, err)
+		}
+
+	// IBC transfer denom trace
+	case i.Ixplac.GetMsgType() == mibc.IbcTransferDenomTraceMsgType:
+
+		convertMsg, _ := i.Ixplac.GetMsg().(ibctransfer.QueryDenomTraceRequest)
+		res, err = ibctransferQueryClient.DenomTrace(
+			i.Ixplac.GetContext(),
+			&convertMsg,
+		)
+		if err != nil {
+			return "", util.LogErr(errors.ErrGrpcRequest, err)
+		}
+
+	// IBC transfer denom hash
+	case i.Ixplac.GetMsgType() == mibc.IbcTransferDenomHashMsgType:
+		convertMsg, _ := i.Ixplac.GetMsg().(ibctransfer.QueryDenomHashRequest)
+		res, err = ibctransferQueryClient.DenomHash(
+			i.Ixplac.GetContext(),
+			&convertMsg,
+		)
+		if err != nil {
+			return "", util.LogErr(errors.ErrGrpcRequest, err)
+		}
+
+	// IBC transfer escrow address
+	case i.Ixplac.GetMsgType() == mibc.IbcTransferEscrowAddressMsgType:
+		convertMsg, _ := i.Ixplac.GetMsg().(types.IbcEscrowAddressMsg)
+
+		addr := ibctransfer.GetEscrowAddress(convertMsg.PortId, convertMsg.ChannelId)
+		return addr.String(), nil
+
+	// IBC transfer params
+	case i.Ixplac.GetMsgType() == mibc.IbcTransferParamsMsgType:
+		convertMsg, _ := i.Ixplac.GetMsg().(ibctransfer.QueryParamsRequest)
+		res, err = ibctransferQueryClient.Params(
+			i.Ixplac.GetContext(),
+			&convertMsg,
+		)
+		if err != nil {
+			return "", util.LogErr(errors.ErrGrpcRequest, err)
+		}
+
 	default:
 		return "", util.LogErr(errors.ErrInvalidMsgType, i.Ixplac.GetMsgType())
 	}
@@ -334,6 +389,10 @@ const (
 	ibcchannelPacketReceiptLabel     = "packet_receipts"
 	ibcchannelPacketAckLabel         = "packet_acks"
 	ibcchannelNextSequenceLabel      = "next_sequence"
+
+	ibctransferDenomTracesLabel   = "denom_traces"
+	ibctransferDenomHashesLabel   = "denom_hashes"
+	ibctransferEscrowAddressLabel = "escrow_address"
 )
 
 func queryByLcdIbc(i IXplaClient) (string, error) {
@@ -341,6 +400,7 @@ func queryByLcdIbc(i IXplaClient) (string, error) {
 	ibcclientUrl := "/ibc/core/client/v1/"
 	ibcconnectionUrl := "/ibc/core/connection/v1/"
 	ibcchannelUrl := "/ibc/core/channel/v1/"
+	ibctransferUrl := "/ibc/apps/transfer/v1/"
 
 	switch {
 	// IBC client states
@@ -491,6 +551,30 @@ func queryByLcdIbc(i IXplaClient) (string, error) {
 		convertMsg, _ := i.Ixplac.GetMsg().(ibcchannel.QueryNextSequenceReceiveRequest)
 
 		url = ibcchannelUrl + util.MakeQueryLabels(ibcchannelChannelsLabel, convertMsg.ChannelId, ibcchannelPortsLabel, convertMsg.PortId, ibcchannelNextSequenceLabel)
+
+	// IBC transfer denom traces
+	case i.Ixplac.GetMsgType() == mibc.IbcTransferDenomTracesMsgType:
+		url = ibctransferUrl + ibctransferDenomTracesLabel
+
+	// IBC transfer denom trace
+	case i.Ixplac.GetMsgType() == mibc.IbcTransferDenomTraceMsgType:
+		convertMsg, _ := i.Ixplac.GetMsg().(ibctransfer.QueryDenomTraceRequest)
+
+		url = ibctransferUrl + util.MakeQueryLabels(ibctransferDenomTracesLabel, convertMsg.Hash)
+
+	// IBC transfer denom hash
+	case i.Ixplac.GetMsgType() == mibc.IbcTransferDenomHashMsgType:
+		return "", util.LogErr(errors.ErrNotSupport, "unsupported querying denom hash by using LCD")
+
+	// IBC transfer escrow address
+	case i.Ixplac.GetMsgType() == mibc.IbcTransferEscrowAddressMsgType:
+		convertMsg, _ := i.Ixplac.GetMsg().(types.IbcEscrowAddressMsg)
+
+		url = ibctransferUrl + util.MakeQueryLabels(ibcchannelChannelsLabel, convertMsg.ChannelId, ibcchannelPortsLabel, convertMsg.PortId, ibctransferEscrowAddressLabel)
+
+	// IBC transfer params
+	case i.Ixplac.GetMsgType() == mibc.IbcTransferParamsMsgType:
+		url = ibctransferUrl + "/params"
 
 	default:
 		return "", util.LogErr(errors.ErrInvalidMsgType, i.Ixplac.GetMsgType())

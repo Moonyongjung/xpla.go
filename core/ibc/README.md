@@ -166,6 +166,7 @@ res, err = xplac.IbcChannelPacketAck(ibcChannelPacketAckMsg).Query()
 
 ### (Query) Channel unreceived packets
 ```go
+// Query unreceived packets
 ibcChannelUnreceivedPacketsMsg := types.IbcChannelUnreceivedPacketsMsg{
     ChannelId: "channel-0",
     PortId:    "transfer",
@@ -176,6 +177,7 @@ res, err = xplac.IbcChannelUnreceivedPackets(ibcChannelUnreceivedPacketsMsg).Que
 
 ### (Query) Channel unreceived acks
 ```go
+// Query unreceived acks
 ibcChannelUnreceivedAcksMsg := types.IbcChannelUnreceivedAcksMsg{
     ChannelId: "channel-0",
     PortId:    "transfer",
@@ -186,9 +188,47 @@ res, err = xplac.IbcChannelUnreceivedAcks(ibcChannelUnreceivedAcksMsg).Query()
 
 ### (Query) Channel next sequence
 ```go
+// Query channel next sequence receive
 ibcChannelNextSequenceMsg := types.IbcChannelNextSequenceMsg{
     ChannelId: "channel-0",
     PortId:    "transfer",
 }
 res, err = xplac.IbcChannelNextSequence(ibcChannelNextSequenceMsg).Query()
+```
+
+### (Query) IBC denom traces
+```go
+// Query IBC transfer denom traces
+res, err = xplac.IbcDenomTraces().Query()
+
+// Query IBC transfer a denom trace
+ibcDenomTraceMsg := types.IbcDenomTraceMsg{
+    HashDenom: "B249D1E86F588286FEA286AA8364FFCE69EC65604BD7869D824ADE40F00FA25B",
+}
+res, err = xplac.IbcDenomTraces().Query()
+```
+
+### (Query) IBC denom hash
+```go
+// Make denom hash by trace
+ibcDenomHashMsg := types.IbcDenomHashMsg{
+    Trace: "[port-id]/[channel-id]/[denom]",
+}
+res, err = xplac.IbcDenomHash(ibcDenomHashMsg).Query()
+```
+
+### (Query) IBC escrow address
+```go
+// Query escrow address
+ibcEscrowAddressMsg := types.IbcEscrowAddressMsg{
+    PortId:    "transfer",
+    ChannelId: "channel-5",
+}
+res, err = xplac.IbcEscrowAddress(ibcEscrowAddressMsg).Query()
+```
+
+### (Query) IBC transfer params
+```go
+// Query IBC transfer params
+res, err = xplac.IbcTransferParams().Query()
 ```

@@ -25,4 +25,9 @@ const (
 	IbcChannelUnreceivedPacketsMsgType    = "ibc-channel-unreceived-packets"
 	IbcChannelUnreceivedAcksMsgType       = "ibc-channel-unreceived-acks"
 	IbcChannelNextSequenceMsgType         = "ibc-channel-next-sequence"
+	IbcTransferDenomTracesMsgType         = "ibc-transfer-denom-traces"
+	IbcTransferDenomTraceMsgType          = "ibc-transfer-denom-trace"
+	IbcTransferDenomHashMsgType           = "ibc-transfer-denom-hash"
+	IbcTransferEscrowAddressMsgType       = "ibc-transfer-escrow-address"
+	IbcTransferParamsMsgType              = "ibc-transfer-params"
 )

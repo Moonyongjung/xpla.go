@@ -78,3 +78,16 @@ type IbcChannelNextSequenceMsg struct {
 	ChannelId string
 	PortId    string
 }
+
+type IbcDenomTraceMsg struct {
+	HashDenom string
+}
+
+type IbcDenomHashMsg struct {
+	Trace string
+}
+
+type IbcEscrowAddressMsg struct {
+	ChannelId string
+	PortId    string
+}
