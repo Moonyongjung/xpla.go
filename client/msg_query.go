@@ -9,6 +9,7 @@ import (
 	mevm "github.com/Moonyongjung/xpla.go/core/evm"
 	mfeegrant "github.com/Moonyongjung/xpla.go/core/feegrant"
 	mgov "github.com/Moonyongjung/xpla.go/core/gov"
+	mibc "github.com/Moonyongjung/xpla.go/core/ibc"
 	mmint "github.com/Moonyongjung/xpla.go/core/mint"
 	mparams "github.com/Moonyongjung/xpla.go/core/params"
 	mreward "github.com/Moonyongjung/xpla.go/core/reward"
@@ -865,6 +866,305 @@ func (xplac *XplaClient) AnnualProvisions() *XplaClient {
 	}
 	xplac.Module = mmint.MintModule
 	xplac.MsgType = mmint.MintQueryAnnualProvisionsMsgType
+	xplac.Msg = msg
+	return xplac
+}
+
+// IBC module
+
+// Query IBC light client states
+func (xplac *XplaClient) IbcClientStates() *XplaClient {
+	msg, err := mibc.MakeIbcClientStatesMsg()
+	if err != nil {
+		xplac.Err = err
+		return xplac
+	}
+	xplac.Module = mibc.IbcModule
+	xplac.MsgType = mibc.IbcClientStatesMsgType
+	xplac.Msg = msg
+	return xplac
+}
+
+// Query IBC light client state by client ID
+func (xplac *XplaClient) IbcClientState(ibcClientStateMsg types.IbcClientStateMsg) *XplaClient {
+	msg, err := mibc.MakeIbcClientStateMsg(ibcClientStateMsg)
+	if err != nil {
+		xplac.Err = err
+		return xplac
+	}
+	xplac.Module = mibc.IbcModule
+	xplac.MsgType = mibc.IbcClientStateMsgType
+	xplac.Msg = msg
+	return xplac
+}
+
+// Query IBC light client status by client ID
+func (xplac *XplaClient) IbcClientStatus(ibcClientStatusMsg types.IbcClientStatusMsg) *XplaClient {
+	msg, err := mibc.MakeIbcClientStatusMsg(ibcClientStatusMsg)
+	if err != nil {
+		xplac.Err = err
+		return xplac
+	}
+	xplac.Module = mibc.IbcModule
+	xplac.MsgType = mibc.IbcClientStatusMsgType
+	xplac.Msg = msg
+	return xplac
+}
+
+// Query IBC client consensus states
+func (xplac *XplaClient) IbcClientConsensusStates(ibcClientConsensusStatesMsg types.IbcClientConsensusStatesMsg) *XplaClient {
+	msg, err := mibc.MakeIbcClientConsensusStatesMsg(ibcClientConsensusStatesMsg)
+	if err != nil {
+		xplac.Err = err
+		return xplac
+	}
+	xplac.Module = mibc.IbcModule
+	xplac.MsgType = mibc.IbcClientConsensusStatesMsgType
+	xplac.Msg = msg
+	return xplac
+}
+
+// Query IBC client consensus state heights
+func (xplac *XplaClient) IbcClientConsensusStateHeights(ibcClientConsensusStateHeightsMsg types.IbcClientConsensusStateHeightsMsg) *XplaClient {
+	msg, err := mibc.MakeIbcClientConsensusStateHeightsMsg(ibcClientConsensusStateHeightsMsg)
+	if err != nil {
+		xplac.Err = err
+		return xplac
+	}
+	xplac.Module = mibc.IbcModule
+	xplac.MsgType = mibc.IbcClientConsensusStateHeightsMsgType
+	xplac.Msg = msg
+	return xplac
+}
+
+// Query IBC client consensus state
+func (xplac *XplaClient) IbcClientConsensusState(ibcClientConsensusStateMsg types.IbcClientConsensusStateMsg) *XplaClient {
+	msg, err := mibc.MakeIbcClientConsensusStateMsg(ibcClientConsensusStateMsg)
+	if err != nil {
+		xplac.Err = err
+		return xplac
+	}
+	xplac.Module = mibc.IbcModule
+	xplac.MsgType = mibc.IbcClientConsensusStateMsgType
+	xplac.Msg = msg
+	return xplac
+}
+
+// Query IBC client tendermint header
+func (xplac *XplaClient) IbcClientHeader() *XplaClient {
+	msg, err := mibc.MakeIbcClientHeaderMsg(xplac.GetRpc())
+	if err != nil {
+		xplac.Err = err
+		return xplac
+	}
+	xplac.Module = mibc.IbcModule
+	xplac.MsgType = mibc.IbcClientHeaderMsgType
+	xplac.Msg = msg
+	return xplac
+}
+
+// Query IBC client self consensus state
+func (xplac *XplaClient) IbcClientSelfConsensusState() *XplaClient {
+	msg, err := mibc.MakeIbcClientSelfConsensusStateMsg(xplac.GetRpc())
+	if err != nil {
+		xplac.Err = err
+		return xplac
+	}
+	xplac.Module = mibc.IbcModule
+	xplac.MsgType = mibc.IbcClientSelfConsensusStateMsgType
+	xplac.Msg = msg
+	return xplac
+}
+
+// Query IBC client params
+func (xplac *XplaClient) IbcClientParams() *XplaClient {
+	msg, err := mibc.MakeIbcClientParamsMsg()
+	if err != nil {
+		xplac.Err = err
+		return xplac
+	}
+	xplac.Module = mibc.IbcModule
+	xplac.MsgType = mibc.IbcClientParamsMsgType
+	xplac.Msg = msg
+	return xplac
+}
+
+// Query IBC connections
+func (xplac *XplaClient) IbcConnections(ibcConnectionMsg ...types.IbcConnectionMsg) *XplaClient {
+	if len(ibcConnectionMsg) == 0 {
+		msg, err := mibc.MakeIbcConnectionConnectionsMsg()
+		if err != nil {
+			xplac.Err = err
+			return xplac
+		}
+		xplac.Module = mibc.IbcModule
+		xplac.MsgType = mibc.IbcConnectionConnectionsMsgType
+		xplac.Msg = msg
+	} else if len(ibcConnectionMsg) == 1 {
+		msg, err := mibc.MakeIbcConnectionConnectionMsg(ibcConnectionMsg[0])
+		if err != nil {
+			xplac.Err = err
+			return xplac
+		}
+		xplac.Module = mibc.IbcModule
+		xplac.MsgType = mibc.IbcConnectionConnectionMsgType
+		xplac.Msg = msg
+	} else {
+		xplac.Err = util.LogErr(errors.ErrInvalidRequest, "need only one parameter")
+	}
+	return xplac
+}
+
+// Query IBC client connections
+func (xplac *XplaClient) IbcClientConnections(ibcClientConnectionsMsg types.IbcClientConnectionsMsg) *XplaClient {
+	msg, err := mibc.MakeIbcConnectionClientConnectionsMsg(ibcClientConnectionsMsg)
+	if err != nil {
+		xplac.Err = err
+		return xplac
+	}
+	xplac.Module = mibc.IbcModule
+	xplac.MsgType = mibc.IbcConnectionClientConnectionsMsgType
+	xplac.Msg = msg
+	return xplac
+}
+
+// Query IBC channels
+func (xplac *XplaClient) IbcChannels(ibcChannelMsg ...types.IbcChannelMsg) *XplaClient {
+	if len(ibcChannelMsg) == 0 {
+		msg, err := mibc.MakeIbcChannelChannelsMsg()
+		if err != nil {
+			xplac.Err = err
+			return xplac
+		}
+		xplac.Module = mibc.IbcModule
+		xplac.MsgType = mibc.IbcChannelChannelsMsgType
+		xplac.Msg = msg
+	} else if len(ibcChannelMsg) == 1 {
+		msg, err := mibc.MakeIbcChannelChannelMsg(ibcChannelMsg[0])
+		if err != nil {
+			xplac.Err = err
+			return xplac
+		}
+		xplac.Module = mibc.IbcModule
+		xplac.MsgType = mibc.IbcChannelChannelMsgType
+		xplac.Msg = msg
+	} else {
+		xplac.Err = util.LogErr(errors.ErrInvalidRequest, "need only one parameter")
+	}
+	return xplac
+}
+
+// Query IBC channel connections
+func (xplac *XplaClient) IbcChannelConnections(ibcChannelConnectionsMsg types.IbcChannelConnectionsMsg) *XplaClient {
+	msg, err := mibc.MakeIbcChannelConnectionsMsg(ibcChannelConnectionsMsg)
+	if err != nil {
+		xplac.Err = err
+		return xplac
+	}
+	xplac.Module = mibc.IbcModule
+	xplac.MsgType = mibc.IbcChannelConnectionsMsgType
+	xplac.Msg = msg
+	return xplac
+}
+
+// Query IBC channel client state
+func (xplac *XplaClient) IbcChannelClientState(ibcChannelClientStateMsg types.IbcChannelClientStateMsg) *XplaClient {
+	msg, err := mibc.MakeIbcChannelClientStateMsg(ibcChannelClientStateMsg)
+	if err != nil {
+		xplac.Err = err
+		return xplac
+	}
+	xplac.Module = mibc.IbcModule
+	xplac.MsgType = mibc.IbcChannelClientStateMsgType
+	xplac.Msg = msg
+	return xplac
+}
+
+// Query IBC channel packet commitments
+func (xplac *XplaClient) IbcChannelPacketCommitments(ibcChannelPacketCommitmentsMsg types.IbcChannelPacketCommitmentsMsg) *XplaClient {
+	if ibcChannelPacketCommitmentsMsg.Sequence == "" {
+		msg, err := mibc.MakeIbcChannelPacketCommitmentsMsg(ibcChannelPacketCommitmentsMsg)
+		if err != nil {
+			xplac.Err = err
+			return xplac
+		}
+		xplac.Module = mibc.IbcModule
+		xplac.MsgType = mibc.IbcChannelPacketCommitmentsMsgType
+		xplac.Msg = msg
+	} else {
+		msg, err := mibc.MakeIbcChannelPacketCommitmentMsg(ibcChannelPacketCommitmentsMsg)
+		if err != nil {
+			xplac.Err = err
+			return xplac
+		}
+		xplac.Module = mibc.IbcModule
+		xplac.MsgType = mibc.IbcChannelPacketCommitmentMsgType
+		xplac.Msg = msg
+	}
+	return xplac
+}
+
+// Query IBC packet receipt
+func (xplac *XplaClient) IbcChannelPacketRecipt(ibcChannelPacketReceiptMsg types.IbcChannelPacketReceiptMsg) *XplaClient {
+	msg, err := mibc.MakeIbcChannelPacketReceiptMsg(ibcChannelPacketReceiptMsg)
+	if err != nil {
+		xplac.Err = err
+		return xplac
+	}
+	xplac.Module = mibc.IbcModule
+	xplac.MsgType = mibc.IbcChannelPacketReceiptMsgType
+	xplac.Msg = msg
+	return xplac
+}
+
+// Query IBC packet ack
+func (xplac *XplaClient) IbcChannelPacketAck(ibcChannelPacketAckMsg types.IbcChannelPacketAckMsg) *XplaClient {
+	msg, err := mibc.MakeIbcChannelPacketAckMsg(ibcChannelPacketAckMsg)
+	if err != nil {
+		xplac.Err = err
+		return xplac
+	}
+	xplac.Module = mibc.IbcModule
+	xplac.MsgType = mibc.IbcChannelPacketAckMsgType
+	xplac.Msg = msg
+	return xplac
+}
+
+// Query IBC unreceived packets
+func (xplac *XplaClient) IbcChannelUnreceivedPackets(ibcChannelUnreceivedPacketsMsg types.IbcChannelUnreceivedPacketsMsg) *XplaClient {
+	msg, err := mibc.MakeIbcChannelPacketUnreceivedPacketsMsg(ibcChannelUnreceivedPacketsMsg)
+	if err != nil {
+		xplac.Err = err
+		return xplac
+	}
+	xplac.Module = mibc.IbcModule
+	xplac.MsgType = mibc.IbcChannelUnreceivedPacketsMsgType
+	xplac.Msg = msg
+	return xplac
+}
+
+// Query IBC unreceived acks
+func (xplac *XplaClient) IbcChannelUnreceivedAcks(ibcChannelUnreceivedAcksMsg types.IbcChannelUnreceivedAcksMsg) *XplaClient {
+	msg, err := mibc.MakeIbcChannelPacketUnreceivedAcksMsg(ibcChannelUnreceivedAcksMsg)
+	if err != nil {
+		xplac.Err = err
+		return xplac
+	}
+	xplac.Module = mibc.IbcModule
+	xplac.MsgType = mibc.IbcChannelUnreceivedAcksMsgType
+	xplac.Msg = msg
+	return xplac
+}
+
+// Query IBC next sequence receive
+func (xplac *XplaClient) IbcChannelNextSequence(ibcChannelNextSequenceMsg types.IbcChannelNextSequenceMsg) *XplaClient {
+	msg, err := mibc.MakeIbcChannelNextSequenceReceiveMsg(ibcChannelNextSequenceMsg)
+	if err != nil {
+		xplac.Err = err
+		return xplac
+	}
+	xplac.Module = mibc.IbcModule
+	xplac.MsgType = mibc.IbcChannelNextSequenceReceiveMsgType
 	xplac.Msg = msg
 	return xplac
 }

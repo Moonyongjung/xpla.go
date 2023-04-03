@@ -24,6 +24,7 @@ Usage of modules and xpla client.
 |EVM|[README](./core/evm/README.md)||
 |Feegrant|[README](./core/feegrant/README.md)||
 |Gov|[README](./core/gov/README.md)||
+|IBC|[README](./core/ibc/README.md)||
 |Mint|[README](./core/mint/README.md)||
 |Params|[README](./core/params/README.md)||
 |Reward|[README](./core/reward/README.md)||
