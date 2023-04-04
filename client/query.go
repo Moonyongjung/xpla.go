@@ -10,6 +10,7 @@ import (
 	mevm "github.com/Moonyongjung/xpla.go/core/evm"
 	mfeegrant "github.com/Moonyongjung/xpla.go/core/feegrant"
 	mgov "github.com/Moonyongjung/xpla.go/core/gov"
+	mibc "github.com/Moonyongjung/xpla.go/core/ibc"
 	mmint "github.com/Moonyongjung/xpla.go/core/mint"
 	mparams "github.com/Moonyongjung/xpla.go/core/params"
 	mreward "github.com/Moonyongjung/xpla.go/core/reward"
@@ -67,6 +68,9 @@ func (xplac *XplaClient) Query() (string, error) {
 
 	} else if xplac.Module == mgov.GovModule {
 		return ixplaClient.QueryGov()
+
+	} else if xplac.Module == mibc.IbcModule {
+		return ixplaClient.QueryIbc()
 
 	} else if xplac.Module == mmint.MintModule {
 		return ixplaClient.QueryMint()
