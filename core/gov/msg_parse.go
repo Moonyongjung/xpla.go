@@ -161,7 +161,7 @@ func parseQueryDepositArgs(queryDepositMsg types.QueryDepositMsg, grpcConn grpc.
 
 		out, err := util.CtxHttpClient("GET", lcdUrl+url, nil, ctx)
 		if err != nil {
-			return nil, "", util.LogErr(errors.ErrHttpRequest, err)
+			return nil, "", err
 		}
 
 		var response govtypes.QueryProposalResponse
