@@ -21,7 +21,7 @@ func parseIbcClientConsensusStateArgs(ibcClientConsensusStateMsg types.IbcClient
 
 		height, err = ibcclient.ParseHeight(ibcClientConsensusStateMsg.Height)
 		if err != nil {
-			return ibcclient.QueryConsensusStateRequest{}, err
+			return ibcclient.QueryConsensusStateRequest{}, util.LogErr(errors.ErrParse, err)
 		}
 	}
 

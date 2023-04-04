@@ -138,7 +138,7 @@ func parseWithdrawAllRewardsArgs(privKey key.PrivateKey, grpcConn grpc.ClientCon
 		msgs = append(msgs, msg)
 	}
 
-	return msgs, err
+	return msgs, nil
 }
 
 // Parsing - set withdraw addr

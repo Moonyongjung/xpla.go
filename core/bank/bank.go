@@ -12,12 +12,7 @@ import (
 
 // (Tx) make msg - bank send
 func MakeBankSendMsg(bankSendMsg types.BankSendMsg, privKey key.PrivateKey) (banktypes.MsgSend, error) {
-	msg, err := parseBankSendArgs(bankSendMsg, privKey)
-	if err != nil {
-		return banktypes.MsgSend{}, err
-	}
-
-	return msg, nil
+	return parseBankSendArgs(bankSendMsg, privKey)
 }
 
 // (Query) make msg - all balances
@@ -26,12 +21,7 @@ func MakeBankAllBalancesMsg(bankBalancesMsg types.BankBalancesMsg) (banktypes.Qu
 		return banktypes.QueryAllBalancesRequest{}, util.LogErr(errors.ErrInsufficientParams, "Empty request or type of parameter is not correct")
 	}
 
-	msg, err := parseBankAllBalancesArgs(bankBalancesMsg)
-	if err != nil {
-		return banktypes.QueryAllBalancesRequest{}, err
-	}
-
-	return msg, nil
+	return parseBankAllBalancesArgs(bankBalancesMsg)
 }
 
 // (Query) make msg - balance
@@ -40,12 +30,7 @@ func MakeBankBalanceMsg(bankBalancesMsg types.BankBalancesMsg) (banktypes.QueryB
 		return banktypes.QueryBalanceRequest{}, util.LogErr(errors.ErrInsufficientParams, "Empty request or type of parameter is not correct")
 	}
 
-	msg, err := parseBankBalanceArgs(bankBalancesMsg)
-	if err != nil {
-		return banktypes.QueryBalanceRequest{}, err
-	}
-
-	return msg, nil
+	return parseBankBalanceArgs(bankBalancesMsg)
 }
 
 // (Query) make msg - denominations metadata

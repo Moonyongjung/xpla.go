@@ -113,7 +113,7 @@ func parseCallSolContractArgs(callSolContractMsg types.CallSolContractMsg, byteA
 	toAddr := util.FromStringToByte20Address(callSolContractMsg.ContractAddress)
 	value, err := util.FromStringToBigInt("0")
 	if err != nil {
-		return CallSolContractParseMsg{}, err
+		return CallSolContractParseMsg{}, util.LogErr(errors.ErrParse, err)
 	}
 
 	msg := ethereum.CallMsg{
@@ -177,7 +177,7 @@ func parseEstimateGasSolArgs(invokeSolContractMsg types.InvokeSolContractMsg, by
 	toAddr := util.FromStringToByte20Address(invokeSolContractMsg.ContractAddress)
 	value, err := util.FromStringToBigInt("0")
 	if err != nil {
-		return CallSolContractParseMsg{}, err
+		return CallSolContractParseMsg{}, util.LogErr(errors.ErrParse, err)
 	}
 
 	msg := ethereum.CallMsg{

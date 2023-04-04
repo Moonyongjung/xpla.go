@@ -14,52 +14,27 @@ import (
 
 // (Tx) make msg - fund community pool
 func MakeFundCommunityPoolMsg(fundCommunityPoolMsg types.FundCommunityPoolMsg, privKey key.PrivateKey) (disttypes.MsgFundCommunityPool, error) {
-	msg, err := parseFundCommunityPoolArgs(fundCommunityPoolMsg, privKey)
-	if err != nil {
-		return disttypes.MsgFundCommunityPool{}, err
-	}
-
-	return msg, nil
+	return parseFundCommunityPoolArgs(fundCommunityPoolMsg, privKey)
 }
 
 // (Tx) make msg - proposal community pool
 func MakeProposalCommunityPoolSpendMsg(communityPoolSpendMsg types.CommunityPoolSpendMsg, privKey key.PrivateKey, encodingConfig params.EncodingConfig) (govtypes.MsgSubmitProposal, error) {
-	msg, err := parseProposalCommunityPoolSpendArgs(communityPoolSpendMsg, privKey, encodingConfig)
-	if err != nil {
-		return govtypes.MsgSubmitProposal{}, err
-	}
-
-	return msg, nil
+	return parseProposalCommunityPoolSpendArgs(communityPoolSpendMsg, privKey, encodingConfig)
 }
 
 // (Tx) make msg - withdraw rewards
 func MakeWithdrawRewardsMsg(withdrawRewardsMsg types.WithdrawRewardsMsg, privKey key.PrivateKey) ([]sdk.Msg, error) {
-	msg, err := parseWithdrawRewardsArgs(withdrawRewardsMsg, privKey)
-	if err != nil {
-		return nil, err
-	}
-
-	return msg, nil
+	return parseWithdrawRewardsArgs(withdrawRewardsMsg, privKey)
 }
 
 // (Tx) make msg - withdraw all rewards
 func MakeWithdrawAllRewardsMsg(privKey key.PrivateKey, grpcConn grpc.ClientConn, ctx context.Context) ([]sdk.Msg, error) {
-	msg, err := parseWithdrawAllRewardsArgs(privKey, grpcConn, ctx)
-	if err != nil {
-		return nil, err
-	}
-
-	return msg, nil
+	return parseWithdrawAllRewardsArgs(privKey, grpcConn, ctx)
 }
 
 // (Tx) make msg - withdraw address
 func MakeSetWithdrawAddrMsg(setWithdrawAddrMsg types.SetwithdrawAddrMsg, privKey key.PrivateKey) (disttypes.MsgSetWithdrawAddress, error) {
-	msg, err := parseSetWithdrawAddrArgs(setWithdrawAddrMsg, privKey)
-	if err != nil {
-		return disttypes.MsgSetWithdrawAddress{}, err
-	}
-
-	return msg, nil
+	return parseSetWithdrawAddrArgs(setWithdrawAddrMsg, privKey)
 }
 
 // (Query) make msg - distribution params
@@ -69,42 +44,22 @@ func MakeQueryDistributionParamsMsg() (disttypes.QueryParamsRequest, error) {
 
 // (Query) make msg - validator outstanding rewards
 func MakeValidatorOutstandingRewardsMsg(validatorOutstandingRewardsMsg types.ValidatorOutstandingRewardsMsg) (disttypes.QueryValidatorOutstandingRewardsRequest, error) {
-	msg, err := parseValidatorOutstandingRewardsArgs(validatorOutstandingRewardsMsg)
-	if err != nil {
-		return disttypes.QueryValidatorOutstandingRewardsRequest{}, err
-	}
-
-	return msg, nil
+	return parseValidatorOutstandingRewardsArgs(validatorOutstandingRewardsMsg)
 }
 
 // (Query) make msg - commission
 func MakeQueryDistCommissionMsg(queryDistCommissionMsg types.QueryDistCommissionMsg) (disttypes.QueryValidatorCommissionRequest, error) {
-	msg, err := parseQueryDistCommissionArgs(queryDistCommissionMsg)
-	if err != nil {
-		return disttypes.QueryValidatorCommissionRequest{}, err
-	}
-
-	return msg, nil
+	return parseQueryDistCommissionArgs(queryDistCommissionMsg)
 }
 
 // (Query) make msg - distribution slashes
 func MakeQueryDistSlashesMsg(queryDistSlashesMsg types.QueryDistSlashesMsg) (disttypes.QueryValidatorSlashesRequest, error) {
-	msg, err := parseDistSlashesArgs(queryDistSlashesMsg)
-	if err != nil {
-		return disttypes.QueryValidatorSlashesRequest{}, err
-	}
-
-	return msg, nil
+	return parseDistSlashesArgs(queryDistSlashesMsg)
 }
 
 // (Query) make msg - distribution rewards
 func MakeyQueryDistRewardsMsg(queryDistRewardsMsg types.QueryDistRewardsMsg) (disttypes.QueryDelegationRewardsRequest, error) {
-	msg, err := parseQueryDistRewardsArgs(queryDistRewardsMsg)
-	if err != nil {
-		return disttypes.QueryDelegationRewardsRequest{}, err
-	}
-
-	return msg, nil
+	return parseQueryDistRewardsArgs(queryDistRewardsMsg)
 }
 
 // (Query) make msg - distribution all rewards

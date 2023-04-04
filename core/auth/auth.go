@@ -38,20 +38,10 @@ func MakeTxsByEventsMsg(txsByEventsMsg types.QueryTxsByEventsMsg) (QueryTxsByEve
 		return QueryTxsByEventParseMsg{}, util.LogErr(errors.ErrInsufficientParams, "Empty request or type of parameter is not correct")
 	}
 
-	msg, err := parseTxsByEventsArgs(txsByEventsMsg)
-	if err != nil {
-		return QueryTxsByEventParseMsg{}, nil
-	}
-
-	return msg, nil
+	return parseTxsByEventsArgs(txsByEventsMsg)
 }
 
 // (Query) make msg - transaction
 func MakeQueryTxMsg(queryTxMsg types.QueryTxMsg) (QueryTxParseMsg, error) {
-	msg, err := parseQueryTxArgs(queryTxMsg)
-	if err != nil {
-		return QueryTxParseMsg{}, err
-	}
-
-	return msg, nil
+	return parseQueryTxArgs(queryTxMsg)
 }

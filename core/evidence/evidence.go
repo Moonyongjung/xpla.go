@@ -8,12 +8,7 @@ import (
 
 // (Query) make msg - evidence
 func MakeQueryEvidenceMsg(queryEvidenceMsg types.QueryEvidenceMsg) (evidencetypes.QueryEvidenceRequest, error) {
-	msg, err := parseQueryEvidenceArgs(queryEvidenceMsg)
-	if err != nil {
-		return evidencetypes.QueryEvidenceRequest{}, err
-	}
-
-	return msg, nil
+	return parseQueryEvidenceArgs(queryEvidenceMsg)
 }
 
 // (Query) make msg - all evidences

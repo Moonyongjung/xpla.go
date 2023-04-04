@@ -7,42 +7,22 @@ import (
 
 // (Tx) make msg - send coin
 func MakeSendCoinMsg(sendCoinMsg types.SendCoinMsg, privKey key.PrivateKey) (types.SendCoinMsg, error) {
-	msg, err := parseSendCoinArgs(sendCoinMsg, privKey)
-	if err != nil {
-		return types.SendCoinMsg{}, err
-	}
-
-	return msg, nil
+	return parseSendCoinArgs(sendCoinMsg, privKey)
 }
 
 // (Tx) make msg - deploy solidity contract
 func MakeDeploySolContractMsg(deploySolContractMsg types.DeploySolContractMsg) (ContractInfo, error) {
-	msg, err := parseDeploySolContractArgs(deploySolContractMsg)
-	if err != nil {
-		return ContractInfo{}, err
-	}
-
-	return msg, nil
+	return parseDeploySolContractArgs(deploySolContractMsg)
 }
 
 // (Tx) make msg - invoke solidity contract
 func MakeInvokeSolContractMsg(InvokeSolContractMsg types.InvokeSolContractMsg) (types.InvokeSolContractMsg, error) {
-	msg, err := parseInvokeSolContractArgs(InvokeSolContractMsg)
-	if err != nil {
-		return types.InvokeSolContractMsg{}, err
-	}
-
-	return msg, nil
+	return parseInvokeSolContractArgs(InvokeSolContractMsg)
 }
 
 // (Query) make msg - call solidity contract
 func MakeCallSolContractMsg(callSolContractMsg types.CallSolContractMsg, byteAddress string) (CallSolContractParseMsg, error) {
-	msg, err := parseCallSolContractArgs(callSolContractMsg, byteAddress)
-	if err != nil {
-		return CallSolContractParseMsg{}, err
-	}
-
-	return msg, nil
+	return parseCallSolContractArgs(callSolContractMsg, byteAddress)
 }
 
 // (Query) make msg - transaction by hash
@@ -52,12 +32,7 @@ func MakeGetTransactionByHashMsg(getTransactionByHashMsg types.GetTransactionByH
 
 // (Query) make msg - block by hash or height
 func MakeGetBlockByHashHeightMsg(getBlockByHashHeightMsg types.GetBlockByHashHeightMsg) (types.GetBlockByHashHeightMsg, error) {
-	msg, err := parseGetBlockByHashHeightArgs(getBlockByHashHeightMsg)
-	if err != nil {
-		return types.GetBlockByHashHeightMsg{}, err
-	}
-
-	return msg, nil
+	return parseGetBlockByHashHeightArgs(getBlockByHashHeightMsg)
 }
 
 // (Query) make msg - account info
@@ -77,12 +52,7 @@ func MakeEthGetBlockTransactionCountMsg(ethGetBlockTransactionCountMsg types.Eth
 
 // (Query) make msg - sol contract estimate gas
 func MakeEstimateGasSolMsg(invokeSolContractMsg types.InvokeSolContractMsg, byteAddress string) (CallSolContractParseMsg, error) {
-	msg, err := parseEstimateGasSolArgs(invokeSolContractMsg, byteAddress)
-	if err != nil {
-		return CallSolContractParseMsg{}, err
-	}
-
-	return msg, nil
+	return parseEstimateGasSolArgs(invokeSolContractMsg, byteAddress)
 }
 
 // (Query) make msg - get transaction by block hash and index
@@ -97,12 +67,7 @@ func MakeGetTransactionReceiptMsg(getTransactionReceiptMsg types.GetTransactionR
 
 // (Query) make msg - eth new filter
 func MakeEthNewFilterMsg(ethNewFilterMsg types.EthNewFilterMsg) (EthNewFilterParseMsg, error) {
-	msg, err := parseEthNewFilterArgs(ethNewFilterMsg)
-	if err != nil {
-		return EthNewFilterParseMsg{}, err
-	}
-
-	return msg, nil
+	return parseEthNewFilterArgs(ethNewFilterMsg)
 }
 
 // (Query) make msg - eth uninstall filter
@@ -122,10 +87,5 @@ func MakeEthGetFilterLogsMsg(ethGetFilterLogsMsg types.EthGetFilterLogsMsg) (typ
 
 // (Query) make msg - eth get logs
 func MakeEthGetLogsMsg(ethGetLogsMsg types.EthGetLogsMsg) (EthNewFilterParseMsg, error) {
-	msg, err := parseEthGetLogsArgs(ethGetLogsMsg)
-	if err != nil {
-		return EthNewFilterParseMsg{}, err
-	}
-
-	return msg, nil
+	return parseEthGetLogsArgs(ethGetLogsMsg)
 }

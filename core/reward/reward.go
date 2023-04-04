@@ -9,12 +9,7 @@ import (
 
 // (Tx) make msg - Fund fee collector
 func MakeFundFeeCollectorMsg(fundFeeCollectorMsg types.FundFeeCollectorMsg, privKey key.PrivateKey) (rewardtypes.MsgFundFeeCollector, error) {
-	msg, err := parseFundFeeCollectorArgs(fundFeeCollectorMsg, privKey)
-	if err != nil {
-		return rewardtypes.MsgFundFeeCollector{}, err
-	}
-
-	return msg, nil
+	return parseFundFeeCollectorArgs(fundFeeCollectorMsg, privKey)
 }
 
 // (Query) make msg - query reward params

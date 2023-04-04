@@ -10,22 +10,12 @@ import (
 
 // (Tx) make msg - software upgrade
 func MakeProposalSoftwareUpgradeMsg(softwareUpgradeMsg types.SoftwareUpgradeMsg, privKey key.PrivateKey) (govtypes.MsgSubmitProposal, error) {
-	msg, err := parseProposalSoftwareUpgradeArgs(softwareUpgradeMsg, privKey)
-	if err != nil {
-		return govtypes.MsgSubmitProposal{}, err
-	}
-
-	return msg, nil
+	return parseProposalSoftwareUpgradeArgs(softwareUpgradeMsg, privKey)
 }
 
 // (Tx) make msg - cancel software upgrade
 func MakeCancelSoftwareUpgradeMsg(cancelSoftwareUpgradeMsg types.CancelSoftwareUpgradeMsg, privKey key.PrivateKey) (govtypes.MsgSubmitProposal, error) {
-	msg, err := parseCancelSoftwareUpgradeArgs(cancelSoftwareUpgradeMsg, privKey)
-	if err != nil {
-		return govtypes.MsgSubmitProposal{}, err
-	}
-
-	return msg, nil
+	return parseCancelSoftwareUpgradeArgs(cancelSoftwareUpgradeMsg, privKey)
 }
 
 // (Query) make msg - applied

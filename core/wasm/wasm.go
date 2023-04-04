@@ -72,32 +72,17 @@ func MakeExecuteMsg(executeMsg types.ExecuteMsg, addr sdk.AccAddress) (wasmtypes
 
 // (Tx) make msg - clear contract admin
 func MakeClearContractAdminMsg(clearContractAdminMsg types.ClearContractAdminMsg, privKey key.PrivateKey) (wasmtypes.MsgClearAdmin, error) {
-	msg, err := parseClearContractAdminArgs(clearContractAdminMsg, privKey)
-	if err != nil {
-		return wasmtypes.MsgClearAdmin{}, err
-	}
-
-	return msg, nil
+	return parseClearContractAdminArgs(clearContractAdminMsg, privKey)
 }
 
 // (Tx) make msg - set contract admin
 func MakeSetContractAdmintMsg(setContractAdminMsg types.SetContractAdminMsg, privKey key.PrivateKey) (wasmtypes.MsgUpdateAdmin, error) {
-	msg, err := parseSetContractAdmintArgs(setContractAdminMsg, privKey)
-	if err != nil {
-		return wasmtypes.MsgUpdateAdmin{}, err
-	}
-
-	return msg, nil
+	return parseSetContractAdmintArgs(setContractAdminMsg, privKey)
 }
 
 // (Tx) make msg - migrate
 func MakeMigrateMsg(migrateMsg types.MigrateMsg, privKey key.PrivateKey) (wasmtypes.MsgMigrateContract, error) {
-	msg, err := parseMigrateArgs(migrateMsg, privKey)
-	if err != nil {
-		return wasmtypes.MsgMigrateContract{}, err
-	}
-
-	return msg, nil
+	return parseMigrateArgs(migrateMsg, privKey)
 }
 
 // (Query) make msg - query contract
@@ -106,12 +91,7 @@ func MakeQueryMsg(queryMsg types.QueryMsg) (wasmtypes.QuerySmartContractStateReq
 		return wasmtypes.QuerySmartContractStateRequest{}, util.LogErr(errors.ErrInsufficientParams, "Empty request or type of parameter is not correct")
 	}
 
-	msg, err := parseQueryArgs(queryMsg)
-	if err != nil {
-		return wasmtypes.QuerySmartContractStateRequest{}, err
-	}
-
-	return msg, nil
+	return parseQueryArgs(queryMsg)
 }
 
 // (Query) make msg - list code
@@ -197,12 +177,7 @@ func MakePinnedMsg() (wasmtypes.QueryPinnedCodesRequest, error) {
 
 // (Query) make msg - libwasmvm version
 func MakeLibwasmvmVersionMsg() (string, error) {
-	msg, err := parseLibwasmvmVersionArgs()
-	if err != nil {
-		return "", err
-	}
-
-	return msg, nil
+	return parseLibwasmvmVersionArgs()
 }
 
 type ArgumentDecoder struct {

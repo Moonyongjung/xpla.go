@@ -51,32 +51,17 @@ func MakeIbcClientConsensusStateHeightsMsg(ibcClientConsensusStateHeightsMsg typ
 
 // (Query) make msg - IBC client consensus state
 func MakeIbcClientConsensusStateMsg(ibcClientConsensusStateMsg types.IbcClientConsensusStateMsg) (ibcclient.QueryConsensusStateRequest, error) {
-	msg, err := parseIbcClientConsensusStateArgs(ibcClientConsensusStateMsg)
-	if err != nil {
-		return ibcclient.QueryConsensusStateRequest{}, err
-	}
-
-	return msg, nil
+	return parseIbcClientConsensusStateArgs(ibcClientConsensusStateMsg)
 }
 
 // (Query) make msg - IBC client tendermint header
 func MakeIbcClientHeaderMsg(rpcUrl string) (cmclient.Context, error) {
-	msg, err := parseCmclientForIbcClientArgs(rpcUrl)
-	if err != nil {
-		return cmclient.Context{}, err
-	}
-
-	return msg, nil
+	return parseCmclientForIbcClientArgs(rpcUrl)
 }
 
 // (Query) make msg - IBC client self consensus state
 func MakeIbcClientSelfConsensusStateMsg(rpcUrl string) (cmclient.Context, error) {
-	msg, err := parseCmclientForIbcClientArgs(rpcUrl)
-	if err != nil {
-		return cmclient.Context{}, err
-	}
-
-	return msg, nil
+	return parseCmclientForIbcClientArgs(rpcUrl)
 }
 
 // (Query) make msg - IBC client params

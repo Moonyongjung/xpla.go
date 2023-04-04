@@ -10,48 +10,27 @@ import (
 
 // (Tx) make msg - create validator
 func MakeCreateValidatorMsg(createValidatorMsg types.CreateValidatorMsg, privKey key.PrivateKey, output string) (sdk.Msg, error) {
-	msg, err := parseCreateValidatorArgs(createValidatorMsg, privKey, output)
-	if err != nil {
-		return nil, err
-	}
-	return msg, nil
+	return parseCreateValidatorArgs(createValidatorMsg, privKey, output)
 }
 
 // (Tx) make msg - edit validator
 func MakeEditValidatorMsg(editValidatorMsg types.EditValidatorMsg, privKey key.PrivateKey) (stakingtypes.MsgEditValidator, error) {
-	msg, err := parseEditValidatorArgs(editValidatorMsg, privKey)
-	if err != nil {
-		return stakingtypes.MsgEditValidator{}, err
-	}
-	return msg, nil
+	return parseEditValidatorArgs(editValidatorMsg, privKey)
 }
 
 // (Tx) make msg - delegate
 func MakeDelegateMsg(delegateMsg types.DelegateMsg, privKey key.PrivateKey) (stakingtypes.MsgDelegate, error) {
-	msg, err := parseDelegateArgs(delegateMsg, privKey)
-	if err != nil {
-		return stakingtypes.MsgDelegate{}, err
-	}
-	return msg, nil
+	return parseDelegateArgs(delegateMsg, privKey)
 }
 
 // (Tx) make msg - unbond
 func MakeUnbondMsg(unbondMsg types.UnbondMsg, privKey key.PrivateKey) (stakingtypes.MsgUndelegate, error) {
-	msg, err := parseUnbondArgs(unbondMsg, privKey)
-	if err != nil {
-		return stakingtypes.MsgUndelegate{}, err
-	}
-	return msg, nil
+	return parseUnbondArgs(unbondMsg, privKey)
 }
 
 // (Tx) make msg - redelegate
 func MakeRedelegateMsg(redelegateMsg types.RedelegateMsg, privKey key.PrivateKey) (stakingtypes.MsgBeginRedelegate, error) {
-	msg, err := parseRedelegateArgs(redelegateMsg, privKey)
-	if err != nil {
-		return stakingtypes.MsgBeginRedelegate{}, err
-	}
-
-	return msg, nil
+	return parseRedelegateArgs(redelegateMsg, privKey)
 }
 
 // (Query) make msg - validator
@@ -147,12 +126,7 @@ func MakeQueryRedelegationsFromMsg(queryRedelegationMsg types.QueryRedelegationM
 
 // (Query) make msg - historical
 func MakeHistoricalInfoMsg(historicalInfoMsg types.HistoricalInfoMsg) (stakingtypes.QueryHistoricalInfoRequest, error) {
-	msg, err := parseHistoricalInfoArgs(historicalInfoMsg)
-	if err != nil {
-		return stakingtypes.QueryHistoricalInfoRequest{}, err
-	}
-
-	return msg, nil
+	return parseHistoricalInfoArgs(historicalInfoMsg)
 }
 
 // (Query) make msg - staking pool

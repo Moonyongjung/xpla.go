@@ -94,13 +94,6 @@ func parseWeightedVoteArgs(weightedVoteMsg types.WeightedVoteMsg, privKey key.Pr
 	return *msg, nil
 }
 
-// Parsing - proposal
-func parseQueryProposalArgs(queryProposalMsg types.QueryProposalMsg) (govtypes.QueryProposalRequest, error) {
-	return govtypes.QueryProposalRequest{
-		ProposalId: util.FromStringToUint64(queryProposalMsg.ProposalID),
-	}, nil
-}
-
 // Parsing - proposals
 func parseQueryProposalsArgs(queryProposalsMsg types.QueryProposalsMsg) (govtypes.QueryProposalsRequest, error) {
 	depositorAddr := queryProposalsMsg.Depositor
@@ -168,7 +161,7 @@ func parseQueryDepositArgs(queryDepositMsg types.QueryDepositMsg, grpcConn grpc.
 
 		out, err := util.CtxHttpClient("GET", lcdUrl+url, nil, ctx)
 		if err != nil {
-			return nil, "", err
+			return nil, "", util.LogErr(errors.ErrHttpRequest, err)
 		}
 
 		var response govtypes.QueryProposalResponse
