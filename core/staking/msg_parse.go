@@ -3,6 +3,7 @@ package staking
 import (
 	"encoding/hex"
 	"fmt"
+	"net"
 
 	"github.com/Moonyongjung/xpla.go/key"
 	"github.com/Moonyongjung/xpla.go/types"
@@ -49,7 +50,7 @@ func parseCreateValidatorArgs(
 	}
 
 	if createValidatorMsg.NodeKey != "" && createValidatorMsg.PrivValidatorKey != "" {
-		_, valPubKey, err = initializedNodeValidatorString(createValidatorMsg.NodeKey, createValidatorMsg.PrivValidatorKey)
+		nodeId, valPubKey, err = initializedNodeValidatorString(createValidatorMsg.NodeKey, createValidatorMsg.PrivValidatorKey)
 		if err != nil {
 			return nil, err
 		}
@@ -62,14 +63,14 @@ func parseCreateValidatorArgs(
 		if err != nil {
 			return nil, util.LogErr(errors.ErrParse, err)
 		}
-		ip, _ := server.ExternalIP()
-
-		if output != "" {
-			if nodeId != "" && ip != "" {
-				types.Memo = fmt.Sprintf("%s@%s:26656", nodeId, ip)
-			}
-		}
 	}
+
+	ip, err := getIP(createValidatorMsg.ServerIp)
+	if err != nil {
+		return nil, err
+	}
+
+	types.Memo = fmt.Sprintf("%s@%s:26656", nodeId, ip)
 
 	website := createValidatorMsg.Website
 	securityContact := createValidatorMsg.SecurityContact
@@ -314,4 +315,24 @@ func initializedNodeValidatorString(nodeKey string, privValKey string) (string, 
 
 	return nodeID, valPubKey, nil
 
+}
+
+func getIP(startingIPAddr string) (ip string, err error) {
+	if len(startingIPAddr) == 0 {
+		ip, err = server.ExternalIP()
+		if err != nil {
+			return "", err
+		}
+		return ip, nil
+	}
+	return calculateIP(startingIPAddr)
+}
+
+func calculateIP(ip string) (string, error) {
+	ipv4 := net.ParseIP(ip).To4()
+	if ipv4 == nil {
+		return "", fmt.Errorf("%v: non ipv4 address", ip)
+	}
+
+	return ipv4.String(), nil
 }

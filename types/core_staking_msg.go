@@ -30,6 +30,7 @@ type CreateValidatorMsg struct {
 	CommissionMaxRate       string
 	CommissionMaxChangeRate string
 	MinSelfDelegation       string
+	ServerIp                string
 }
 
 type EditValidatorMsg struct {
