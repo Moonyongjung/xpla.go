@@ -18,6 +18,7 @@ Usage of modules and xpla client.
 |Auth|[README](./core/auth/README.md)||
 |Authz|[README](./core/authz/README.md)||
 |Bank|[README](./core/bank/README.md)||
+|Base|[README](./core/base/README.md)||
 |Crisis|[README](./core/crisis/README.md)||
 |Distribution|[README](./core/distribution/README.md)||
 |Evidence|[README](./core/evidence/README.md)||

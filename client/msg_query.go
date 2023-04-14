@@ -4,6 +4,7 @@ import (
 	mauth "github.com/Moonyongjung/xpla.go/core/auth"
 	mauthz "github.com/Moonyongjung/xpla.go/core/authz"
 	mbank "github.com/Moonyongjung/xpla.go/core/bank"
+	mbase "github.com/Moonyongjung/xpla.go/core/base"
 	mdist "github.com/Moonyongjung/xpla.go/core/distribution"
 	mevidence "github.com/Moonyongjung/xpla.go/core/evidence"
 	mevm "github.com/Moonyongjung/xpla.go/core/evm"
@@ -199,6 +200,86 @@ func (xplac *XplaClient) Total(totalMsg ...types.TotalMsg) *XplaClient {
 		}
 		xplac.Module = mbank.BankModule
 		xplac.MsgType = mbank.BankTotalSupplyOfMsgType
+		xplac.Msg = msg
+	} else {
+		xplac.Err = util.LogErr(errors.ErrInvalidRequest, "need only one parameter")
+	}
+	return xplac
+}
+
+// Base
+
+// Query node info
+func (xplac *XplaClient) NodeInfo() *XplaClient {
+	msg, err := mbase.MakeBaseNodeInfoMsg()
+	if err != nil {
+		xplac.Err = err
+		return xplac
+	}
+	xplac.Module = mbase.Base
+	xplac.MsgType = mbase.BaseNodeInfoMsgType
+	xplac.Msg = msg
+	return xplac
+}
+
+// Query syncing
+func (xplac *XplaClient) Syncing() *XplaClient {
+	msg, err := mbase.MakeBaseSyncingMsg()
+	if err != nil {
+		xplac.Err = err
+		return xplac
+	}
+	xplac.Module = mbase.Base
+	xplac.MsgType = mbase.BaseSyncingMsgType
+	xplac.Msg = msg
+	return xplac
+}
+
+// Query block
+func (xplac *XplaClient) Block(blockMsg ...types.BlockMsg) *XplaClient {
+	if len(blockMsg) == 0 {
+		msg, err := mbase.MakeBaseLatestBlockMsg()
+		if err != nil {
+			xplac.Err = err
+			return xplac
+		}
+		xplac.Module = mbase.Base
+		xplac.MsgType = mbase.BaseLatestBlockMsgtype
+		xplac.Msg = msg
+	} else if len(blockMsg) == 1 {
+		msg, err := mbase.MakeBaseBlockByHeightMsg(blockMsg[0])
+		if err != nil {
+			xplac.Err = err
+			return xplac
+		}
+		xplac.Module = mbase.Base
+		xplac.MsgType = mbase.BaseBlockByHeightMsgType
+		xplac.Msg = msg
+	} else {
+		xplac.Err = util.LogErr(errors.ErrInvalidRequest, "need only one parameter")
+	}
+	return xplac
+}
+
+// Query validator set
+func (xplac *XplaClient) ValidatorSet(validatorSetMsg ...types.ValidatorSetMsg) *XplaClient {
+	if len(validatorSetMsg) == 0 {
+		msg, err := mbase.MakeLatestValidatorSetMsg()
+		if err != nil {
+			xplac.Err = err
+			return xplac
+		}
+		xplac.Module = mbase.Base
+		xplac.MsgType = mbase.BaseLatestValidatorSetMsgType
+		xplac.Msg = msg
+	} else if len(validatorSetMsg) == 1 {
+		msg, err := mbase.MakeValidatorSetByHeightMsg(validatorSetMsg[0])
+		if err != nil {
+			xplac.Err = err
+			return xplac
+		}
+		xplac.Module = mbase.Base
+		xplac.MsgType = mbase.BaseValidatorSetByHeightMsgType
 		xplac.Msg = msg
 	} else {
 		xplac.Err = util.LogErr(errors.ErrInvalidRequest, "need only one parameter")
