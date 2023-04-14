@@ -1,4 +1,4 @@
-package module
+package queries
 
 import (
 	mgov "github.com/Moonyongjung/xpla.go/core/gov"

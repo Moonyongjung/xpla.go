@@ -1,4 +1,4 @@
-package module
+package queries
 
 import (
 	mparams "github.com/Moonyongjung/xpla.go/core/params"

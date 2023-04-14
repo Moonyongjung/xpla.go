@@ -1,4 +1,4 @@
-package module
+package queries
 
 import (
 	"math/big"

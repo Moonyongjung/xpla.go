@@ -1,4 +1,4 @@
-package module
+package queries
 
 import (
 	mslashing "github.com/Moonyongjung/xpla.go/core/slashing"

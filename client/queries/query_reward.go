@@ -1,4 +1,4 @@
-package module
+package queries
 
 import (
 	mreward "github.com/Moonyongjung/xpla.go/core/reward"

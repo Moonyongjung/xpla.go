@@ -1,4 +1,4 @@
-package module
+package queries
 
 import (
 	mauth "github.com/Moonyongjung/xpla.go/core/auth"

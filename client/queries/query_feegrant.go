@@ -1,4 +1,4 @@
-package module
+package queries
 
 import (
 	mfeegrant "github.com/Moonyongjung/xpla.go/core/feegrant"

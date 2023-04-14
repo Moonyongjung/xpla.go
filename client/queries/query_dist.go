@@ -1,4 +1,4 @@
-package module
+package queries
 
 import (
 	mdist "github.com/Moonyongjung/xpla.go/core/distribution"

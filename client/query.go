@@ -1,7 +1,7 @@
 package client
 
 import (
-	"github.com/Moonyongjung/xpla.go/client/module"
+	"github.com/Moonyongjung/xpla.go/client/queries"
 	mauth "github.com/Moonyongjung/xpla.go/core/auth"
 	mauthz "github.com/Moonyongjung/xpla.go/core/authz"
 	mbank "github.com/Moonyongjung/xpla.go/core/bank"
@@ -44,7 +44,7 @@ func (xplac *XplaClient) Query() (string, error) {
 	}
 
 	qt := setQueryType(xplac)
-	ixplaClient := module.NewIXplaClient(xplac, qt)
+	ixplaClient := queries.NewIXplaClient(xplac, qt)
 
 	if xplac.Module == mauth.AuthModule {
 		return ixplaClient.QueryAuth()

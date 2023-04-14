@@ -1,4 +1,4 @@
-package module
+package queries
 
 import (
 	mibc "github.com/Moonyongjung/xpla.go/core/ibc"

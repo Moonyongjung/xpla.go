@@ -1,4 +1,4 @@
-package module
+package queries
 
 import (
 	mauthz "github.com/Moonyongjung/xpla.go/core/authz"

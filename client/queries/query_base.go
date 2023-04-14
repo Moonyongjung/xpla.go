@@ -1,4 +1,4 @@
-package module
+package queries
 
 import (
 	mbase "github.com/Moonyongjung/xpla.go/core/base"

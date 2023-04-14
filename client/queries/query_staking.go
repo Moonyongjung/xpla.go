@@ -1,4 +1,4 @@
-package module
+package queries
 
 import (
 	mstaking "github.com/Moonyongjung/xpla.go/core/staking"

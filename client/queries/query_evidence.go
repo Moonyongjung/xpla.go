@@ -1,4 +1,4 @@
-package module
+package queries
 
 import (
 	mevidence "github.com/Moonyongjung/xpla.go/core/evidence"

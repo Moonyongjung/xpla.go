@@ -1,4 +1,4 @@
-package module
+package queries
 
 import (
 	mbank "github.com/Moonyongjung/xpla.go/core/bank"
