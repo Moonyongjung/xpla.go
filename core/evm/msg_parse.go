@@ -133,6 +133,14 @@ func parseCallSolContractArgs(callSolContractMsg types.CallSolContractMsg, byteA
 	return callSolContractParseMsg, nil
 }
 
+func parseEthGetBlockTransactionCountArgs(ethGetBlockTransactionCountMsg types.EthGetBlockTransactionCountMsg) (types.EthGetBlockTransactionCountMsg, error) {
+	if ethGetBlockTransactionCountMsg.BlockHash != "" {
+		ethGetBlockTransactionCountMsg.BlockHash = util.FromStringToTypeHexString(ethGetBlockTransactionCountMsg.BlockHash)
+	}
+
+	return ethGetBlockTransactionCountMsg, nil
+}
+
 // Parsing - block by hash or height
 func parseGetBlockByHashHeightArgs(getBlockByHashHeightMsg types.GetBlockByHashHeightMsg) (types.GetBlockByHashHeightMsg, error) {
 	if getBlockByHashHeightMsg.BlockHash != "" && getBlockByHashHeightMsg.BlockHeight != "" {

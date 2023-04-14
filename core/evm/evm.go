@@ -47,7 +47,7 @@ func MakeWeb3Sha3Msg(web3Sha3Msg types.Web3Sha3Msg) (types.Web3Sha3Msg, error) {
 
 // (Query) make msg - get transaction count of the block number
 func MakeEthGetBlockTransactionCountMsg(ethGetBlockTransactionCountMsg types.EthGetBlockTransactionCountMsg) (types.EthGetBlockTransactionCountMsg, error) {
-	return ethGetBlockTransactionCountMsg, nil
+	return parseEthGetBlockTransactionCountArgs(ethGetBlockTransactionCountMsg)
 }
 
 // (Query) make msg - sol contract estimate gas

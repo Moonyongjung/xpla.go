@@ -80,7 +80,7 @@ func queryByGrpcGov(i IXplaClient) (string, error) {
 	case i.Ixplac.GetMsgType() == mgov.GovQueryDepositsParamsMsgType:
 		convertMsg, _ := i.Ixplac.GetMsg().(govtypes.QueryProposalParams)
 
-		var deposit govtypes.Deposit
+		var deposit govtypes.Deposits
 		clientCtx, err := clientForQuery(i)
 		if err != nil {
 			return "", err
@@ -90,8 +90,13 @@ func queryByGrpcGov(i IXplaClient) (string, error) {
 		if err != nil {
 			return "", util.LogErr(errors.ErrGrpcRequest, err)
 		}
-		clientCtx.Codec.MustUnmarshalJSON(resByTxQuery, &deposit)
-		res = &deposit
+
+		clientCtx.LegacyAmino.MustUnmarshalJSON(resByTxQuery, &deposit)
+		out, err := printObjectLegacy(i, deposit)
+		if err != nil {
+			return "", util.LogErr(errors.ErrParse, err)
+		}
+		return string(out), nil
 
 	// Gov deposits
 	case i.Ixplac.GetMsgType() == mgov.GovQueryDepositsRequestMsgType:
