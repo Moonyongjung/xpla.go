@@ -7,6 +7,7 @@ import (
 	"github.com/Moonyongjung/xpla.go/util"
 
 	tmv1beta1 "cosmossdk.io/api/cosmos/base/tendermint/v1beta1"
+	cmclient "github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/grpc/tmservice"
 )
 
@@ -48,24 +49,36 @@ func queryByGrpcBase(i IXplaClient) (string, error) {
 
 	// Latest block
 	case i.Ixplac.GetMsgType() == mbase.BaseLatestBlockMsgtype:
-		convertMsg, _ := i.Ixplac.GetMsg().(tmservice.GetLatestBlockRequest)
-		res, err = serviceClient.GetLatestBlock(
-			i.Ixplac.GetContext(),
-			&convertMsg,
-		)
-		if err != nil {
-			return "", util.LogErr(errors.ErrGrpcRequest, err)
+		if i.Ixplac.GetRpc() != "" {
+			var height *int64
+			return queryBlockByRpc(i, height)
+
+		} else {
+			convertMsg, _ := i.Ixplac.GetMsg().(tmservice.GetLatestBlockRequest)
+			res, err = serviceClient.GetLatestBlock(
+				i.Ixplac.GetContext(),
+				&convertMsg,
+			)
+			if err != nil {
+				return "", util.LogErr(errors.ErrGrpcRequest, err)
+			}
 		}
 
 	// Block by height
 	case i.Ixplac.GetMsgType() == mbase.BaseBlockByHeightMsgType:
 		convertMsg, _ := i.Ixplac.GetMsg().(tmservice.GetBlockByHeightRequest)
-		res, err = serviceClient.GetBlockByHeight(
-			i.Ixplac.GetContext(),
-			&convertMsg,
-		)
-		if err != nil {
-			return "", util.LogErr(errors.ErrGrpcRequest, err)
+		if i.Ixplac.GetRpc() != "" {
+			height := &convertMsg.Height
+			return queryBlockByRpc(i, height)
+
+		} else {
+			res, err = serviceClient.GetBlockByHeight(
+				i.Ixplac.GetContext(),
+				&convertMsg,
+			)
+			if err != nil {
+				return "", util.LogErr(errors.ErrGrpcRequest, err)
+			}
 		}
 
 	// Latest validator set
@@ -124,12 +137,12 @@ func queryByLcdBase(i IXplaClient) (string, error) {
 
 	// Latest block
 	case i.Ixplac.GetMsgType() == mbase.BaseLatestBlockMsgtype:
-		url = url + util.MakeQueryLabels(baseBlocksLabel, baseLatestLabel)
+		url = util.MakeQueryLabels("/", baseBlocksLabel, baseLatestLabel)
 
 	// Block by height
 	case i.Ixplac.GetMsgType() == mbase.BaseBlockByHeightMsgType:
 		convertMsg, _ := i.Ixplac.GetMsg().(tmservice.GetBlockByHeightRequest)
-		url = url + util.MakeQueryLabels(baseBlocksLabel, util.FromInt64ToString(convertMsg.Height))
+		url = util.MakeQueryLabels("/", baseBlocksLabel, util.FromInt64ToString(convertMsg.Height))
 
 	// Latest validator set
 	case i.Ixplac.GetMsgType() == mbase.BaseLatestValidatorSetMsgType:
@@ -149,5 +162,21 @@ func queryByLcdBase(i IXplaClient) (string, error) {
 		return "", err
 	}
 
+	return string(out), nil
+}
+
+func queryBlockByRpc(i IXplaClient, height *int64) (string, error) {
+	client, err := cmclient.NewClientFromNode(i.Ixplac.GetRpc())
+	if err != nil {
+		return "", util.LogErr(errors.ErrGrpcRequest, err)
+	}
+	res, err := client.Block(i.Ixplac.GetContext(), height)
+	if err != nil {
+		return "", util.LogErr(errors.ErrGrpcRequest, err)
+	}
+	out, err := printObjectLegacy(i, res)
+	if err != nil {
+		return "", util.LogErr(errors.ErrGrpcRequest, err)
+	}
 	return string(out), nil
 }
