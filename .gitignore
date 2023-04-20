@@ -5,3 +5,4 @@ docs
 .pytest_cache
 yarn.lock
 .github/
+backup/

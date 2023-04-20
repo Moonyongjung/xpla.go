@@ -35,7 +35,7 @@ const (
 	EvmEthNewFilterMsgType                      = "eth-new-filter"
 	EvmEthNewBlockFilterMsgType                 = "eth-new-block-filter"
 	EvmEthNewPendingTransactionFilterMsgType    = "eth-new-pending-transaction-filter"
-	EvmEthUninsatllFilterMsgType                = "eth-uninstall-filter"
+	EvmEthUninstallFilterMsgType                = "eth-uninstall-filter"
 	EvmEthGetFilterChangesMsgType               = "eth-get-filter-changes"
 	EvmEthGetFilterLogsMsgType                  = "eth-get-filter-logs"
 	EvmEthGetLogsMsgType                        = "eth-get-logs"

@@ -648,14 +648,14 @@ func (xplac *XplaClient) EthNewPendingTransactionFilter() *XplaClient {
 }
 
 // Uninstall filter.
-func (xplac *XplaClient) EthUnistallFilter(ethUninsatllFilterMsg types.EthUninsatllFilterMsg) *XplaClient {
-	msg, err := mevm.MakeEthUninstallFilterMsg(ethUninsatllFilterMsg)
+func (xplac *XplaClient) EthUninstallFilter(ethUninstallFilterMsg types.EthUninstallFilterMsg) *XplaClient {
+	msg, err := mevm.MakeEthUninstallFilterMsg(ethUninstallFilterMsg)
 	if err != nil {
 		xplac.Err = err
 		return xplac
 	}
 	xplac.Module = mevm.EvmModule
-	xplac.MsgType = mevm.EvmEthUninsatllFilterMsgType
+	xplac.MsgType = mevm.EvmEthUninstallFilterMsgType
 	xplac.Msg = msg
 	return xplac
 }
@@ -1186,7 +1186,7 @@ func (xplac *XplaClient) IbcChannelPacketCommitments(ibcChannelPacketCommitments
 }
 
 // Query IBC packet receipt
-func (xplac *XplaClient) IbcChannelPacketRecipt(ibcChannelPacketReceiptMsg types.IbcChannelPacketReceiptMsg) *XplaClient {
+func (xplac *XplaClient) IbcChannelPacketReceipt(ibcChannelPacketReceiptMsg types.IbcChannelPacketReceiptMsg) *XplaClient {
 	msg, err := mibc.MakeIbcChannelPacketReceiptMsg(ibcChannelPacketReceiptMsg)
 	if err != nil {
 		xplac.Err = err

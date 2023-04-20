@@ -150,7 +150,7 @@ ibcChannelPacketReceiptMsg := types.IbcChannelPacketReceiptMsg{
     PortId:    "transfer",
     Sequence:  "2",
 }
-res, err = xplac.IbcChannelPacketRecipt(ibcChannelPacketReceiptMsg).Query()
+res, err = xplac.IbcChannelPacketReceipt(ibcChannelPacketReceiptMsg).Query()
 ```
 
 ### (Query) Channel packet ack

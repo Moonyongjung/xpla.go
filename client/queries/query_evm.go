@@ -453,8 +453,8 @@ func (i IXplaClient) QueryEvm() (string, error) {
 		return jsonReturn(ethNewPendingTransactionFilterResponse)
 
 	// uninstall filter
-	case i.Ixplac.GetMsgType() == mevm.EvmEthUninsatllFilterMsgType:
-		convertMsg, _ := i.Ixplac.GetMsg().(types.EthUninsatllFilterMsg)
+	case i.Ixplac.GetMsgType() == mevm.EvmEthUninstallFilterMsgType:
+		convertMsg, _ := i.Ixplac.GetMsg().(types.EthUninstallFilterMsg)
 
 		var result bool
 		err := evmClient.RpcClient.CallContext(evmClient.Ctx, &result, "eth_uninstallFilter", convertMsg.FilterId)

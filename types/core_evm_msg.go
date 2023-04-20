@@ -86,7 +86,7 @@ type EthGetLogsMsg struct {
 	Topics    []string
 }
 
-type EthUninsatllFilterMsg struct {
+type EthUninstallFilterMsg struct {
 	FilterId string
 }
 

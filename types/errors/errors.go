@@ -25,6 +25,7 @@ var (
 	ErrCannotConvert       = new(16, "cannot convert type")
 	ErrParse               = new(17, "parse error")
 	ErrSdkClient           = new(18, "cosmos sdk client set error")
+	ErrAlreadyExist        = new(19, "already exist")
 )
 
 func new(errCode uint64, desc string) XGoError {

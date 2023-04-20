@@ -71,8 +71,8 @@ func MakeEthNewFilterMsg(ethNewFilterMsg types.EthNewFilterMsg) (EthNewFilterPar
 }
 
 // (Query) make msg - eth uninstall filter
-func MakeEthUninstallFilterMsg(ethUninsatllFilter types.EthUninsatllFilterMsg) (types.EthUninsatllFilterMsg, error) {
-	return ethUninsatllFilter, nil
+func MakeEthUninstallFilterMsg(ethUninstallFilter types.EthUninstallFilterMsg) (types.EthUninstallFilterMsg, error) {
+	return ethUninstallFilter, nil
 }
 
 // (Query) make msg - eth get filter changes

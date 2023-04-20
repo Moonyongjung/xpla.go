@@ -263,7 +263,7 @@ ethUninsatllFilterMsg := types.EthUninsatllFilterMsg{
     FilterId: "0x168b9d421ecbffa1ac706926c2203454",
 }
 
-res, err = xplac.EthUnistallFilter(ethUninsatllFilterMsg).Query()
+res, err = xplac.EthUninstallFilter(ethUninsatllFilterMsg).Query()
 ```
 
 ### (Query) Get filter changes
