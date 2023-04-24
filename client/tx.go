@@ -100,7 +100,7 @@ func (xplac *XplaClient) CreateAndSignTx() ([]byte, error) {
 				return nil, err
 			}
 
-			return nil, nil
+			return jsonTx, nil
 		}
 
 		return txBytes, nil
@@ -143,7 +143,7 @@ func (xplac *XplaClient) CreateUnsignedTx() ([]byte, error) {
 			return nil, err
 		}
 
-		return nil, nil
+		return jsonTx, nil
 	}
 
 	return txBytes, nil
@@ -252,7 +252,7 @@ func (xplac *XplaClient) SignTx(signTxMsg types.SignTxMsg) ([]byte, error) {
 			return nil, err
 		}
 
-		return nil, nil
+		return json, nil
 	}
 
 	return json, nil
@@ -368,7 +368,7 @@ func (xplac *XplaClient) MultiSign(txMultiSignMsg types.TxMultiSignMsg) ([]byte,
 	if err != nil {
 		return nil, err
 	}
-	return nil, nil
+	return json, nil
 }
 
 // Create and sign transaction of evm.
