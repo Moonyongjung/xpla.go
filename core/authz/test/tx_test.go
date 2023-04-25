@@ -75,7 +75,7 @@ func (suite *TestSuite) TestSimulateGrant() {
 
 	// execute operation
 	op := SimulateMsgGrant(suite.app.AccountKeeper, suite.app.BankKeeper, suite.app.AuthzKeeper)
-	operationMsg, futureOperations, err := op(r, suite.app.BaseApp, ctx, accounts, "")
+	operationMsg, futureOperations, err := op(r, suite.app.BaseApp, ctx, accounts, testutil.TestChainId)
 	suite.Require().NoError(err)
 
 	var msg authz.MsgGrant
@@ -110,7 +110,7 @@ func (suite *TestSuite) TestSimulateRevoke() {
 
 	// execute operation
 	op := SimulateMsgRevoke(suite.app.AccountKeeper, suite.app.BankKeeper, suite.app.AuthzKeeper)
-	operationMsg, futureOperations, err := op(r, suite.app.BaseApp, suite.ctx, accounts, "")
+	operationMsg, futureOperations, err := op(r, suite.app.BaseApp, suite.ctx, accounts, testutil.TestChainId)
 	suite.Require().NoError(err)
 
 	var msg authz.MsgRevoke
@@ -144,7 +144,7 @@ func (suite *TestSuite) TestSimulateExec() {
 
 	// execute operation
 	op := SimulateMsgExec(suite.app.AccountKeeper, suite.app.BankKeeper, suite.app.AuthzKeeper, suite.app.AppCodec())
-	operationMsg, futureOperations, err := op(r, suite.app.BaseApp, suite.ctx, accounts, "")
+	operationMsg, futureOperations, err := op(r, suite.app.BaseApp, suite.ctx, accounts, testutil.TestChainId)
 	suite.Require().NoError(err)
 
 	var msg authz.MsgExec

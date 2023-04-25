@@ -59,7 +59,7 @@ func (suite *TestSuite) TestSimulateMsgSetWithdrawAddress() {
 
 	// execute operation
 	op := SimulateMsgSetWithdrawAddress(suite.app.AccountKeeper, suite.app.BankKeeper, suite.app.DistrKeeper)
-	operationMsg, futureOperations, err := op(r, suite.app.BaseApp, suite.ctx, accounts, "")
+	operationMsg, futureOperations, err := op(r, suite.app.BaseApp, suite.ctx, accounts, testutil.TestChainId)
 	suite.Require().NoError(err)
 
 	var msg disttypes.MsgSetWithdrawAddress
@@ -100,7 +100,7 @@ func (suite *TestSuite) TestSimulateMsgWithdrawDelegatorReward() {
 
 	// execute operation
 	op := SimulateMsgWithdrawDelegatorReward(suite.app.AccountKeeper, suite.app.BankKeeper, suite.app.DistrKeeper, suite.app.StakingKeeper)
-	operationMsg, futureOperations, err := op(r, suite.app.BaseApp, suite.ctx, accounts, "")
+	operationMsg, futureOperations, err := op(r, suite.app.BaseApp, suite.ctx, accounts, testutil.TestChainId)
 	suite.Require().NoError(err)
 
 	var msg disttypes.MsgWithdrawDelegatorReward
@@ -127,7 +127,7 @@ func (suite *TestSuite) TestSimulateMsgFundCommunityPool() {
 
 	// execute operation
 	op := SimulateMsgFundCommunityPool(suite.app.AccountKeeper, suite.app.BankKeeper, suite.app.DistrKeeper, suite.app.StakingKeeper)
-	operationMsg, futureOperations, err := op(r, suite.app.BaseApp, suite.ctx, accounts, "")
+	operationMsg, futureOperations, err := op(r, suite.app.BaseApp, suite.ctx, accounts, testutil.TestChainId)
 	suite.Require().NoError(err)
 
 	var msg disttypes.MsgFundCommunityPool
@@ -179,7 +179,7 @@ func SimulateMsgSetWithdrawAddress(ak disttypes.AccountKeeper, bk disttypes.Bank
 			CoinsSpentInMsg: spendable,
 		}
 
-		return simulation.GenAndDeliverTxWithRandFees(txCtx)
+		return testutil.GenAndDeliverTxWithRandFees(txCtx)
 	}
 }
 
@@ -234,7 +234,7 @@ func SimulateMsgWithdrawDelegatorReward(ak disttypes.AccountKeeper, bk disttypes
 			CoinsSpentInMsg: spendable,
 		}
 
-		return simulation.GenAndDeliverTxWithRandFees(txCtx)
+		return testutil.GenAndDeliverTxWithRandFees(txCtx)
 	}
 }
 
@@ -289,7 +289,7 @@ func SimulateMsgFundCommunityPool(ak disttypes.AccountKeeper, bk disttypes.BankK
 			ModuleName:    disttypes.ModuleName,
 		}
 
-		return simulation.GenAndDeliverTx(txCtx, fees)
+		return testutil.GenAndDeliverTx(txCtx, fees)
 	}
 }
 

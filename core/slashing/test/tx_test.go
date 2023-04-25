@@ -65,7 +65,7 @@ func TestSimulateMsgUnjail(t *testing.T) {
 
 	// execute operation
 	op := SimulateMsgUnjail(app.AccountKeeper, app.BankKeeper, app.SlashingKeeper, app.StakingKeeper)
-	operationMsg, futureOperations, err := op(r, app.BaseApp, ctx, accounts, "")
+	operationMsg, futureOperations, err := op(r, app.BaseApp, ctx, accounts, testutil.TestChainId)
 	require.NoError(t, err)
 
 	var msg slashingtypes.MsgUnjail

@@ -55,7 +55,7 @@ func (suite *TestSuite) TestSimulateMsgSend() {
 
 	// execute operation
 	op := SimulateMsgSend(suite.app.AccountKeeper, suite.app.BankKeeper)
-	operationMsg, futureOperations, err := op(r, suite.app.BaseApp, suite.ctx, accounts, "")
+	operationMsg, futureOperations, err := op(r, suite.app.BaseApp, suite.ctx, accounts, testutil.TestChainId)
 	suite.Require().NoError(err)
 
 	var msg banktypes.MsgSend

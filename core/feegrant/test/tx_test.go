@@ -172,7 +172,7 @@ func SimulateMsgGrantAllowance(ak feegrant.AccountKeeper, bk feegrant.BankKeeper
 			CoinsSpentInMsg: spendableCoins,
 		}
 
-		return simulation.GenAndDeliverTxWithRandFees(txCtx)
+		return testutil.GenAndDeliverTxWithRandFees(txCtx)
 	}
 }
 
@@ -230,7 +230,7 @@ func SimulateMsgRevokeAllowance(ak feegrant.AccountKeeper, bk feegrant.BankKeepe
 			CoinsSpentInMsg: spendableCoins,
 		}
 
-		return simulation.GenAndDeliverTxWithRandFees(txCtx)
+		return testutil.GenAndDeliverTxWithRandFees(txCtx)
 	}
 }
 

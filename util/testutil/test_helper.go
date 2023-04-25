@@ -30,6 +30,7 @@ import (
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 	minttypes "github.com/cosmos/cosmos-sdk/x/mint/types"
+	simutil "github.com/cosmos/cosmos-sdk/x/simulation"
 	"github.com/cosmos/go-bip39"
 	evmhd "github.com/evmos/ethermint/crypto/hd"
 	abci "github.com/tendermint/tendermint/abci/types"
@@ -42,7 +43,7 @@ import (
 
 const (
 	DefaultTestGenTxGas = 1000000
-	TestChainId         = "cude_1-1"
+	TestChainId         = "cude_47-5"
 )
 
 func Setup(isCheckTx bool, invCheckPeriod uint) *xapp.XplaApp {
@@ -58,6 +59,7 @@ func Setup(isCheckTx bool, invCheckPeriod uint) *xapp.XplaApp {
 		app.InitChain(
 			abci.RequestInitChain{
 				Validators:      []abci.ValidatorUpdate{},
+				ChainId:         TestChainId,
 				ConsensusParams: helpers.DefaultConsensusParams,
 				AppStateBytes:   stateBytes,
 			},
@@ -86,6 +88,51 @@ func setup(withGenesis bool, invCheckPeriod uint) (*xapp.XplaApp, xapp.GenesisSt
 	}
 
 	return app, xapp.GenesisState{}
+}
+
+// GenAndDeliverTxWithRandFees generates a transaction with a random fee and delivers it.
+func GenAndDeliverTxWithRandFees(txCtx simutil.OperationInput) (simulation.OperationMsg, []simulation.FutureOperation, error) {
+	account := txCtx.AccountKeeper.GetAccount(txCtx.Context, txCtx.SimAccount.Address)
+	spendable := txCtx.Bankkeeper.SpendableCoins(txCtx.Context, account.GetAddress())
+
+	var fees sdk.Coins
+	var err error
+
+	coins, hasNeg := spendable.SafeSub(txCtx.CoinsSpentInMsg)
+	if hasNeg {
+		return simulation.NoOpMsg(txCtx.ModuleName, txCtx.MsgType, "message doesn't leave room for fees"), nil, err
+	}
+
+	fees, err = simulation.RandomFees(txCtx.R, txCtx.Context, coins)
+	if err != nil {
+		return simulation.NoOpMsg(txCtx.ModuleName, txCtx.MsgType, "unable to generate fees"), nil, err
+	}
+	return GenAndDeliverTx(txCtx, fees)
+}
+
+// GenAndDeliverTx generates a transactions and delivers it.
+func GenAndDeliverTx(txCtx simutil.OperationInput, fees sdk.Coins) (simulation.OperationMsg, []simulation.FutureOperation, error) {
+	account := txCtx.AccountKeeper.GetAccount(txCtx.Context, txCtx.SimAccount.Address)
+	tx, err := GenTx(
+		txCtx.TxGen,
+		[]sdk.Msg{txCtx.Msg},
+		fees,
+		DefaultTestGenTxGas,
+		TestChainId,
+		[]uint64{account.GetAccountNumber()},
+		[]uint64{account.GetSequence()},
+		txCtx.SimAccount.PrivKey,
+	)
+	if err != nil {
+		return simulation.NoOpMsg(txCtx.ModuleName, txCtx.MsgType, "unable to generate mock tx"), nil, err
+	}
+
+	_, _, err = txCtx.App.Deliver(txCtx.TxGen.TxEncoder(), tx)
+	if err != nil {
+		return simulation.NoOpMsg(txCtx.ModuleName, txCtx.MsgType, "unable to deliver tx"), nil, err
+	}
+
+	return simulation.NewOperationMsg(txCtx.Msg, true, "", txCtx.Cdc), nil, nil
 }
 
 // GenTx generates a signed mock transaction.

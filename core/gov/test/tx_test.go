@@ -371,7 +371,7 @@ func SimulateMsgDeposit(ak govtypes.AccountKeeper, bk govtypes.BankKeeper, k kee
 			ModuleName:    govtypes.ModuleName,
 		}
 
-		return simulation.GenAndDeliverTx(txCtx, fees)
+		return testutil.GenAndDeliverTx(txCtx, fees)
 	}
 }
 
@@ -460,7 +460,7 @@ func SimulateMsgVoteWeighted(ak govtypes.AccountKeeper, bk govtypes.BankKeeper, 
 			CoinsSpentInMsg: spendable,
 		}
 
-		return simulation.GenAndDeliverTxWithRandFees(txCtx)
+		return testutil.GenAndDeliverTxWithRandFees(txCtx)
 	}
 }
 
@@ -581,7 +581,7 @@ func operationSimulateMsgVote(ak govtypes.AccountKeeper, bk govtypes.BankKeeper,
 			CoinsSpentInMsg: spendable,
 		}
 
-		return simulation.GenAndDeliverTxWithRandFees(txCtx)
+		return testutil.GenAndDeliverTxWithRandFees(txCtx)
 	}
 }
 

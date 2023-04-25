@@ -309,7 +309,7 @@ func SimulateMsgCreateValidator(ak stakingtypes.AccountKeeper, bk stakingtypes.B
 			ModuleName:    stakingtypes.ModuleName,
 		}
 
-		return genAndDeliverTx(txCtx, fees)
+		return testutil.GenAndDeliverTx(txCtx, fees)
 	}
 }
 
@@ -373,7 +373,7 @@ func SimulateMsgEditValidator(ak stakingtypes.AccountKeeper, bk stakingtypes.Ban
 			CoinsSpentInMsg: spendable,
 		}
 
-		return simulation.GenAndDeliverTxWithRandFees(txCtx)
+		return testutil.GenAndDeliverTxWithRandFees(txCtx)
 	}
 }
 
@@ -441,7 +441,7 @@ func SimulateMsgDelegate(ak stakingtypes.AccountKeeper, bk stakingtypes.BankKeep
 			ModuleName:    stakingtypes.ModuleName,
 		}
 
-		return simulation.GenAndDeliverTx(txCtx, fees)
+		return testutil.GenAndDeliverTx(txCtx, fees)
 	}
 }
 
@@ -526,7 +526,7 @@ func SimulateMsgUndelegate(ak stakingtypes.AccountKeeper, bk stakingtypes.BankKe
 			CoinsSpentInMsg: spendable,
 		}
 
-		return simulation.GenAndDeliverTxWithRandFees(txCtx)
+		return testutil.GenAndDeliverTxWithRandFees(txCtx)
 	}
 }
 
@@ -635,7 +635,7 @@ func SimulateMsgBeginRedelegate(ak stakingtypes.AccountKeeper, bk stakingtypes.B
 			CoinsSpentInMsg: spendable,
 		}
 
-		return simulation.GenAndDeliverTxWithRandFees(txCtx)
+		return testutil.GenAndDeliverTxWithRandFees(txCtx)
 	}
 }
 
@@ -710,32 +710,6 @@ func getValTargetAccount(t *testing.T, app *xapp.XplaApp, ctx sdk.Context, accou
 	accounts = append(accounts, specAccount)
 
 	return accounts
-}
-
-// genAndDeliverTx generates a transactions and delivers it.
-func genAndDeliverTx(txCtx simulation.OperationInput, fees sdk.Coins) (simtypes.OperationMsg, []simtypes.FutureOperation, error) {
-	account := txCtx.AccountKeeper.GetAccount(txCtx.Context, txCtx.SimAccount.Address)
-	tx, err := testutil.GenTx(
-		txCtx.TxGen,
-		[]sdk.Msg{txCtx.Msg},
-		fees,
-		testutil.DefaultTestGenTxGas,
-		txCtx.Context.ChainID(),
-		[]uint64{account.GetAccountNumber()},
-		[]uint64{account.GetSequence()},
-		txCtx.SimAccount.PrivKey,
-	)
-
-	if err != nil {
-		return simtypes.NoOpMsg(txCtx.ModuleName, txCtx.MsgType, "unable to generate mock tx"), nil, err
-	}
-
-	_, _, err = txCtx.App.Deliver(txCtx.TxGen.TxEncoder(), tx)
-	if err != nil {
-		return simtypes.NoOpMsg(txCtx.ModuleName, txCtx.MsgType, "unable to deliver tx"), nil, err
-	}
-
-	return simtypes.NewOperationMsg(txCtx.Msg, true, "", txCtx.Cdc), nil, nil
 }
 
 func getTestingValidator0(t *testing.T, app *xapp.XplaApp, ctx sdk.Context, accounts []simtypes.Account) stakingtypes.Validator {
