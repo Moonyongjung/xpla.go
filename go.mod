@@ -20,6 +20,7 @@ require (
 	github.com/xpladev/xpla v1.2.0
 	golang.org/x/net v0.2.0
 	google.golang.org/grpc v1.51.0
+	gopkg.in/yaml.v3 v3.0.1
 )
 
 require (
@@ -159,7 +160,6 @@ require (
 	gopkg.in/ini.v1 v1.66.6 // indirect
 	gopkg.in/natefinch/npipe.v2 v2.0.0-20160621034901-c1b8fa8bdcce // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
-	gopkg.in/yaml.v3 v3.0.1 // indirect
 	nhooyr.io/websocket v1.8.6 // indirect
 )
 

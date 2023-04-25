@@ -1,10 +1,16 @@
 # xpla.go
 <div align="left">
   <a href="https://pkg.go.dev/github.com/Moonyongjung/xpla.go">
-    <img src="https://pkg.go.dev/badge/github.com/Moonyongjung/xpla.go.svg" alt="Go Reference">
+    <img alt="Go Reference" src="https://pkg.go.dev/badge/github.com/Moonyongjung/xpla.go.svg">
   </a>
   <a href="https://goreportcard.com/report/github.com/Moonyongjung/xpla.go">
     <img alt="Go report card" src="https://goreportcard.com/badge/github.com/Moonyongjung/xpla.go" />
+  </a>
+  <a href="https://github.com/Moonyongjung/xpla.go/blob/main/LICENSE">
+    <img alt="License: MIT" src="https://img.shields.io/github/license/Moonyongjung/xpla.go.svg" />
+  </a>
+  <a href="https://github.com/Moonyongjung/xpla.go">
+    <img alt="Lines Of Code" src="https://img.shields.io/tokei/lines/github/Moonyongjung/xpla.go?style=round-square" />
   </a>
 </div>
 Xpla.go is a Golang SDK for writing applications that interact with the Xpla blockchain and provides simple abstractions over core data structures, serialization, key management, and API request generation.
