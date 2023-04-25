@@ -260,6 +260,9 @@ func (xplac *XplaClient) SignTx(signTxMsg types.SignTxMsg) ([]byte, error) {
 
 // Sign created unsigned transaction with multi signatures.
 func (xplac *XplaClient) MultiSign(txMultiSignMsg types.TxMultiSignMsg) ([]byte, error) {
+	if xplac.Err != nil {
+		return nil, xplac.Err
+	}
 
 	clientCtx, err := util.NewClient()
 	if err != nil {
