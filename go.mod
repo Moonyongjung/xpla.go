@@ -1,11 +1,11 @@
 module github.com/Moonyongjung/xpla.go
 
-go 1.18
+go 1.19
 
 require (
 	cosmossdk.io/api v0.2.5
 	github.com/CosmWasm/wasmd v0.28.0
-	github.com/CosmWasm/wasmvm v1.0.0
+	github.com/CosmWasm/wasmvm v1.0.1
 	github.com/cosmos/cosmos-sdk v0.45.9
 	github.com/cosmos/go-bip39 v1.0.0
 	github.com/cosmos/ibc-go/v3 v3.2.0
@@ -17,7 +17,7 @@ require (
 	github.com/tendermint/crypto v0.0.0-20191022145703-50d29ede1e15
 	github.com/tendermint/tendermint v0.34.21
 	github.com/tendermint/tm-db v0.6.7
-	github.com/xpladev/xpla v1.2.0
+	github.com/xpladev/xpla v1.2.2
 	golang.org/x/net v0.2.0
 	google.golang.org/grpc v1.51.0
 	gopkg.in/yaml.v3 v3.0.1

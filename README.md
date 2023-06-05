@@ -42,5 +42,3 @@ Usage of modules and xpla client.
 
 ## License
 This software is licensed under the MIT license. See [LICENSE](./LICENSE) for full disclosure.
-
-© 2022 Xpla.
