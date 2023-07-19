@@ -17,7 +17,7 @@ const (
 	broadcastUrl = "/cosmos/tx/v1beta1/txs"
 )
 
-// LoadAccount simulates gas and fee for a transaction
+// LoadAccount gets the account info by AccAddress
 // If xpla client has gRPC client, query account information by using gRPC
 func (xplac *XplaClient) LoadAccount(address sdk.AccAddress) (res authtypes.AccountI, err error) {
 
