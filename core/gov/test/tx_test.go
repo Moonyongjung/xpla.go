@@ -55,7 +55,7 @@ func TestSimulateMsgSubmitProposal(t *testing.T) {
 
 	// execute operation
 	op := SimulateMsgSubmitProposal(app.AccountKeeper, app.BankKeeper, app.GovKeeper, MockWeightedProposalContent{3}.ContentSimulatorFn())
-	operationMsg, _, err := op(r, app.BaseApp, ctx, accounts, "")
+	operationMsg, _, err := op(r, app.BaseApp, ctx, accounts, testutil.TestChainId)
 	require.NoError(t, err)
 
 	var msg govtypes.MsgSubmitProposal
