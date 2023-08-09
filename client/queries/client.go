@@ -57,7 +57,7 @@ func NewIXplaClient(moduleClient ModuleClient, qt uint8) *IXplaClient {
 }
 
 // Print protobuf message by using cosmos sdk codec.
-func printProto(i IXplaClient, toPrint proto.Message) ([]byte, error) {
+func PrintProto(i IXplaClient, toPrint proto.Message) ([]byte, error) {
 	out, err := i.Ixplac.GetEncoding().Marshaler.MarshalJSON(toPrint)
 	if err != nil {
 		return nil, util.LogErr(errors.ErrFailedToMarshal, err)
@@ -66,7 +66,7 @@ func printProto(i IXplaClient, toPrint proto.Message) ([]byte, error) {
 }
 
 // Print object by using cosmos sdk legacy amino.
-func printObjectLegacy(i IXplaClient, toPrint interface{}) ([]byte, error) {
+func PrintObjectLegacy(i IXplaClient, toPrint interface{}) ([]byte, error) {
 	out, err := i.Ixplac.GetEncoding().Amino.MarshalJSON(toPrint)
 	if err != nil {
 		return nil, util.LogErr(errors.ErrFailedToMarshal, err)
@@ -75,7 +75,7 @@ func printObjectLegacy(i IXplaClient, toPrint interface{}) ([]byte, error) {
 }
 
 // For auth module and gov module, make cosmos sdk client for querying.
-func clientForQuery(i IXplaClient) (cmclient.Context, error) {
+func ClientForQuery(i IXplaClient) (cmclient.Context, error) {
 	client, err := cmclient.NewClientFromNode(i.Ixplac.GetRpc())
 	if err != nil {
 		return cmclient.Context{}, util.LogErr(errors.ErrSdkClient, err)

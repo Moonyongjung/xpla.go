@@ -2,6 +2,24 @@ package client
 
 import (
 	"github.com/Moonyongjung/xpla.go/client/queries"
+	qauth "github.com/Moonyongjung/xpla.go/client/queries/auth"
+	qauthz "github.com/Moonyongjung/xpla.go/client/queries/authz"
+	qbank "github.com/Moonyongjung/xpla.go/client/queries/bank"
+	qbase "github.com/Moonyongjung/xpla.go/client/queries/base"
+	qdist "github.com/Moonyongjung/xpla.go/client/queries/distribution"
+	qevidence "github.com/Moonyongjung/xpla.go/client/queries/evidence"
+	qevm "github.com/Moonyongjung/xpla.go/client/queries/evm"
+	qfeegrant "github.com/Moonyongjung/xpla.go/client/queries/feegrant"
+	qgov "github.com/Moonyongjung/xpla.go/client/queries/gov"
+	qibc "github.com/Moonyongjung/xpla.go/client/queries/ibc"
+	qmint "github.com/Moonyongjung/xpla.go/client/queries/mint"
+	qparams "github.com/Moonyongjung/xpla.go/client/queries/params"
+	qreward "github.com/Moonyongjung/xpla.go/client/queries/reward"
+	qslashing "github.com/Moonyongjung/xpla.go/client/queries/slashing"
+	qstaking "github.com/Moonyongjung/xpla.go/client/queries/staking"
+	qupgrade "github.com/Moonyongjung/xpla.go/client/queries/upgrade"
+	qwasm "github.com/Moonyongjung/xpla.go/client/queries/wasm"
+
 	mauth "github.com/Moonyongjung/xpla.go/core/auth"
 	mauthz "github.com/Moonyongjung/xpla.go/core/authz"
 	mbank "github.com/Moonyongjung/xpla.go/core/bank"
@@ -47,55 +65,55 @@ func (xplac *XplaClient) Query() (string, error) {
 	ixplaClient := queries.NewIXplaClient(xplac, qt)
 
 	if xplac.Module == mauth.AuthModule {
-		return ixplaClient.QueryAuth()
+		return qauth.QueryAuth(*ixplaClient)
 
 	} else if xplac.Module == mauthz.AuthzModule {
-		return ixplaClient.QueryAuthz()
+		return qauthz.QueryAuthz(*ixplaClient)
 
 	} else if xplac.Module == mbank.BankModule {
-		return ixplaClient.QueryBank()
+		return qbank.QueryBank(*ixplaClient)
 
 	} else if xplac.Module == mbase.Base {
-		return ixplaClient.QueryBase()
+		return qbase.QueryBase(*ixplaClient)
 
 	} else if xplac.Module == mdist.DistributionModule {
-		return ixplaClient.QueryDistribution()
+		return qdist.QueryDistribution(*ixplaClient)
 
 	} else if xplac.Module == mevidence.EvidenceModule {
-		return ixplaClient.QueryEvidence()
+		return qevidence.QueryEvidence(*ixplaClient)
 
 	} else if xplac.Module == mevm.EvmModule {
-		return ixplaClient.QueryEvm()
+		return qevm.QueryEvm(*ixplaClient)
 
 	} else if xplac.Module == mfeegrant.FeegrantModule {
-		return ixplaClient.QueryFeegrant()
+		return qfeegrant.QueryFeegrant(*ixplaClient)
 
 	} else if xplac.Module == mgov.GovModule {
-		return ixplaClient.QueryGov()
+		return qgov.QueryGov(*ixplaClient)
 
 	} else if xplac.Module == mibc.IbcModule {
-		return ixplaClient.QueryIbc()
+		return qibc.QueryIbc(*ixplaClient)
 
 	} else if xplac.Module == mmint.MintModule {
-		return ixplaClient.QueryMint()
+		return qmint.QueryMint(*ixplaClient)
 
 	} else if xplac.Module == mparams.ParamsModule {
-		return ixplaClient.QueryParams()
+		return qparams.QueryParams(*ixplaClient)
 
 	} else if xplac.Module == mreward.RewardModule {
-		return ixplaClient.QueryReward()
+		return qreward.QueryReward(*ixplaClient)
 
 	} else if xplac.Module == mslashing.SlashingModule {
-		return ixplaClient.QuerySlashing()
+		return qslashing.QuerySlashing(*ixplaClient)
 
 	} else if xplac.Module == mstaking.StakingModule {
-		return ixplaClient.QueryStaking()
+		return qstaking.QueryStaking(*ixplaClient)
 
 	} else if xplac.Module == mupgrade.UpgradeModule {
-		return ixplaClient.QueryUpgrade()
+		return qupgrade.QueryUpgrade(*ixplaClient)
 
 	} else if xplac.Module == mwasm.WasmModule {
-		return ixplaClient.QueryWasm()
+		return qwasm.QueryWasm(*ixplaClient)
 
 	} else {
 		return "", util.LogErr(errors.ErrInvalidRequest, "invalid module")
