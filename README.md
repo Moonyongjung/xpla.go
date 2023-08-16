@@ -9,6 +9,9 @@
   <a href="https://github.com/Moonyongjung/xpla.go/blob/main/LICENSE">
     <img alt="License: MIT" src="https://img.shields.io/github/license/Moonyongjung/xpla.go.svg" />
   </a>
+  <a href="https://app.codecov.io/gh/Moonyongjung/xpla.go">
+    <img alt="codecov" src="https://codecov.io/gh/Moonyongjung/xpla.go/branch/main/graph/badge.svg" />
+  </a>
   <a href="https://github.com/Moonyongjung/xpla.go">
     <img alt="Lines Of Code" src="https://img.shields.io/tokei/lines/github/Moonyongjung/xpla.go?style=round-square" />
   </a>
