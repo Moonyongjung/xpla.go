@@ -43,11 +43,10 @@ func (s *IntegrationTestSuite) SetupSuite() {
 	s.T().Log("setting up integration test suite")
 
 	s.network = network.New(s.T(), s.cfg)
+	s.Require().NoError(s.network.WaitForNextBlock())
 
 	val := s.network.Validators[0]
 	val2 := s.network.Validators[1]
-
-	s.Require().NoError(s.network.WaitForNextBlock())
 
 	del, err := sdk.ParseCoinNormalized("1000stake")
 	s.Require().NoError(err)
@@ -86,8 +85,6 @@ func (s *IntegrationTestSuite) SetupSuite() {
 		s.network.Validators[0].APIAddress,
 		s.network.Validators[0].AppConfig.GRPC.Address,
 	}
-
-	s.Require().NoError(s.network.WaitForNextBlock())
 }
 
 func (s *IntegrationTestSuite) TearDownSuite() {
@@ -356,7 +353,7 @@ func (s *IntegrationTestSuite) TestRedelegation() {
 				queryRedelegationsResponse.RedelegationResponses[0].Redelegation.ValidatorDstAddress,
 			)
 			s.Require().Equal(
-				int64(3),
+				int64(4),
 				queryRedelegationsResponse.RedelegationResponses[0].Entries[0].RedelegationEntry.CreationHeight,
 			)
 		}
@@ -398,7 +395,7 @@ func (s *IntegrationTestSuite) TestRedelegationDelegator() {
 			queryRedelegationsResponse.RedelegationResponses[0].Redelegation.ValidatorDstAddress,
 		)
 		s.Require().Equal(
-			int64(3),
+			int64(4),
 			queryRedelegationsResponse.RedelegationResponses[0].Entries[0].RedelegationEntry.CreationHeight,
 		)
 	}
@@ -444,7 +441,7 @@ func (s *IntegrationTestSuite) TestRedelegationSrcValidator() {
 				queryRedelegationsResponse.RedelegationResponses[0].Redelegation.ValidatorDstAddress,
 			)
 			s.Require().Equal(
-				int64(3),
+				int64(4),
 				queryRedelegationsResponse.RedelegationResponses[0].Entries[0].RedelegationEntry.CreationHeight,
 			)
 		}

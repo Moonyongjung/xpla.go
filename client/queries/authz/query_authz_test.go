@@ -40,11 +40,10 @@ func (s *IntegrationTestSuite) SetupSuite() {
 	s.T().Log("setting up integration test suite")
 
 	s.network = network.New(s.T(), s.cfg)
+	s.Require().NoError(s.network.WaitForNextBlock())
 
 	val1 := s.network.Validators[0]
 	val2 := s.network.Validators[1]
-
-	s.Require().NoError(s.network.WaitForNextBlock())
 
 	_, err := authztestutil.ExecGrant(
 		val1,
@@ -67,8 +66,6 @@ func (s *IntegrationTestSuite) SetupSuite() {
 		s.network.Validators[0].APIAddress,
 		s.network.Validators[0].AppConfig.GRPC.Address,
 	}
-
-	s.Require().NoError(s.network.WaitForNextBlock())
 }
 
 func (s *IntegrationTestSuite) TearDownSuite() {

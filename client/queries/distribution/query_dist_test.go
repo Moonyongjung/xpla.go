@@ -43,11 +43,10 @@ func (s *IntegrationTestSuite) SetupSuite() {
 	s.T().Log("setting up integration test suite")
 
 	s.network = network.New(s.T(), s.cfg)
+	s.Require().NoError(s.network.WaitForNextBlock())
 
 	val := s.network.Validators[0]
 	val2 := s.network.Validators[1]
-
-	s.Require().NoError(s.network.WaitForNextBlock())
 
 	del, err := sdk.ParseCoinNormalized("1000stake")
 	s.Require().NoError(err)
@@ -59,14 +58,13 @@ func (s *IntegrationTestSuite) SetupSuite() {
 		del,
 	)
 	s.Require().NoError(err)
+	s.Require().NoError(s.network.WaitForNextBlock())
 
 	s.xplac = qtest.NewTestXplaClient()
 	s.apis = []string{
 		s.network.Validators[0].APIAddress,
 		s.network.Validators[0].AppConfig.GRPC.Address,
 	}
-
-	s.Require().NoError(s.network.WaitForNextBlock())
 }
 
 func (s *IntegrationTestSuite) TearDownSuite() {

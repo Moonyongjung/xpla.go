@@ -44,12 +44,11 @@ func (s *IntegrationTestSuite) SetupSuite() {
 	s.T().Log("setting up integration test suite")
 
 	s.network = network.New(s.T(), s.cfg)
+	s.Require().NoError(s.network.WaitForNextBlock())
 
 	val := s.network.Validators[0]
 	granter := val.Address
 	grantee := s.network.Validators[1].Address
-
-	s.Require().NoError(s.network.WaitForNextBlock())
 
 	s.createGrant(granter, grantee)
 
@@ -63,8 +62,6 @@ func (s *IntegrationTestSuite) SetupSuite() {
 		s.network.Validators[0].APIAddress,
 		s.network.Validators[0].AppConfig.GRPC.Address,
 	}
-
-	s.Require().NoError(s.network.WaitForNextBlock())
 }
 
 func (s *IntegrationTestSuite) TearDownSuite() {

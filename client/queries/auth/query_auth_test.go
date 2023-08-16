@@ -44,6 +44,7 @@ func (s *IntegrationTestSuite) SetupSuite() {
 	s.T().Log("setting up integration test suite")
 
 	s.network = network.New(s.T(), s.cfg)
+	s.Require().NoError(s.network.WaitForNextBlock())
 
 	kb := s.network.Validators[0].ClientCtx.Keyring
 	_, _, err := kb.NewMnemonic("newAccount", keyring.English, sdk.GetConfig().GetFullBIP44Path(), keyring.DefaultBIP39Passphrase, hd.Secp256k1)
@@ -54,8 +55,6 @@ func (s *IntegrationTestSuite) SetupSuite() {
 		s.network.Validators[0].APIAddress,
 		s.network.Validators[0].AppConfig.GRPC.Address,
 	}
-
-	s.Require().NoError(s.network.WaitForNextBlock())
 }
 
 func (s *IntegrationTestSuite) TearDownSuite() {

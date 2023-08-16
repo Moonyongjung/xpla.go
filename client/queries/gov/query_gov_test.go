@@ -39,10 +39,9 @@ func (s *IntegrationTestSuite) SetupSuite() {
 	s.T().Log("setting up integration test suite")
 
 	s.network = network.New(s.T(), s.cfg)
+	s.Require().NoError(s.network.WaitForNextBlock())
 
 	val := s.network.Validators[0]
-
-	s.Require().NoError(s.network.WaitForNextBlock())
 
 	// create a proposal with deposit
 	_, err := govtestutil.MsgSubmitProposal(val.ClientCtx, val.Address.String(),
@@ -71,14 +70,13 @@ func (s *IntegrationTestSuite) SetupSuite() {
 	// vote for proposal3 as val
 	_, err = govtestutil.MsgVote(val.ClientCtx, val.Address.String(), "3", "yes=0.6,no=0.3,abstain=0.05,no_with_veto=0.05")
 	s.Require().NoError(err)
+	s.Require().NoError(s.network.WaitForNextBlock())
 
 	s.xplac = qtest.NewTestXplaClient()
 	s.apis = []string{
 		s.network.Validators[0].APIAddress,
 		s.network.Validators[0].AppConfig.GRPC.Address,
 	}
-
-	s.Require().NoError(s.network.WaitForNextBlock())
 }
 
 func (s *IntegrationTestSuite) TearDownSuite() {

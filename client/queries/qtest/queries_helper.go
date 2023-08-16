@@ -10,8 +10,11 @@ func NewTestXplaClient() *client.XplaClient {
 }
 
 func ResetXplac(xplac *client.XplaClient) *client.XplaClient {
-	return xplac.
-		WithURL("").
-		WithGrpc("").
-		WithRpc("")
+	xplac.WithOptions(client.Options{})
+	xplac.Module = ""
+	xplac.MsgType = ""
+	xplac.Msg = nil
+	xplac.Err = nil
+
+	return xplac
 }
