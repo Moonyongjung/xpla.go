@@ -40,18 +40,16 @@ func (s *IntegrationTestSuite) SetupSuite() {
 
 	s.network = network.New(s.T(), s.cfg)
 
-	_, err := s.network.WaitForHeight(1)
-	s.Require().NoError(err)
-
 	val := s.network.Validators[0]
 
+	s.Require().NoError(s.network.WaitForNextBlock())
+
 	// create a proposal with deposit
-	_, err = govtestutil.MsgSubmitProposal(val.ClientCtx, val.Address.String(),
+	_, err := govtestutil.MsgSubmitProposal(val.ClientCtx, val.Address.String(),
 		"Text Proposal 1", "Where is the title!?", govtypes.ProposalTypeText,
 		fmt.Sprintf("--%s=%s", govcli.FlagDeposit, sdk.NewCoin(s.cfg.BondDenom, govtypes.DefaultMinDepositTokens).String()))
 	s.Require().NoError(err)
-	_, err = s.network.WaitForHeight(1)
-	s.Require().NoError(err)
+	s.Require().NoError(s.network.WaitForNextBlock())
 
 	// vote for proposal
 	_, err = govtestutil.MsgVote(val.ClientCtx, val.Address.String(), "1", "yes")
@@ -61,16 +59,14 @@ func (s *IntegrationTestSuite) SetupSuite() {
 	_, err = govtestutil.MsgSubmitProposal(val.ClientCtx, val.Address.String(),
 		"Text Proposal 2", "Where is the title!?", govtypes.ProposalTypeText)
 	s.Require().NoError(err)
-	_, err = s.network.WaitForHeight(1)
-	s.Require().NoError(err)
+	s.Require().NoError(s.network.WaitForNextBlock())
 
 	// create a proposal3 with deposit
 	_, err = govtestutil.MsgSubmitProposal(val.ClientCtx, val.Address.String(),
 		"Text Proposal 3", "Where is the title!?", govtypes.ProposalTypeText,
 		fmt.Sprintf("--%s=%s", govcli.FlagDeposit, sdk.NewCoin(s.cfg.BondDenom, govtypes.DefaultMinDepositTokens).String()))
 	s.Require().NoError(err)
-	_, err = s.network.WaitForHeight(1)
-	s.Require().NoError(err)
+	s.Require().NoError(s.network.WaitForNextBlock())
 
 	// vote for proposal3 as val
 	_, err = govtestutil.MsgVote(val.ClientCtx, val.Address.String(), "3", "yes=0.6,no=0.3,abstain=0.05,no_with_veto=0.05")
@@ -82,8 +78,7 @@ func (s *IntegrationTestSuite) SetupSuite() {
 		s.network.Validators[0].AppConfig.GRPC.Address,
 	}
 
-	_, err = s.network.WaitForHeight(1)
-	s.Require().NoError(err)
+	s.Require().NoError(s.network.WaitForNextBlock())
 }
 
 func (s *IntegrationTestSuite) TearDownSuite() {
@@ -221,8 +216,6 @@ func (s *IntegrationTestSuite) TestTally() {
 		var queryTallyResultResponse govtypes.QueryTallyResultResponse
 		jsonpb.Unmarshal(strings.NewReader(res), &queryTallyResultResponse)
 
-		s.T().Log(queryTallyResultResponse.Tally)
-
 		s.Require().Equal("60000000000000000000", queryTallyResultResponse.Tally.Yes.String())
 		s.Require().Equal("5000000000000000000", queryTallyResultResponse.Tally.Abstain.String())
 		s.Require().Equal("30000000000000000000", queryTallyResultResponse.Tally.No.String())
@@ -350,29 +343,6 @@ func (s *IntegrationTestSuite) TestGovParams() {
 	}
 	s.xplac = qtest.ResetXplac(s.xplac)
 }
-
-// func (s *IntegrationTestSuite) TestProposer() {
-// 	// not supported LCD
-// 	s.xplac.WithGrpc(s.apis[1])
-
-// 	s.T().Log(s.apis[1])
-
-// 	ProposerMsg := types.ProposerMsg{
-// 		ProposalID: "2",
-// 	}
-
-// 	res, err := s.xplac.Proposer(ProposerMsg).Query()
-// 	s.Require().NoError(err)
-
-// 	var proposer govcliutils.Proposer
-// 	json.Unmarshal([]byte(res), &proposer)
-
-// 	s.T().Log(proposer)
-
-// 	s.Require().Equal(1, 2)
-
-// 	s.xplac = qtest.ResetXplac(s.xplac)
-// }
 
 func TestIntegrationTestSuite(t *testing.T) {
 	cfg := network.DefaultConfig()

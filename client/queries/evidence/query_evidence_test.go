@@ -40,8 +40,7 @@ func (s *IntegrationTestSuite) SetupSuite() {
 		s.network.Validators[0].AppConfig.GRPC.Address,
 	}
 
-	_, err := s.network.WaitForHeight(1)
-	s.Require().NoError(err)
+	s.Require().NoError(s.network.WaitForNextBlock())
 }
 
 func (s *IntegrationTestSuite) TearDownSuite() {

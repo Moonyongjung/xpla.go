@@ -57,8 +57,7 @@ func (s *IntegrationTestSuite) SetupSuite() {
 		s.network.Validators[0].AppConfig.GRPC.Address,
 	}
 
-	_, err = s.network.WaitForHeight(1)
-	s.Require().NoError(err)
+	s.Require().NoError(s.network.WaitForNextBlock())
 }
 
 func (s *IntegrationTestSuite) TearDownSuite() {
@@ -83,9 +82,6 @@ func (s *IntegrationTestSuite) TestQuerySubspace() {
 
 		var queryParamsResponse proposal.QueryParamsResponse
 		jsonpb.Unmarshal(strings.NewReader(res), &queryParamsResponse)
-
-		s.T().Log(res)
-		s.T().Log(queryParamsResponse)
 
 		s.Require().Equal("staking", queryParamsResponse.Param.Subspace)
 		s.Require().Equal("MaxValidators", queryParamsResponse.Param.Key)

@@ -55,8 +55,7 @@ func (s *IntegrationTestSuite) SetupSuite() {
 		s.network.Validators[0].AppConfig.GRPC.Address,
 	}
 
-	_, err = s.network.WaitForHeight(1)
-	s.Require().NoError(err)
+	s.Require().NoError(s.network.WaitForNextBlock())
 }
 
 func (s *IntegrationTestSuite) TearDownSuite() {
@@ -77,7 +76,6 @@ func (s *IntegrationTestSuite) TestQueryParams() {
 
 		var authParamsResponse authtypes.QueryParamsResponse
 		jsonpb.Unmarshal(strings.NewReader(res), &authParamsResponse)
-		s.T().Log(authParamsResponse)
 		s.Require().Equal(uint64(256), authParamsResponse.Params.MaxMemoCharacters)
 		s.Require().Equal(uint64(7), authParamsResponse.Params.TxSigLimit)
 		s.Require().Equal(uint64(10), authParamsResponse.Params.TxSizeCostPerByte)

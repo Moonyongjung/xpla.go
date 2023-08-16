@@ -44,11 +44,10 @@ func (s *IntegrationTestSuite) SetupSuite() {
 
 	s.network = network.New(s.T(), s.cfg)
 
-	_, err := s.network.WaitForHeight(1)
-	s.Require().NoError(err)
-
 	val := s.network.Validators[0]
 	val2 := s.network.Validators[1]
+
+	s.Require().NoError(s.network.WaitForNextBlock())
 
 	del, err := sdk.ParseCoinNormalized("1000stake")
 	s.Require().NoError(err)
@@ -61,17 +60,13 @@ func (s *IntegrationTestSuite) SetupSuite() {
 	)
 	s.Require().NoError(err)
 
-	_, err = s.network.WaitForHeight(1)
-	s.Require().NoError(err)
-
 	s.xplac = qtest.NewTestXplaClient()
 	s.apis = []string{
 		s.network.Validators[0].APIAddress,
 		s.network.Validators[0].AppConfig.GRPC.Address,
 	}
 
-	_, err = s.network.WaitForHeight(1)
-	s.Require().NoError(err)
+	s.Require().NoError(s.network.WaitForNextBlock())
 }
 
 func (s *IntegrationTestSuite) TearDownSuite() {
@@ -121,8 +116,6 @@ func (s *IntegrationTestSuite) TestValidatorOutstandingRewards() {
 		var queryValidatorOutstandingRewardsResponse disttypes.QueryValidatorOutstandingRewardsResponse
 		jsonpb.Unmarshal(strings.NewReader(res), &queryValidatorOutstandingRewardsResponse)
 
-		s.T().Log(queryValidatorOutstandingRewardsResponse.Rewards)
-
 		s.Require().Equal("stake", queryValidatorOutstandingRewardsResponse.Rewards.Rewards[0].Denom)
 		s.Require().NotEqual("0", queryValidatorOutstandingRewardsResponse.Rewards.Rewards[0].Amount.String())
 	}
@@ -147,8 +140,6 @@ func (s *IntegrationTestSuite) TestDistCommission() {
 
 		var queryValidatorCommissionResponse disttypes.QueryValidatorCommissionResponse
 		jsonpb.Unmarshal(strings.NewReader(res), &queryValidatorCommissionResponse)
-
-		s.T().Log(queryValidatorCommissionResponse.Commission)
 
 		s.Require().Equal("stake", queryValidatorCommissionResponse.Commission.Commission[0].Denom)
 		s.Require().NotEqual("0", queryValidatorCommissionResponse.Commission.Commission[0].Amount.String())
@@ -206,8 +197,6 @@ func (s *IntegrationTestSuite) TestDistRewards() {
 		var queryDelegationRewardsResponse disttypes.QueryDelegationRewardsResponse
 		jsonpb.Unmarshal(strings.NewReader(res), &queryDelegationRewardsResponse)
 
-		s.T().Log(queryDelegationRewardsResponse.Rewards)
-
 		s.Require().NotEqual("0", queryDelegationRewardsResponse.Rewards[0].Amount.String())
 
 		queryDistRewardsMsgTotal := types.QueryDistRewardsMsg{
@@ -219,8 +208,6 @@ func (s *IntegrationTestSuite) TestDistRewards() {
 
 		var queryDelegatorTotalRewardsResponse disttypes.QueryDelegatorTotalRewardsResponse
 		json.Unmarshal([]byte(res1), &queryDelegatorTotalRewardsResponse)
-
-		s.T().Log(queryDelegatorTotalRewardsResponse.Rewards)
 
 		s.Require().NotEqual("0", queryDelegatorTotalRewardsResponse.Rewards[0].Reward[0].Amount.String())
 	}
@@ -240,8 +227,6 @@ func (s *IntegrationTestSuite) TestCommunityPool() {
 
 		var queryCommunityPoolResponse disttypes.QueryCommunityPoolResponse
 		jsonpb.Unmarshal(strings.NewReader(res), &queryCommunityPoolResponse)
-
-		s.T().Log(queryCommunityPoolResponse.Pool)
 
 		s.Require().Equal("stake", queryCommunityPoolResponse.Pool[0].Denom)
 		s.Require().NotEqual("0", queryCommunityPoolResponse.Pool[0].Amount.String())

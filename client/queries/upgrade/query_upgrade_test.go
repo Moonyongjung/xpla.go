@@ -42,8 +42,7 @@ func (s *IntegrationTestSuite) SetupSuite() {
 		s.network.Validators[0].AppConfig.GRPC.Address,
 	}
 
-	_, err := s.network.WaitForHeight(1)
-	s.Require().NoError(err)
+	s.Require().NoError(s.network.WaitForNextBlock())
 }
 
 func (s *IntegrationTestSuite) TearDownSuite() {
@@ -61,8 +60,6 @@ func (s *IntegrationTestSuite) TestModulesVersion() {
 
 		res, err := s.xplac.ModulesVersion().Query()
 		s.Require().NoError(err)
-
-		s.T().Log(res)
 
 		var queryModuleVersionsResponse upgradetypes.QueryModuleVersionsResponse
 		jsonpb.Unmarshal(strings.NewReader(res), &queryModuleVersionsResponse)

@@ -45,16 +45,15 @@ func (s *IntegrationTestSuite) SetupSuite() {
 
 	s.network = network.New(s.T(), s.cfg)
 
-	_, err := s.network.WaitForHeight(1)
-	s.Require().NoError(err)
-
 	val := s.network.Validators[0]
 	granter := val.Address
 	grantee := s.network.Validators[1].Address
 
+	s.Require().NoError(s.network.WaitForNextBlock())
+
 	s.createGrant(granter, grantee)
 
-	_, err = feegrant.NewGrant(granter, grantee, &feegrant.BasicAllowance{
+	_, err := feegrant.NewGrant(granter, grantee, &feegrant.BasicAllowance{
 		SpendLimit: sdk.NewCoins(sdk.NewCoin("stake", sdk.NewInt(100))),
 	})
 	s.Require().NoError(err)
@@ -65,8 +64,7 @@ func (s *IntegrationTestSuite) SetupSuite() {
 		s.network.Validators[0].AppConfig.GRPC.Address,
 	}
 
-	_, err = s.network.WaitForHeight(1)
-	s.Require().NoError(err)
+	s.Require().NoError(s.network.WaitForNextBlock())
 }
 
 func (s *IntegrationTestSuite) TearDownSuite() {

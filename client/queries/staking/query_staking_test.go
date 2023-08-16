@@ -44,11 +44,10 @@ func (s *IntegrationTestSuite) SetupSuite() {
 
 	s.network = network.New(s.T(), s.cfg)
 
-	_, err := s.network.WaitForHeight(1)
-	s.Require().NoError(err)
-
 	val := s.network.Validators[0]
 	val2 := s.network.Validators[1]
+
+	s.Require().NoError(s.network.WaitForNextBlock())
 
 	del, err := sdk.ParseCoinNormalized("1000stake")
 	s.Require().NoError(err)
@@ -63,9 +62,7 @@ func (s *IntegrationTestSuite) SetupSuite() {
 		del,
 	)
 	s.Require().NoError(err)
-
-	_, err = s.network.WaitForHeight(1)
-	s.Require().NoError(err)
+	s.Require().NoError(s.network.WaitForNextBlock())
 
 	// redelegate
 	_, err = stakingtestutil.MsgRedelegateExec(
@@ -77,14 +74,12 @@ func (s *IntegrationTestSuite) SetupSuite() {
 		fmt.Sprintf("--%s=%d", flags.FlagGas, 300000),
 	)
 	s.Require().NoError(err)
-	_, err = s.network.WaitForHeight(1)
-	s.Require().NoError(err)
+	s.Require().NoError(s.network.WaitForNextBlock())
 
 	// unbonding
 	_, err = stakingtestutil.MsgUnbondExec(val.ClientCtx, val.Address, val.ValAddress, unbond)
 	s.Require().NoError(err)
-	_, err = s.network.WaitForHeight(1)
-	s.Require().NoError(err)
+	s.Require().NoError(s.network.WaitForNextBlock())
 
 	s.xplac = qtest.NewTestXplaClient()
 	s.apis = []string{
@@ -92,8 +87,7 @@ func (s *IntegrationTestSuite) SetupSuite() {
 		s.network.Validators[0].AppConfig.GRPC.Address,
 	}
 
-	_, err = s.network.WaitForHeight(1)
-	s.Require().NoError(err)
+	s.Require().NoError(s.network.WaitForNextBlock())
 }
 
 func (s *IntegrationTestSuite) TearDownSuite() {
@@ -472,8 +466,6 @@ func (s *IntegrationTestSuite) TestHistoricalInfo() {
 		}
 		res, err := s.xplac.HistoricalInfo(historicalInfoMsg).Query()
 		s.Require().NoError(err)
-
-		s.T().Log(res)
 
 		var queryHistoricalInfoResponse stakingtypes.QueryHistoricalInfoResponse
 		jsonpb.Unmarshal(strings.NewReader(res), &queryHistoricalInfoResponse)

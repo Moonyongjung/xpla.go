@@ -42,8 +42,7 @@ func (s *IntegrationTestSuite) SetupSuite() {
 		s.network.Validators[0].AppConfig.GRPC.Address,
 	}
 
-	_, err := s.network.WaitForHeight(1)
-	s.Require().NoError(err)
+	s.Require().NoError(s.network.WaitForNextBlock())
 }
 
 func (s *IntegrationTestSuite) TearDownSuite() {
@@ -61,8 +60,6 @@ func (s *IntegrationTestSuite) TestParams() {
 
 		res, err := s.xplac.SlashingParams().Query()
 		s.Require().NoError(err)
-
-		s.T().Log(res)
 
 		var queryParamsResponse slashingtypes.QueryParamsResponse
 		jsonpb.Unmarshal(strings.NewReader(res), &queryParamsResponse)
@@ -106,8 +103,6 @@ func (s *IntegrationTestSuite) TestSigningInfos() {
 		// validators signing info
 		res2, err := s.xplac.SigningInfos().Query()
 		s.Require().NoError(err)
-
-		s.T().Log(res2)
 
 		var querySigningInfosResponse slashingtypes.QuerySigningInfosResponse
 		jsonpb.Unmarshal(strings.NewReader(res2), &querySigningInfosResponse)
