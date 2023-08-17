@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/Moonyongjung/xpla.go/client"
-	"github.com/Moonyongjung/xpla.go/client/queries/qtest"
+	"github.com/Moonyongjung/xpla.go/client/xplago_helper"
 	"github.com/Moonyongjung/xpla.go/util/testutil"
 	"github.com/gogo/protobuf/jsonpb"
 
@@ -36,7 +36,7 @@ func (s *IntegrationTestSuite) SetupSuite() {
 	s.network = network.New(s.T(), s.cfg)
 	s.Require().NoError(s.network.WaitForNextBlock())
 
-	s.xplac = qtest.NewTestXplaClient()
+	s.xplac = xplago_helper.NewTestXplaClient()
 	s.apis = []string{
 		s.network.Validators[0].APIAddress,
 		s.network.Validators[0].AppConfig.GRPC.Address,
@@ -64,7 +64,7 @@ func (s IntegrationTestSuite) TestEvidence() {
 
 		s.Require().Equal(0, len(queryAllEvidenceResponse.Evidence))
 	}
-	s.xplac = qtest.ResetXplac(s.xplac)
+	s.xplac = xplago_helper.ResetXplac(s.xplac)
 }
 
 func TestIntegrationTestSuite(t *testing.T) {

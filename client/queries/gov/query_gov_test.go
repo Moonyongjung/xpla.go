@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"github.com/Moonyongjung/xpla.go/client"
-	"github.com/Moonyongjung/xpla.go/client/queries/qtest"
+	"github.com/Moonyongjung/xpla.go/client/xplago_helper"
 	"github.com/Moonyongjung/xpla.go/types"
 	"github.com/Moonyongjung/xpla.go/util/testutil"
 	"github.com/gogo/protobuf/jsonpb"
@@ -72,7 +72,7 @@ func (s *IntegrationTestSuite) SetupSuite() {
 	s.Require().NoError(err)
 	s.Require().NoError(s.network.WaitForNextBlock())
 
-	s.xplac = qtest.NewTestXplaClient()
+	s.xplac = xplago_helper.NewTestXplaClient()
 	s.apis = []string{
 		s.network.Validators[0].APIAddress,
 		s.network.Validators[0].AppConfig.GRPC.Address,
@@ -109,7 +109,7 @@ func (s *IntegrationTestSuite) TestQueryProposal() {
 		s.Require().Equal("Text Proposal 1", content.GetTitle())
 		s.Require().Equal("Where is the title!?", content.GetDescription())
 	}
-	s.xplac = qtest.ResetXplac(s.xplac)
+	s.xplac = xplago_helper.ResetXplac(s.xplac)
 }
 
 func (s *IntegrationTestSuite) TestQueryProposals() {
@@ -130,7 +130,7 @@ func (s *IntegrationTestSuite) TestQueryProposals() {
 
 		s.Require().Equal(3, len(queryProposalsResponse.Proposals))
 	}
-	s.xplac = qtest.ResetXplac(s.xplac)
+	s.xplac = xplago_helper.ResetXplac(s.xplac)
 }
 
 func (s *IntegrationTestSuite) TestDeposit() {
@@ -159,7 +159,7 @@ func (s *IntegrationTestSuite) TestDeposit() {
 		s.Require().Equal(govtypes.DefaultMinDepositTokens, queryDepositResponse.Deposit.Amount[0].Amount)
 		s.Require().Equal("stake", queryDepositResponse.Deposit.Amount[0].Denom)
 	}
-	s.xplac = qtest.ResetXplac(s.xplac)
+	s.xplac = xplago_helper.ResetXplac(s.xplac)
 }
 
 func (s *IntegrationTestSuite) TestVote() {
@@ -193,7 +193,7 @@ func (s *IntegrationTestSuite) TestVote() {
 			s.Require().Equal(uint64(1), vote.ProposalId)
 		}
 	}
-	s.xplac = qtest.ResetXplac(s.xplac)
+	s.xplac = xplago_helper.ResetXplac(s.xplac)
 }
 
 func (s *IntegrationTestSuite) TestTally() {
@@ -220,7 +220,7 @@ func (s *IntegrationTestSuite) TestTally() {
 		s.Require().Equal("5000000000000000000", queryTallyResultResponse.Tally.NoWithVeto.String())
 
 	}
-	s.xplac = qtest.ResetXplac(s.xplac)
+	s.xplac = xplago_helper.ResetXplac(s.xplac)
 }
 
 func (s *IntegrationTestSuite) TestGovParams() {
@@ -339,7 +339,7 @@ func (s *IntegrationTestSuite) TestGovParams() {
 		}
 
 	}
-	s.xplac = qtest.ResetXplac(s.xplac)
+	s.xplac = xplago_helper.ResetXplac(s.xplac)
 }
 
 func TestIntegrationTestSuite(t *testing.T) {

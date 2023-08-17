@@ -1,4 +1,4 @@
-package qtest
+package xplago_helper
 
 import (
 	"github.com/Moonyongjung/xpla.go/client"
