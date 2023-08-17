@@ -581,7 +581,7 @@ func (xplac *XplaClient) EthGetBlockTransactionCount(ethGetBlockTransactionCount
 
 // Query estimate gas.
 func (xplac *XplaClient) EstimateGas(invokeSolContractMsg types.InvokeSolContractMsg) *XplaClient {
-	msg, err := mevm.MakeEstimateGasSolMsg(invokeSolContractMsg, xplac.GetPrivateKey().PubKey().Address().String())
+	msg, err := mevm.MakeEstimateGasSolMsg(invokeSolContractMsg)
 	if err != nil {
 		xplac.Err = err
 		return xplac

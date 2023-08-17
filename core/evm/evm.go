@@ -51,8 +51,8 @@ func MakeEthGetBlockTransactionCountMsg(ethGetBlockTransactionCountMsg types.Eth
 }
 
 // (Query) make msg - sol contract estimate gas
-func MakeEstimateGasSolMsg(invokeSolContractMsg types.InvokeSolContractMsg, byteAddress string) (CallSolContractParseMsg, error) {
-	return parseEstimateGasSolArgs(invokeSolContractMsg, byteAddress)
+func MakeEstimateGasSolMsg(invokeSolContractMsg types.InvokeSolContractMsg) (CallSolContractParseMsg, error) {
+	return parseEstimateGasSolArgs(invokeSolContractMsg)
 }
 
 // (Query) make msg - get transaction by block hash and index

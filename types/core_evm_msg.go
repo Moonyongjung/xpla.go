@@ -28,6 +28,7 @@ type InvokeSolContractMsg struct {
 	Bytecode             string
 	ABIJsonFilePath      string
 	BytecodeJsonFilePath string
+	FromByteAddress      string
 }
 
 type CallSolContractMsg struct {
