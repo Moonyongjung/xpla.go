@@ -30,7 +30,7 @@ func queryByGrpcSlashing(i queries.IXplaClient) (string, error) {
 
 	switch {
 	// Slashing parameters
-	case i.Ixplac.GetMsgType() == mslashing.SlahsingQuerySlashingParamsMsgType:
+	case i.Ixplac.GetMsgType() == mslashing.SlashingQuerySlashingParamsMsgType:
 		convertMsg, _ := i.Ixplac.GetMsg().(slashingtypes.QueryParamsRequest)
 		res, err = queryClient.Params(
 			i.Ixplac.GetContext(),
@@ -83,7 +83,7 @@ func queryByLcdSlashing(i queries.IXplaClient) (string, error) {
 	url := util.MakeQueryLcdUrl(slashingv1beta1.Query_ServiceDesc.Metadata.(string))
 	switch {
 	// Slashing parameters
-	case i.Ixplac.GetMsgType() == mslashing.SlahsingQuerySlashingParamsMsgType:
+	case i.Ixplac.GetMsgType() == mslashing.SlashingQuerySlashingParamsMsgType:
 		url = url + slashingParamsLabel
 
 	// Slashing signing information
