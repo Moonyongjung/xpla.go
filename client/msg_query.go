@@ -414,7 +414,7 @@ func (xplac *XplaClient) QueryEvidence(queryEvidenceMsg ...types.QueryEvidenceMs
 
 // Call(as query) solidity contract.
 func (xplac *XplaClient) CallSolidityContract(callSolContractMsg types.CallSolContractMsg) *XplaClient {
-	msg, err := mevm.MakeCallSolContractMsg(callSolContractMsg, xplac.GetPrivateKey().PubKey().Address().String())
+	msg, err := mevm.MakeCallSolContractMsg(callSolContractMsg)
 	if err != nil {
 		xplac.Err = err
 		return xplac
