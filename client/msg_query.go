@@ -310,7 +310,7 @@ func (xplac *XplaClient) ValidatorOutstandingRewards(validatorOutstandingRewards
 		return xplac
 	}
 	xplac.Module = mdist.DistributionModule
-	xplac.MsgType = mdist.DistributionValidatorOutstandingRewardsMSgType
+	xplac.MsgType = mdist.DistributionValidatorOutstandingRewardsMsgType
 	xplac.Msg = msg
 	return xplac
 }
@@ -348,7 +348,7 @@ func (xplac *XplaClient) DistRewards(queryDistRewardsMsg types.QueryDistRewardsM
 	}
 
 	if queryDistRewardsMsg.ValidatorAddr != "" {
-		msg, err := mdist.MakeyQueryDistRewardsMsg(queryDistRewardsMsg)
+		msg, err := mdist.MakeQueryDistRewardsMsg(queryDistRewardsMsg)
 		if err != nil {
 			xplac.Err = err
 			return xplac
@@ -357,7 +357,7 @@ func (xplac *XplaClient) DistRewards(queryDistRewardsMsg types.QueryDistRewardsM
 		xplac.MsgType = mdist.DistributionQueryRewardsMsgType
 		xplac.Msg = msg
 	} else {
-		msg, err := mdist.MakeyQueryDistTotalRewardsMsg(queryDistRewardsMsg)
+		msg, err := mdist.MakeQueryDistTotalRewardsMsg(queryDistRewardsMsg)
 		if err != nil {
 			xplac.Err = err
 			return xplac

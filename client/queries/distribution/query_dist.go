@@ -41,7 +41,7 @@ func queryByGrpcDist(i queries.IXplaClient) (string, error) {
 		}
 
 	// Distribution validator outstanding rewards
-	case i.Ixplac.GetMsgType() == mdist.DistributionValidatorOutstandingRewardsMSgType:
+	case i.Ixplac.GetMsgType() == mdist.DistributionValidatorOutstandingRewardsMsgType:
 		convertMsg, _ := i.Ixplac.GetMsg().(disttypes.QueryValidatorOutstandingRewardsRequest)
 		res, err = queryClient.ValidatorOutstandingRewards(
 			i.Ixplac.GetContext(),
@@ -138,7 +138,7 @@ func queryByLcdDist(i queries.IXplaClient) (string, error) {
 		url = url + distParamsLabel
 
 	// Distribution validator outstanding rewards
-	case i.Ixplac.GetMsgType() == mdist.DistributionValidatorOutstandingRewardsMSgType:
+	case i.Ixplac.GetMsgType() == mdist.DistributionValidatorOutstandingRewardsMsgType:
 		convertMsg, _ := i.Ixplac.GetMsg().(disttypes.QueryValidatorOutstandingRewardsRequest)
 
 		url = url + util.MakeQueryLabels(distValidatorLabel, convertMsg.ValidatorAddress, distOutstandingRewardsLabel)
