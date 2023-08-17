@@ -1384,7 +1384,7 @@ func (xplac *XplaClient) SlashingParams() *XplaClient {
 		return xplac
 	}
 	xplac.Module = mslashing.SlashingModule
-	xplac.MsgType = mslashing.SlahsingQuerySlashingParamsMsgType
+	xplac.MsgType = mslashing.SlashingQuerySlashingParamsMsgType
 	xplac.Msg = msg
 	return xplac
 }
