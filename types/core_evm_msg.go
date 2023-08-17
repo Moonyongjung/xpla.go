@@ -38,6 +38,7 @@ type CallSolContractMsg struct {
 	Bytecode             string
 	ABIJsonFilePath      string
 	BytecodeJsonFilePath string
+	FromByteAddress      string
 }
 
 type GetTransactionByHashMsg struct {

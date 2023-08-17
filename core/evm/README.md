@@ -70,6 +70,7 @@ callSolContractMsg := types.CallSolContractMsg{
     // Args: nil, // input params if needed to call
     ABIJsonFilePath: "./abi.json",
     BytecodeJsonFilePath: "./bytecode.json",
+    FromByteAddress: "0xC9F0A2b814d389088a508E31fBa483E8C4372CC2"
 }
 
 res, err := xplac.CallSolidityContract(callSolContractMsg).Query()
