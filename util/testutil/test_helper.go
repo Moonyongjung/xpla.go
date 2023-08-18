@@ -387,3 +387,15 @@ func NewTestEthSecpPrivKey(mnemonic string) (cryptotypes.PrivKey, error) {
 
 	return privateKey, nil
 }
+
+func NewTestSecpPrivKey(mnemonic string) (cryptotypes.PrivKey, error) {
+	algo := hd.Secp256k1
+	derivedPri, err := algo.Derive()(mnemonic, keyring.DefaultBIP39Passphrase, sdk.GetConfig().GetFullBIP44Path())
+	if err != nil {
+		return nil, err
+	}
+
+	privateKey := algo.Generate()(derivedPri)
+
+	return privateKey, nil
+}

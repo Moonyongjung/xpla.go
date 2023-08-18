@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"github.com/Moonyongjung/xpla.go/client"
-	"github.com/Moonyongjung/xpla.go/client/queries/qtest"
+	"github.com/Moonyongjung/xpla.go/client/xplago_helper"
 	"github.com/Moonyongjung/xpla.go/types"
 	"github.com/Moonyongjung/xpla.go/util/testutil"
 	"github.com/gogo/protobuf/jsonpb"
@@ -80,7 +80,7 @@ func (s *IntegrationTestSuite) SetupSuite() {
 	s.Require().NoError(err)
 	s.Require().NoError(s.network.WaitForNextBlock())
 
-	s.xplac = qtest.NewTestXplaClient()
+	s.xplac = xplago_helper.NewTestXplaClient()
 	s.apis = []string{
 		s.network.Validators[0].APIAddress,
 		s.network.Validators[0].AppConfig.GRPC.Address,
@@ -128,7 +128,7 @@ func (s *IntegrationTestSuite) TestQueryValidators() {
 		s.Require().Equal(validatorNumber, len(queryValidatorsResponse.Validators))
 
 	}
-	s.xplac = qtest.ResetXplac(s.xplac)
+	s.xplac = xplago_helper.ResetXplac(s.xplac)
 }
 
 func (s *IntegrationTestSuite) TestDelegation() {
@@ -168,7 +168,7 @@ func (s *IntegrationTestSuite) TestDelegation() {
 			s.Require().Equal("1010", queryDelegationResponse.DelegationResponse.Balance.Amount.String())
 		}
 	}
-	s.xplac = qtest.ResetXplac(s.xplac)
+	s.xplac = xplago_helper.ResetXplac(s.xplac)
 }
 
 func (s *IntegrationTestSuite) TestDelegationDelegator() {
@@ -204,7 +204,7 @@ func (s *IntegrationTestSuite) TestDelegationDelegator() {
 			s.Require().Equal(2, len(queryDelegatorDelegationsResponse.DelegationResponses))
 		}
 	}
-	s.xplac = qtest.ResetXplac(s.xplac)
+	s.xplac = xplago_helper.ResetXplac(s.xplac)
 }
 
 func (s *IntegrationTestSuite) TestDelegationValidator() {
@@ -231,7 +231,7 @@ func (s *IntegrationTestSuite) TestDelegationValidator() {
 
 		s.Require().Equal(2, len(queryValidatorDelegationsResponse.DelegationResponses))
 	}
-	s.xplac = qtest.ResetXplac(s.xplac)
+	s.xplac = xplago_helper.ResetXplac(s.xplac)
 }
 
 func (s *IntegrationTestSuite) TestUnbonding() {
@@ -258,7 +258,7 @@ func (s *IntegrationTestSuite) TestUnbonding() {
 		s.Require().Equal(val1.Address.String(), queryUnbondingDelegationResponse.Unbond.DelegatorAddress)
 		s.Require().Equal(val1.ValAddress.String(), queryUnbondingDelegationResponse.Unbond.ValidatorAddress)
 	}
-	s.xplac = qtest.ResetXplac(s.xplac)
+	s.xplac = xplago_helper.ResetXplac(s.xplac)
 }
 
 func (s *IntegrationTestSuite) TestUnbondingDelegator() {
@@ -284,7 +284,7 @@ func (s *IntegrationTestSuite) TestUnbondingDelegator() {
 		s.Require().Equal(val1.Address.String(), queryDelegatorUnbondingDelegationsResponse.UnbondingResponses[0].DelegatorAddress)
 		s.Require().Equal(val1.ValAddress.String(), queryDelegatorUnbondingDelegationsResponse.UnbondingResponses[0].ValidatorAddress)
 	}
-	s.xplac = qtest.ResetXplac(s.xplac)
+	s.xplac = xplago_helper.ResetXplac(s.xplac)
 }
 
 func (s *IntegrationTestSuite) TestUnbondingValidator() {
@@ -310,7 +310,7 @@ func (s *IntegrationTestSuite) TestUnbondingValidator() {
 		s.Require().Equal(val1.Address.String(), queryValidatorUnbondingDelegationsResponse.UnbondingResponses[0].DelegatorAddress)
 		s.Require().Equal(val1.ValAddress.String(), queryValidatorUnbondingDelegationsResponse.UnbondingResponses[0].ValidatorAddress)
 	}
-	s.xplac = qtest.ResetXplac(s.xplac)
+	s.xplac = xplago_helper.ResetXplac(s.xplac)
 }
 
 func (s *IntegrationTestSuite) TestRedelegation() {
@@ -358,7 +358,7 @@ func (s *IntegrationTestSuite) TestRedelegation() {
 			)
 		}
 	}
-	s.xplac = qtest.ResetXplac(s.xplac)
+	s.xplac = xplago_helper.ResetXplac(s.xplac)
 }
 
 func (s *IntegrationTestSuite) TestRedelegationDelegator() {
@@ -400,7 +400,7 @@ func (s *IntegrationTestSuite) TestRedelegationDelegator() {
 		)
 	}
 
-	s.xplac = qtest.ResetXplac(s.xplac)
+	s.xplac = xplago_helper.ResetXplac(s.xplac)
 }
 
 func (s *IntegrationTestSuite) TestRedelegationSrcValidator() {
@@ -447,7 +447,7 @@ func (s *IntegrationTestSuite) TestRedelegationSrcValidator() {
 		}
 	}
 
-	s.xplac = qtest.ResetXplac(s.xplac)
+	s.xplac = xplago_helper.ResetXplac(s.xplac)
 }
 
 func (s *IntegrationTestSuite) TestHistoricalInfo() {
@@ -469,7 +469,7 @@ func (s *IntegrationTestSuite) TestHistoricalInfo() {
 
 		s.Require().Equal(validatorNumber, len(queryHistoricalInfoResponse.Hist.Valset))
 	}
-	s.xplac = qtest.ResetXplac(s.xplac)
+	s.xplac = xplago_helper.ResetXplac(s.xplac)
 }
 
 func (s *IntegrationTestSuite) TestStakingPool() {
@@ -489,7 +489,7 @@ func (s *IntegrationTestSuite) TestStakingPool() {
 		s.Require().Equal("200000000000000000990", queryPoolResponse.Pool.BondedTokens.String())
 		s.Require().Equal("10", queryPoolResponse.Pool.NotBondedTokens.String())
 	}
-	s.xplac = qtest.ResetXplac(s.xplac)
+	s.xplac = xplago_helper.ResetXplac(s.xplac)
 }
 
 func (s *IntegrationTestSuite) TestParams() {
@@ -512,7 +512,7 @@ func (s *IntegrationTestSuite) TestParams() {
 		s.Require().Equal(uint32(10000), queryParamsResponse.Params.HistoricalEntries)
 
 	}
-	s.xplac = qtest.ResetXplac(s.xplac)
+	s.xplac = xplago_helper.ResetXplac(s.xplac)
 }
 
 func msgDelegateExec(clientCtx cmclient.Context, delegator, validator, amount fmt.Stringer, extraArgs ...string) (sdktestutil.BufferWriter, error) {

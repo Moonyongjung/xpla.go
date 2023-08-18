@@ -33,7 +33,7 @@ func MakeWithdrawAllRewardsMsg(privKey key.PrivateKey, grpcConn grpc.ClientConn,
 }
 
 // (Tx) make msg - withdraw address
-func MakeSetWithdrawAddrMsg(setWithdrawAddrMsg types.SetwithdrawAddrMsg, privKey key.PrivateKey) (disttypes.MsgSetWithdrawAddress, error) {
+func MakeSetWithdrawAddrMsg(setWithdrawAddrMsg types.SetWithdrawAddrMsg, privKey key.PrivateKey) (disttypes.MsgSetWithdrawAddress, error) {
 	return parseSetWithdrawAddrArgs(setWithdrawAddrMsg, privKey)
 }
 
@@ -58,12 +58,12 @@ func MakeQueryDistSlashesMsg(queryDistSlashesMsg types.QueryDistSlashesMsg) (dis
 }
 
 // (Query) make msg - distribution rewards
-func MakeyQueryDistRewardsMsg(queryDistRewardsMsg types.QueryDistRewardsMsg) (disttypes.QueryDelegationRewardsRequest, error) {
+func MakeQueryDistRewardsMsg(queryDistRewardsMsg types.QueryDistRewardsMsg) (disttypes.QueryDelegationRewardsRequest, error) {
 	return parseQueryDistRewardsArgs(queryDistRewardsMsg)
 }
 
 // (Query) make msg - distribution all rewards
-func MakeyQueryDistTotalRewardsMsg(queryDistRewardsMsg types.QueryDistRewardsMsg) (disttypes.QueryDelegationTotalRewardsRequest, error) {
+func MakeQueryDistTotalRewardsMsg(queryDistRewardsMsg types.QueryDistRewardsMsg) (disttypes.QueryDelegationTotalRewardsRequest, error) {
 	return disttypes.QueryDelegationTotalRewardsRequest{
 		DelegatorAddress: queryDistRewardsMsg.DelegatorAddr,
 	}, nil

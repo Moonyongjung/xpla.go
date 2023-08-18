@@ -310,7 +310,7 @@ func (xplac *XplaClient) ValidatorOutstandingRewards(validatorOutstandingRewards
 		return xplac
 	}
 	xplac.Module = mdist.DistributionModule
-	xplac.MsgType = mdist.DistributionValidatorOutstandingRewardsMSgType
+	xplac.MsgType = mdist.DistributionValidatorOutstandingRewardsMsgType
 	xplac.Msg = msg
 	return xplac
 }
@@ -348,7 +348,7 @@ func (xplac *XplaClient) DistRewards(queryDistRewardsMsg types.QueryDistRewardsM
 	}
 
 	if queryDistRewardsMsg.ValidatorAddr != "" {
-		msg, err := mdist.MakeyQueryDistRewardsMsg(queryDistRewardsMsg)
+		msg, err := mdist.MakeQueryDistRewardsMsg(queryDistRewardsMsg)
 		if err != nil {
 			xplac.Err = err
 			return xplac
@@ -357,7 +357,7 @@ func (xplac *XplaClient) DistRewards(queryDistRewardsMsg types.QueryDistRewardsM
 		xplac.MsgType = mdist.DistributionQueryRewardsMsgType
 		xplac.Msg = msg
 	} else {
-		msg, err := mdist.MakeyQueryDistTotalRewardsMsg(queryDistRewardsMsg)
+		msg, err := mdist.MakeQueryDistTotalRewardsMsg(queryDistRewardsMsg)
 		if err != nil {
 			xplac.Err = err
 			return xplac
@@ -414,7 +414,7 @@ func (xplac *XplaClient) QueryEvidence(queryEvidenceMsg ...types.QueryEvidenceMs
 
 // Call(as query) solidity contract.
 func (xplac *XplaClient) CallSolidityContract(callSolContractMsg types.CallSolContractMsg) *XplaClient {
-	msg, err := mevm.MakeCallSolContractMsg(callSolContractMsg, xplac.GetPrivateKey().PubKey().Address().String())
+	msg, err := mevm.MakeCallSolContractMsg(callSolContractMsg)
 	if err != nil {
 		xplac.Err = err
 		return xplac
@@ -581,7 +581,7 @@ func (xplac *XplaClient) EthGetBlockTransactionCount(ethGetBlockTransactionCount
 
 // Query estimate gas.
 func (xplac *XplaClient) EstimateGas(invokeSolContractMsg types.InvokeSolContractMsg) *XplaClient {
-	msg, err := mevm.MakeEstimateGasSolMsg(invokeSolContractMsg, xplac.GetPrivateKey().PubKey().Address().String())
+	msg, err := mevm.MakeEstimateGasSolMsg(invokeSolContractMsg)
 	if err != nil {
 		xplac.Err = err
 		return xplac
@@ -1384,7 +1384,7 @@ func (xplac *XplaClient) SlashingParams() *XplaClient {
 		return xplac
 	}
 	xplac.Module = mslashing.SlashingModule
-	xplac.MsgType = mslashing.SlahsingQuerySlashingParamsMsgType
+	xplac.MsgType = mslashing.SlashingQuerySlashingParamsMsgType
 	xplac.Msg = msg
 	return xplac
 }

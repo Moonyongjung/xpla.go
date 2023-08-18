@@ -21,8 +21,8 @@ func MakeInvokeSolContractMsg(InvokeSolContractMsg types.InvokeSolContractMsg) (
 }
 
 // (Query) make msg - call solidity contract
-func MakeCallSolContractMsg(callSolContractMsg types.CallSolContractMsg, byteAddress string) (CallSolContractParseMsg, error) {
-	return parseCallSolContractArgs(callSolContractMsg, byteAddress)
+func MakeCallSolContractMsg(callSolContractMsg types.CallSolContractMsg) (CallSolContractParseMsg, error) {
+	return parseCallSolContractArgs(callSolContractMsg)
 }
 
 // (Query) make msg - transaction by hash
@@ -51,8 +51,8 @@ func MakeEthGetBlockTransactionCountMsg(ethGetBlockTransactionCountMsg types.Eth
 }
 
 // (Query) make msg - sol contract estimate gas
-func MakeEstimateGasSolMsg(invokeSolContractMsg types.InvokeSolContractMsg, byteAddress string) (CallSolContractParseMsg, error) {
-	return parseEstimateGasSolArgs(invokeSolContractMsg, byteAddress)
+func MakeEstimateGasSolMsg(invokeSolContractMsg types.InvokeSolContractMsg) (CallSolContractParseMsg, error) {
+	return parseEstimateGasSolArgs(invokeSolContractMsg)
 }
 
 // (Query) make msg - get transaction by block hash and index

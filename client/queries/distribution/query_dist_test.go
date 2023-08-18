@@ -7,7 +7,7 @@ import (
 	"testing"
 
 	"github.com/Moonyongjung/xpla.go/client"
-	"github.com/Moonyongjung/xpla.go/client/queries/qtest"
+	"github.com/Moonyongjung/xpla.go/client/xplago_helper"
 	"github.com/Moonyongjung/xpla.go/types"
 	"github.com/Moonyongjung/xpla.go/util/testutil"
 	"github.com/gogo/protobuf/jsonpb"
@@ -60,7 +60,7 @@ func (s *IntegrationTestSuite) SetupSuite() {
 	s.Require().NoError(err)
 	s.Require().NoError(s.network.WaitForNextBlock())
 
-	s.xplac = qtest.NewTestXplaClient()
+	s.xplac = xplago_helper.NewTestXplaClient()
 	s.apis = []string{
 		s.network.Validators[0].APIAddress,
 		s.network.Validators[0].AppConfig.GRPC.Address,
@@ -91,7 +91,7 @@ func (s *IntegrationTestSuite) TestDistributionParams() {
 		s.Require().Equal("0.040000000000000000", queryParamsResponse.Params.BonusProposerReward.String())
 		s.Require().True(queryParamsResponse.Params.WithdrawAddrEnabled)
 	}
-	s.xplac = qtest.ResetXplac(s.xplac)
+	s.xplac = xplago_helper.ResetXplac(s.xplac)
 }
 
 func (s *IntegrationTestSuite) TestValidatorOutstandingRewards() {
@@ -117,7 +117,7 @@ func (s *IntegrationTestSuite) TestValidatorOutstandingRewards() {
 		s.Require().Equal("stake", queryValidatorOutstandingRewardsResponse.Rewards.Rewards[0].Denom)
 		s.Require().NotEqual("0", queryValidatorOutstandingRewardsResponse.Rewards.Rewards[0].Amount.String())
 	}
-	s.xplac = qtest.ResetXplac(s.xplac)
+	s.xplac = xplago_helper.ResetXplac(s.xplac)
 }
 
 func (s *IntegrationTestSuite) TestDistCommission() {
@@ -143,7 +143,7 @@ func (s *IntegrationTestSuite) TestDistCommission() {
 		s.Require().NotEqual("0", queryValidatorCommissionResponse.Commission.Commission[0].Amount.String())
 
 	}
-	s.xplac = qtest.ResetXplac(s.xplac)
+	s.xplac = xplago_helper.ResetXplac(s.xplac)
 }
 
 func (s *IntegrationTestSuite) TestDistSlashes() {
@@ -168,7 +168,7 @@ func (s *IntegrationTestSuite) TestDistSlashes() {
 
 		s.Require().Equal(0, len(queryValidatorSlashesResponse.Slashes))
 	}
-	s.xplac = qtest.ResetXplac(s.xplac)
+	s.xplac = xplago_helper.ResetXplac(s.xplac)
 }
 func (s *IntegrationTestSuite) TestDistRewards() {
 
@@ -209,7 +209,7 @@ func (s *IntegrationTestSuite) TestDistRewards() {
 
 		s.Require().NotEqual("0", queryDelegatorTotalRewardsResponse.Rewards[0].Reward[0].Amount.String())
 	}
-	s.xplac = qtest.ResetXplac(s.xplac)
+	s.xplac = xplago_helper.ResetXplac(s.xplac)
 }
 
 func (s *IntegrationTestSuite) TestCommunityPool() {
@@ -229,7 +229,7 @@ func (s *IntegrationTestSuite) TestCommunityPool() {
 		s.Require().Equal("stake", queryCommunityPoolResponse.Pool[0].Denom)
 		s.Require().NotEqual("0", queryCommunityPoolResponse.Pool[0].Amount.String())
 	}
-	s.xplac = qtest.ResetXplac(s.xplac)
+	s.xplac = xplago_helper.ResetXplac(s.xplac)
 }
 
 func msgDelegateExec(clientCtx cmclient.Context, delegator, validator, amount fmt.Stringer, extraArgs ...string) (sdktestutil.BufferWriter, error) {

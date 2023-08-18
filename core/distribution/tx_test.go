@@ -156,7 +156,7 @@ func SimulateMsgSetWithdrawAddress(ak disttypes.AccountKeeper, bk disttypes.Bank
 		account := ak.GetAccount(ctx, simAccount.Address)
 		spendable := bk.SpendableCoins(ctx, account.GetAddress())
 
-		setwithdrawAddrMsg := types.SetwithdrawAddrMsg{
+		setwithdrawAddrMsg := types.SetWithdrawAddrMsg{
 			WithdrawAddr: simToAccount.Address.String(),
 		}
 		msg, err := mdist.MakeSetWithdrawAddrMsg(setwithdrawAddrMsg, simAccount.PrivKey)

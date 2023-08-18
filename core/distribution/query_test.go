@@ -362,7 +362,7 @@ func (suite *TestSuite) TestGRPCDelegationRewards() {
 					ValidatorAddr: valAddrs[0].String(),
 					DelegatorAddr: "",
 				}
-				msg, _ := mdist.MakeyQueryDistRewardsMsg(queryDistRewardsMsg)
+				msg, _ := mdist.MakeQueryDistRewardsMsg(queryDistRewardsMsg)
 				req = &msg
 			},
 			false,
@@ -374,7 +374,7 @@ func (suite *TestSuite) TestGRPCDelegationRewards() {
 					ValidatorAddr: "",
 					DelegatorAddr: addrs[1].String(),
 				}
-				msg, _ := mdist.MakeyQueryDistRewardsMsg(queryDistRewardsMsg)
+				msg, _ := mdist.MakeQueryDistRewardsMsg(queryDistRewardsMsg)
 				req = &msg
 			},
 			false,
@@ -386,7 +386,7 @@ func (suite *TestSuite) TestGRPCDelegationRewards() {
 					ValidatorAddr: valAddrs[1].String(),
 					DelegatorAddr: addrs[1].String(),
 				}
-				msg, _ := mdist.MakeyQueryDistRewardsMsg(queryDistRewardsMsg)
+				msg, _ := mdist.MakeQueryDistRewardsMsg(queryDistRewardsMsg)
 				req = &msg
 			},
 			false,
@@ -398,7 +398,7 @@ func (suite *TestSuite) TestGRPCDelegationRewards() {
 					ValidatorAddr: valAddrs[0].String(),
 					DelegatorAddr: addrs[0].String(),
 				}
-				msg, _ := mdist.MakeyQueryDistRewardsMsg(queryDistRewardsMsg)
+				msg, _ := mdist.MakeQueryDistRewardsMsg(queryDistRewardsMsg)
 				req = &msg
 
 				expRes = &disttypes.QueryDelegationRewardsResponse{

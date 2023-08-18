@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"github.com/Moonyongjung/xpla.go/client"
-	"github.com/Moonyongjung/xpla.go/client/queries/qtest"
+	"github.com/Moonyongjung/xpla.go/client/xplago_helper"
 	"github.com/Moonyongjung/xpla.go/types"
 	"github.com/Moonyongjung/xpla.go/util/testutil"
 
@@ -50,7 +50,7 @@ func (s *IntegrationTestSuite) SetupSuite() {
 	_, _, err := kb.NewMnemonic("newAccount", keyring.English, sdk.GetConfig().GetFullBIP44Path(), keyring.DefaultBIP39Passphrase, hd.Secp256k1)
 	s.Require().NoError(err)
 
-	s.xplac = qtest.NewTestXplaClient()
+	s.xplac = xplago_helper.NewTestXplaClient()
 	s.apis = []string{
 		s.network.Validators[0].APIAddress,
 		s.network.Validators[0].AppConfig.GRPC.Address,
@@ -81,7 +81,7 @@ func (s *IntegrationTestSuite) TestQueryParams() {
 		s.Require().Equal(uint64(590), authParamsResponse.Params.SigVerifyCostED25519)
 		s.Require().Equal(uint64(1000), authParamsResponse.Params.SigVerifyCostSecp256k1)
 	}
-	s.xplac = qtest.ResetXplac(s.xplac)
+	s.xplac = xplago_helper.ResetXplac(s.xplac)
 }
 
 func (s *IntegrationTestSuite) TestAccAddress() {
@@ -113,7 +113,7 @@ func (s *IntegrationTestSuite) TestAccAddress() {
 		s.Require().Equal(uint64(0), baseAccount.AccountNumber)
 
 	}
-	s.xplac = qtest.ResetXplac(s.xplac)
+	s.xplac = xplago_helper.ResetXplac(s.xplac)
 }
 
 func (s *IntegrationTestSuite) TestAccounts() {
@@ -140,7 +140,7 @@ func (s *IntegrationTestSuite) TestAccounts() {
 		}
 		s.Require().Equal(validatorNumber, valNum)
 	}
-	s.xplac = qtest.ResetXplac(s.xplac)
+	s.xplac = xplago_helper.ResetXplac(s.xplac)
 }
 
 func (s *IntegrationTestSuite) TestQueryTxByEventAndQueryTx() {
@@ -205,7 +205,7 @@ func (s *IntegrationTestSuite) TestQueryTxByEventAndQueryTx() {
 			s.Require().Equal(txHash, txResponse.TxHash)
 		}
 	}
-	s.xplac = qtest.ResetXplac(s.xplac)
+	s.xplac = xplago_helper.ResetXplac(s.xplac)
 }
 
 func (s *IntegrationTestSuite) createBankMsg(val *network.Validator, toAddr sdk.AccAddress, amount sdk.Coins, extraFlags ...string) (sdktestutil.BufferWriter, error) {

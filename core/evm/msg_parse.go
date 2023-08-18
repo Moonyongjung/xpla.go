@@ -81,7 +81,7 @@ func parseInvokeSolContractArgs(invokeSolContractMsg types.InvokeSolContractMsg)
 }
 
 // Parsing - call solidity contract
-func parseCallSolContractArgs(callSolContractMsg types.CallSolContractMsg, byteAddress string) (CallSolContractParseMsg, error) {
+func parseCallSolContractArgs(callSolContractMsg types.CallSolContractMsg) (CallSolContractParseMsg, error) {
 	var err error
 	bytecode := callSolContractMsg.Bytecode
 	if callSolContractMsg.BytecodeJsonFilePath != "" {
@@ -109,7 +109,7 @@ func parseCallSolContractArgs(callSolContractMsg types.CallSolContractMsg, byteA
 		return CallSolContractParseMsg{}, util.LogErr(errors.ErrParse, err)
 	}
 
-	fromAddr := util.FromStringToByte20Address(byteAddress)
+	fromAddr := util.FromStringToByte20Address(callSolContractMsg.FromByteAddress)
 	toAddr := util.FromStringToByte20Address(callSolContractMsg.ContractAddress)
 	value, err := util.FromStringToBigInt("0")
 	if err != nil {
@@ -151,7 +151,7 @@ func parseGetBlockByHashHeightArgs(getBlockByHashHeightMsg types.GetBlockByHashH
 }
 
 // Parsing - sol contract estimate gas
-func parseEstimateGasSolArgs(invokeSolContractMsg types.InvokeSolContractMsg, byteAddress string) (CallSolContractParseMsg, error) {
+func parseEstimateGasSolArgs(invokeSolContractMsg types.InvokeSolContractMsg) (CallSolContractParseMsg, error) {
 	var err error
 	bytecode := invokeSolContractMsg.Bytecode
 	if invokeSolContractMsg.BytecodeJsonFilePath != "" {
@@ -181,7 +181,7 @@ func parseEstimateGasSolArgs(invokeSolContractMsg types.InvokeSolContractMsg, by
 		return CallSolContractParseMsg{}, util.LogErr(errors.ErrParse, err)
 	}
 
-	fromAddr := util.FromStringToByte20Address(byteAddress)
+	fromAddr := util.FromStringToByte20Address(invokeSolContractMsg.FromByteAddress)
 	toAddr := util.FromStringToByte20Address(invokeSolContractMsg.ContractAddress)
 	value, err := util.FromStringToBigInt("0")
 	if err != nil {

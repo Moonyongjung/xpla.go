@@ -1,7 +1,6 @@
 package client
 
 import (
-	"fmt"
 	"math/rand"
 	"os"
 	"strings"
@@ -162,9 +161,6 @@ func (suite *TestSuite) TestSimulateSignatureOnly() {
 		suite.Require().NoError(err)
 
 		signPath := "../util/testutil/test_files/signature" + util.FromIntToString(i) + ".json"
-
-		fmt.Println(string(txbytes))
-		fmt.Println(string(convertJson(signPath)))
 
 		suite.Require().Equal(txbytes, convertJson(signPath))
 	}
