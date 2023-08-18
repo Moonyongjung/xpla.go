@@ -178,6 +178,39 @@ func (s *ClientBroadcastTestSuite) TestBroadcast() {
 	s.xplac = xplago_helper.ResetXplac(s.xplac)
 }
 
+func (s *ClientBroadcastTestSuite) TestBroadcastMode() {
+	invalidBroadcastMode := "invalid-mode"
+
+	from := s.accounts[0]
+	to := s.accounts[1]
+
+	s.xplac.
+		WithPrivateKey(from.PrivKey).
+		WithURL(s.apis[0])
+
+	modes := []string{"block", "async", "sync", "", invalidBroadcastMode}
+
+	for _, mode := range modes {
+		s.xplac.WithBroadcastMode(mode)
+
+		bankSendMsg := types.BankSendMsg{
+			FromAddress: from.Address.String(),
+			ToAddress:   to.Address.String(),
+			Amount:      testSendAmount,
+		}
+		txbytes, err := s.xplac.BankSend(bankSendMsg).CreateAndSignTx()
+		s.Require().NoError(err)
+
+		// if empty mode or invalid mode is changed to "sync"
+		_, err = s.xplac.Broadcast(txbytes)
+		s.Require().NoError(err)
+		s.Require().NoError(s.network.WaitForNextBlock())
+
+		newSeq := util.FromStringToInt(s.xplac.GetSequence()) + 1
+		s.xplac.WithSequence(util.FromIntToString(newSeq))
+	}
+}
+
 func TestClientBroadcastTestSuite(t *testing.T) {
 	cfg := network.DefaultConfig()
 	cfg.ChainID = testutil.TestChainId
