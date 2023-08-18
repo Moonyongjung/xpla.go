@@ -33,7 +33,7 @@ func MakeWithdrawAllRewardsMsg(privKey key.PrivateKey, grpcConn grpc.ClientConn,
 }
 
 // (Tx) make msg - withdraw address
-func MakeSetWithdrawAddrMsg(setWithdrawAddrMsg types.SetwithdrawAddrMsg, privKey key.PrivateKey) (disttypes.MsgSetWithdrawAddress, error) {
+func MakeSetWithdrawAddrMsg(setWithdrawAddrMsg types.SetWithdrawAddrMsg, privKey key.PrivateKey) (disttypes.MsgSetWithdrawAddress, error) {
 	return parseSetWithdrawAddrArgs(setWithdrawAddrMsg, privKey)
 }
 

@@ -135,7 +135,7 @@ func (xplac *XplaClient) WithdrawAllRewards() *XplaClient {
 }
 
 // Change the default withdraw address for rewards associated with an address.
-func (xplac *XplaClient) SetWithdrawAddr(setWithdrawAddrMsg types.SetwithdrawAddrMsg) *XplaClient {
+func (xplac *XplaClient) SetWithdrawAddr(setWithdrawAddrMsg types.SetWithdrawAddrMsg) *XplaClient {
 	msg, err := mdist.MakeSetWithdrawAddrMsg(setWithdrawAddrMsg, xplac.Opts.PrivateKey)
 	if err != nil {
 		xplac.Err = err

@@ -142,7 +142,7 @@ func parseWithdrawAllRewardsArgs(privKey key.PrivateKey, grpcConn grpc.ClientCon
 }
 
 // Parsing - set withdraw addr
-func parseSetWithdrawAddrArgs(setWithdrawAddrMsg types.SetwithdrawAddrMsg, privKey key.PrivateKey) (disttypes.MsgSetWithdrawAddress, error) {
+func parseSetWithdrawAddrArgs(setWithdrawAddrMsg types.SetWithdrawAddrMsg, privKey key.PrivateKey) (disttypes.MsgSetWithdrawAddress, error) {
 	delAddr, err := util.GetAddrByPrivKey(privKey)
 	if err != nil {
 		return disttypes.MsgSetWithdrawAddress{}, util.LogErr(errors.ErrParse, err)

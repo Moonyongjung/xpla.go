@@ -19,7 +19,7 @@ type WithdrawRewardsMsg struct {
 	Commission    bool
 }
 
-type SetwithdrawAddrMsg struct {
+type SetWithdrawAddrMsg struct {
 	WithdrawAddr string
 }
 
