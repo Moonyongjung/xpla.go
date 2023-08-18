@@ -129,7 +129,7 @@ func (xplac *XplaClient) WithdrawAllRewards() *XplaClient {
 		xplac.Err = err
 	}
 	xplac.Module = mdist.DistributionModule
-	xplac.MsgType = mdist.DistributionWithdrawRewardsMsgType
+	xplac.MsgType = mdist.DistributionWithdrawAllRewardsMsgType
 	xplac.Msg = msg
 	return xplac
 }
