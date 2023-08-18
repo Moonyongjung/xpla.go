@@ -20,7 +20,7 @@ import (
 )
 
 var (
-	validatorNumber = 1
+	validatorNumberforHTTP = 1
 )
 
 type ClientHTTPTestSuite struct {
@@ -134,6 +134,6 @@ func (s *ClientHTTPTestSuite) TestSimulate() {
 func TestClientHTTPTestSuite(t *testing.T) {
 	cfg := network.DefaultConfig()
 	cfg.ChainID = testutil.TestChainId
-	cfg.NumValidators = validatorNumber
+	cfg.NumValidators = validatorNumberforHTTP
 	suite.Run(t, NewClientHTTPTestSuite(cfg))
 }

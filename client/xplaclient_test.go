@@ -26,15 +26,6 @@ var (
 )
 
 func TestNewXplaClient(t *testing.T) {
-	// mnemonic, err := key.NewMnemonic()
-	// assert.NoError(t, err)
-
-	// priKey, err := key.NewPrivKey(mnemonic)
-	// assert.NoError(t, err)
-
-	// addr, err := key.Bech32AddrString(priKey)
-	// assert.NoError(t, err)
-
 	s := rand.NewSource(1)
 	r := rand.New(s)
 	accounts := testutil.RandomAccounts(r, 2)

@@ -6,9 +6,11 @@ grantMsg := types.GrantMsg {
     Granter: "xpla1e4f6k98es55vxxv2pcfzpsjrf3mvazeyqpw8g9",
     Grantee: "xpla19yq7kjcgse7x672faptju0lxmy4cvdlcpmxnyn",
     SpendLimit: "1000",
+    
+    // select options as below
     Period: "3600",
-    PeriodLimit: "10"
-    Expiration: "36000"
+    PeriodLimit: "10",
+    Expiration: "2100-01-01T23:59:59+00:00",
 }
 txbytes, err := xplac.Grant(grantMsg).CreateAndSignTx()
 res, err := xplac.Broadcast(txbytes)
