@@ -8,17 +8,17 @@ import (
 	"github.com/Moonyongjung/xpla.go/client"
 	"github.com/Moonyongjung/xpla.go/client/xplago_helper"
 	"github.com/Moonyongjung/xpla.go/types"
-	"github.com/Moonyongjung/xpla.go/util/testutil"
 
+	"github.com/Moonyongjung/xpla.go/util/testutil/network"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/crypto/hd"
 	"github.com/cosmos/cosmos-sdk/crypto/keyring"
 	sdktestutil "github.com/cosmos/cosmos-sdk/testutil"
-	"github.com/cosmos/cosmos-sdk/testutil/network"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/tx"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	bankcli "github.com/cosmos/cosmos-sdk/x/bank/client/testutil"
+	ethermint "github.com/evmos/ethermint/types"
 	"github.com/gogo/protobuf/jsonpb"
 	"github.com/gogo/protobuf/proto"
 	"github.com/stretchr/testify/suite"
@@ -105,12 +105,12 @@ func (s *IntegrationTestSuite) TestAccAddress() {
 		var accountResponse authtypes.QueryAccountResponse
 		jsonpb.Unmarshal(strings.NewReader(res), &accountResponse)
 
-		var baseAccount authtypes.BaseAccount
-		proto.Unmarshal(accountResponse.Account.Value, &baseAccount)
+		var ethAccount ethermint.EthAccount
+		proto.Unmarshal(accountResponse.Account.Value, &ethAccount)
 
-		s.Require().Equal("/cosmos.crypto.secp256k1.PubKey", baseAccount.PubKey.TypeUrl)
-		s.Require().Equal(addr, baseAccount.Address)
-		s.Require().Equal(uint64(0), baseAccount.AccountNumber)
+		s.Require().Equal("/ethermint.crypto.v1.ethsecp256k1.PubKey", ethAccount.PubKey.TypeUrl)
+		s.Require().Equal(addr, ethAccount.Address)
+		s.Require().Equal(uint64(0), ethAccount.AccountNumber)
 
 	}
 	s.xplac = xplago_helper.ResetXplac(s.xplac)
@@ -127,18 +127,13 @@ func (s *IntegrationTestSuite) TestAccounts() {
 		res, err := s.xplac.Accounts().Query()
 		s.Require().NoError(err)
 
+		s.T().Log(res)
+
 		var accountsResponse authtypes.QueryAccountsResponse
 		jsonpb.Unmarshal(strings.NewReader(res), &accountsResponse)
 
-		valNum := 0
-		for _, account := range accountsResponse.Accounts {
-			var baseAccount authtypes.BaseAccount
-			proto.Unmarshal(account.Value, &baseAccount)
-			if baseAccount.PubKey.TypeUrl == "/cosmos.crypto.secp256k1.PubKey" {
-				valNum++
-			}
-		}
-		s.Require().Equal(validatorNumber, valNum)
+		// 2 validator, 7 module accounts
+		s.Require().Len(accountsResponse.Accounts, 9)
 	}
 	s.xplac = xplago_helper.ResetXplac(s.xplac)
 }
@@ -222,7 +217,6 @@ func (s *IntegrationTestSuite) createBankMsg(val *network.Validator, toAddr sdk.
 
 func TestIntegrationTestSuite(t *testing.T) {
 	cfg := network.DefaultConfig()
-	cfg.ChainID = testutil.TestChainId
 	cfg.NumValidators = validatorNumber
 	suite.Run(t, NewIntegrationTestSuite(cfg))
 }

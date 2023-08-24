@@ -9,6 +9,8 @@ const (
 	DefaultXplaKeyAlgo = "eth_secp256k1"
 	// Xpla tool default name
 	XplaToolDefaultName = "xpla"
+	// axpla base denom unit
+	BaseDenomUnit = 18
 
 	// query method type
 	QueryGrpc = 1

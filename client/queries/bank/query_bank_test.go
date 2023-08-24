@@ -8,19 +8,15 @@ import (
 	"github.com/Moonyongjung/xpla.go/client/xplago_helper"
 	"github.com/Moonyongjung/xpla.go/types"
 	"github.com/Moonyongjung/xpla.go/util"
-	"github.com/Moonyongjung/xpla.go/util/testutil"
 	"github.com/gogo/protobuf/jsonpb"
 	"github.com/stretchr/testify/suite"
 
-	"github.com/cosmos/cosmos-sdk/testutil/network"
+	"github.com/Moonyongjung/xpla.go/util/testutil/network"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 )
 
 var (
 	validatorNumber = 2
-
-	mainDenom = "amain"
-	altDenom  = "aalt"
 )
 
 type IntegrationTestSuite struct {
@@ -43,38 +39,6 @@ func (s *IntegrationTestSuite) SetupSuite() {
 	genesisState := s.cfg.GenesisState
 	var bankGenesis banktypes.GenesisState
 	s.Require().NoError(s.cfg.Codec.UnmarshalJSON(genesisState[banktypes.ModuleName], &bankGenesis))
-
-	bankGenesis.DenomMetadata = []banktypes.Metadata{
-		{
-			Description: "main token for test",
-			DenomUnits: []*banktypes.DenomUnit{
-				{
-					Denom:    "main",
-					Exponent: 18,
-					Aliases:  []string{"MAIN"},
-				},
-				{
-					Denom:    mainDenom,
-					Exponent: 0,
-					Aliases:  []string{"attomain"},
-				},
-			},
-			Base:    mainDenom,
-			Display: "main",
-		},
-		{
-			Description: "alt token for test",
-			DenomUnits: []*banktypes.DenomUnit{
-				{
-					Denom:    altDenom,
-					Exponent: 0,
-					Aliases:  []string{"attoalt"},
-				},
-			},
-			Base:    altDenom,
-			Display: "alt",
-		},
-	}
 
 	bankGenesisBz, err := s.cfg.Codec.MarshalJSON(&bankGenesis)
 	s.Require().NoError(err)
@@ -117,13 +81,13 @@ func (s *IntegrationTestSuite) TestAllBalancesAndBalance() {
 		var allBalancesResponse banktypes.QueryAllBalancesResponse
 		jsonpb.Unmarshal(strings.NewReader(res), &allBalancesResponse)
 
-		bal1, err := util.FromStringToBigInt("1000000000000000000000")
+		bal1, err := util.FromStringToBigInt("400000000000000000000")
 		s.Require().NoError(err)
-		bal2, err := util.FromStringToBigInt("400000000000000000000")
+		bal2, err := util.FromStringToBigInt("1000000000000000000000")
 		s.Require().NoError(err)
 
-		denom1 := "node0token"
-		denom2 := "stake"
+		denom1 := "axpla"
+		denom2 := "node0token"
 
 		s.Require().Equal(bal1, allBalancesResponse.Balances[0].Amount.BigInt())
 		s.Require().Equal(bal2, allBalancesResponse.Balances[1].Amount.BigInt())
@@ -164,11 +128,11 @@ func (s *IntegrationTestSuite) TestDenomMetadata() {
 		jsonpb.Unmarshal(strings.NewReader(res), &denomsMetadataResponse)
 
 		s.Require().Equal(2, len(denomsMetadataResponse.Metadatas))
-		s.Require().Equal(altDenom, denomsMetadataResponse.Metadatas[0].Base)
-		s.Require().Equal(mainDenom, denomsMetadataResponse.Metadatas[1].Base)
+		s.Require().Equal(types.XplaDenom, denomsMetadataResponse.Metadatas[0].Base)
+		s.Require().Equal("node0token", denomsMetadataResponse.Metadatas[1].Base)
 
 		denomMetadataMsg := types.DenomMetadataMsg{
-			Denom: mainDenom,
+			Denom: types.XplaDenom,
 		}
 		res, err = s.xplac.DenomMetadata(denomMetadataMsg).Query()
 		s.Require().NoError(err)
@@ -176,7 +140,7 @@ func (s *IntegrationTestSuite) TestDenomMetadata() {
 		var denomMetadataResponse banktypes.QueryDenomMetadataResponse
 		jsonpb.Unmarshal(strings.NewReader(res), &denomMetadataResponse)
 
-		s.Require().Equal(mainDenom, denomMetadataResponse.Metadata.Base)
+		s.Require().Equal(types.XplaDenom, denomMetadataResponse.Metadata.Base)
 	}
 	s.xplac = xplago_helper.ResetXplac(s.xplac)
 }
@@ -189,16 +153,14 @@ func (s *IntegrationTestSuite) TestBankTotal() {
 			s.xplac.WithGrpc(api)
 		}
 
-		bal1, err := util.FromStringToBigInt("1000000000000000000000")
-		s.Require().NoError(err)
 		bal2, err := util.FromStringToBigInt("1000000000000000000000")
 		s.Require().NoError(err)
-		bal3, err := util.FromStringToBigInt("1000000020597259368396")
+		bal3, err := util.FromStringToBigInt("1000000000000000000000")
 		s.Require().NoError(err)
 
-		denom1 := "node0token"
-		denom2 := "node1token"
-		denom3 := "stake"
+		denom1 := "axpla"
+		denom2 := "node0token"
+		denom3 := "node1token"
 
 		res, err := s.xplac.Total().Query()
 		s.Require().NoError(err)
@@ -207,7 +169,6 @@ func (s *IntegrationTestSuite) TestBankTotal() {
 		jsonpb.Unmarshal(strings.NewReader(res), &totalSupplyResponse)
 
 		s.Require().Equal(denom1, totalSupplyResponse.Supply[0].Denom)
-		s.Require().Equal(bal1, totalSupplyResponse.Supply[0].Amount.BigInt())
 		s.Require().Equal(denom2, totalSupplyResponse.Supply[1].Denom)
 		s.Require().Equal(bal2, totalSupplyResponse.Supply[1].Amount.BigInt())
 		s.Require().Equal(denom3, totalSupplyResponse.Supply[2].Denom)
@@ -223,14 +184,12 @@ func (s *IntegrationTestSuite) TestBankTotal() {
 		jsonpb.Unmarshal(strings.NewReader(res), &supplyOfResponse)
 
 		s.Require().Equal(denom1, supplyOfResponse.Amount.Denom)
-		s.Require().Equal(bal1, supplyOfResponse.Amount.Amount.BigInt())
 	}
 	s.xplac = xplago_helper.ResetXplac(s.xplac)
 }
 
 func TestIntegrationTestSuite(t *testing.T) {
 	cfg := network.DefaultConfig()
-	cfg.ChainID = testutil.TestChainId
 	cfg.NumValidators = validatorNumber
 	suite.Run(t, NewIntegrationTestSuite(cfg))
 }

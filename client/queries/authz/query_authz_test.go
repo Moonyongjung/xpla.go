@@ -8,15 +8,15 @@ import (
 	"github.com/Moonyongjung/xpla.go/client"
 	"github.com/Moonyongjung/xpla.go/client/xplago_helper"
 	"github.com/Moonyongjung/xpla.go/types"
-	"github.com/Moonyongjung/xpla.go/util/testutil"
 	"github.com/gogo/protobuf/jsonpb"
 
+	"github.com/Moonyongjung/xpla.go/util/testutil/network"
 	"github.com/cosmos/cosmos-sdk/client/flags"
-	"github.com/cosmos/cosmos-sdk/testutil/network"
+	"github.com/cosmos/cosmos-sdk/testutil"
+	clitestutil "github.com/cosmos/cosmos-sdk/testutil/cli"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/authz"
 	"github.com/cosmos/cosmos-sdk/x/authz/client/cli"
-	authztestutil "github.com/cosmos/cosmos-sdk/x/authz/client/testutil"
 	"github.com/stretchr/testify/suite"
 )
 
@@ -45,12 +45,12 @@ func (s *IntegrationTestSuite) SetupSuite() {
 	val1 := s.network.Validators[0]
 	val2 := s.network.Validators[1]
 
-	_, err := authztestutil.ExecGrant(
+	_, err := ExecGrant(
 		val1,
 		[]string{
 			val2.Address.String(),
 			"send",
-			fmt.Sprintf("--%s=100stake", cli.FlagSpendLimit),
+			fmt.Sprintf("--%s=100axpla", cli.FlagSpendLimit),
 			fmt.Sprintf("--%s=%s", flags.FlagFrom, val1.Address.String()),
 			fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastBlock),
 			fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
@@ -121,9 +121,14 @@ func (s *IntegrationTestSuite) TestAuthzGrant() {
 	s.xplac = xplago_helper.ResetXplac(s.xplac)
 }
 
+func ExecGrant(val *network.Validator, args []string) (testutil.BufferWriter, error) {
+	cmd := cli.NewCmdGrantAuthorization()
+	clientCtx := val.ClientCtx
+	return clitestutil.ExecTestCLICmd(clientCtx, cmd, args)
+}
+
 func TestIntegrationTestSuite(t *testing.T) {
 	cfg := network.DefaultConfig()
-	cfg.ChainID = testutil.TestChainId
 	cfg.NumValidators = validatorNumber
 	suite.Run(t, NewIntegrationTestSuite(cfg))
 }

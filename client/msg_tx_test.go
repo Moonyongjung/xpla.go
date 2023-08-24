@@ -1,10 +1,6 @@
 package client_test
 
 import (
-	"math/rand"
-	"testing"
-
-	"github.com/Moonyongjung/xpla.go/client"
 	"github.com/Moonyongjung/xpla.go/types"
 
 	mauthz "github.com/Moonyongjung/xpla.go/core/authz"
@@ -20,56 +16,12 @@ import (
 	mstaking "github.com/Moonyongjung/xpla.go/core/staking"
 	mupgrade "github.com/Moonyongjung/xpla.go/core/upgrade"
 	mwasm "github.com/Moonyongjung/xpla.go/core/wasm"
-	"github.com/Moonyongjung/xpla.go/util/testutil"
 
-	"github.com/cosmos/cosmos-sdk/testutil/network"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
-	"github.com/stretchr/testify/suite"
 )
 
-type TestMsgTx struct {
-	suite.Suite
-
-	xplac      *client.XplaClient
-	accounts   []simtypes.Account
-	validators []sdk.ValAddress
-	testTxHash string
-	apis       []string
-
-	cfg     network.Config
-	network *network.Network
-}
-
-func NewTestMsgTx(cfg network.Config) *TestMsgTx {
-	return &TestMsgTx{cfg: cfg}
-}
-
-func (s *TestMsgTx) SetupSuite() {
-	src := rand.NewSource(1)
-	r := rand.New(src)
-	s.accounts = testutil.RandomAccounts(r, 5)
-	for _, acc := range s.accounts {
-		s.validators = append(s.validators, sdk.ValAddress(acc.Address))
-	}
-	s.testTxHash = "B6BBBB649F19E8970EF274C0083FE945FD38AD8C524D68BB3FE3A20D72DF03C4"
-
-	s.network = network.New(s.T(), s.cfg)
-	s.Require().NoError(s.network.WaitForNextBlock())
-
-	s.xplac = client.NewXplaClient(testutil.TestChainId).
-		WithPrivateKey(s.accounts[0].PrivKey)
-	s.apis = []string{
-		s.network.Validators[0].APIAddress,
-		s.network.Validators[0].AppConfig.GRPC.Address,
-	}
-}
-func (s *TestMsgTx) TearDownSuite() {
-	s.T().Log("tearing down integration test suite")
-	s.network.Cleanup()
-}
-
-func (s *TestMsgTx) TestAuthz() {
+func (s *ClientTestSuite) TestAuthzTx() {
+	s.xplac.WithPrivateKey(s.accounts[0].PrivKey)
 	// authz grant
 	authzGrantMsg := types.AuthzGrantMsg{
 		Granter:           s.accounts[0].Address.String(),
@@ -132,7 +84,8 @@ func (s *TestMsgTx) TestAuthz() {
 	s.Require().Equal(mauthz.AuthzExecMsgType, s.xplac.GetMsgType())
 }
 
-func (s *TestMsgTx) TestBank() {
+func (s *ClientTestSuite) TestBankTx() {
+	s.xplac.WithPrivateKey(s.accounts[0].PrivKey)
 	// bank send
 	bankSendMsg := types.BankSendMsg{
 		FromAddress: s.accounts[0].Address.String(),
@@ -149,7 +102,8 @@ func (s *TestMsgTx) TestBank() {
 	s.Require().Equal(mbank.BankSendMsgType, s.xplac.GetMsgType())
 }
 
-func (s *TestMsgTx) TestCrisis() {
+func (s *ClientTestSuite) TestCrisisTx() {
+	s.xplac.WithPrivateKey(s.accounts[0].PrivKey)
 	// invariant broken
 	invariantBrokenMsg := types.InvariantBrokenMsg{
 		ModuleName:     "bank",
@@ -165,7 +119,8 @@ func (s *TestMsgTx) TestCrisis() {
 	s.Require().Equal(mcrisis.CrisisInvariantBrokenMsgType, s.xplac.GetMsgType())
 }
 
-func (s *TestMsgTx) TestDistribution() {
+func (s *ClientTestSuite) TestDistributionTx() {
+	s.xplac.WithPrivateKey(s.accounts[0].PrivKey)
 	// fund community pool
 	fundCommunityPoolMsg := types.FundCommunityPoolMsg{
 		Amount: "1000",
@@ -199,7 +154,7 @@ func (s *TestMsgTx) TestDistribution() {
 	// withdraw rewards
 	withdrawRewardsMsg := types.WithdrawRewardsMsg{
 		DelegatorAddr: s.accounts[0].Address.String(),
-		ValidatorAddr: s.validators[0].String(),
+		ValidatorAddr: s.network.Validators[0].ValAddress.String(),
 		Commission:    true,
 	}
 	s.xplac.WithdrawRewards(withdrawRewardsMsg)
@@ -225,7 +180,8 @@ func (s *TestMsgTx) TestDistribution() {
 	s.Require().Equal(mdist.DistributionSetWithdrawAddrMsgType, s.xplac.GetMsgType())
 }
 
-func (s *TestMsgTx) TestEvm() {
+func (s *ClientTestSuite) TestEvmTx() {
+	s.xplac.WithPrivateKey(s.accounts[0].PrivKey)
 	// send evm coin
 	sendCoinMsg := types.SendCoinMsg{
 		FromAddress: s.accounts[0].PubKey.Address().String(),
@@ -273,7 +229,8 @@ func (s *TestMsgTx) TestEvm() {
 	s.Require().Equal(mevm.EvmInvokeSolContractMsgType, s.xplac.GetMsgType())
 }
 
-func (s *TestMsgTx) TestFeegrant() {
+func (s *ClientTestSuite) TestFeegrantTx() {
+	s.xplac.WithPrivateKey(s.accounts[0].PrivKey)
 	// feegrant
 	feeGrantMsg := types.FeeGrantMsg{
 		Granter:    s.accounts[0].Address.String(),
@@ -307,7 +264,8 @@ func (s *TestMsgTx) TestFeegrant() {
 	s.Require().Equal(mfeegrant.FeegrantRevokeGrantMsgType, s.xplac.GetMsgType())
 }
 
-func (s *TestMsgTx) TestGov() {
+func (s *ClientTestSuite) TestGovTx() {
+	s.xplac.WithPrivateKey(s.accounts[0].PrivKey)
 	// submit proposal
 	submitProposalMsg := types.SubmitProposalMsg{
 		Title:       "Test proposal",
@@ -370,7 +328,8 @@ func (s *TestMsgTx) TestGov() {
 	s.Require().Equal(mgov.GovWeightedVoteMsgType, s.xplac.GetMsgType())
 }
 
-func (s *TestMsgTx) TestParams() {
+func (s *ClientTestSuite) TestParamsTx() {
+	s.xplac.WithPrivateKey(s.accounts[0].PrivKey)
 	// change params
 	paramChangeMsg := types.ParamChangeMsg{
 		Title:       "Staking param change",
@@ -394,7 +353,8 @@ func (s *TestMsgTx) TestParams() {
 	s.Require().Equal(mparams.ParamsProposalParamChangeMsgType, s.xplac.GetMsgType())
 }
 
-func (s *TestMsgTx) TestReward() {
+func (s *ClientTestSuite) TestRewardTx() {
+	s.xplac.WithPrivateKey(s.accounts[0].PrivKey)
 	// fund fee collector
 	fundFeeCollectorMsg := types.FundFeeCollectorMsg{
 		DepositorAddr: s.accounts[0].Address.String(),
@@ -410,7 +370,8 @@ func (s *TestMsgTx) TestReward() {
 	s.Require().Equal(mreward.RewardFundFeeCollectorMsgType, s.xplac.GetMsgType())
 }
 
-func (s *TestMsgTx) TestSlashing() {
+func (s *ClientTestSuite) TestSlashingTx() {
+	s.xplac.WithPrivateKey(s.accounts[0].PrivKey)
 	// unjail
 	s.xplac.Unjail()
 
@@ -422,12 +383,15 @@ func (s *TestMsgTx) TestSlashing() {
 	s.Require().Equal(mslashing.SlahsingUnjailMsgType, s.xplac.GetMsgType())
 }
 
-func (s *TestMsgTx) TestStaking() {
+func (s *ClientTestSuite) TestStakingTx() {
+	s.xplac.WithPrivateKey(s.accounts[0].PrivKey)
+	tmpVal := sdk.ValAddress(s.accounts[0].Address)
+
 	// create validator
 	createValidatorMsg := types.CreateValidatorMsg{
 		NodeKey:                 `{"priv_key":{"type":"tendermint/PrivKeyEd25519","value":"F20DGZKfFFCqgXe2AxF6855KrzfqVasdunk2LMG/EBV+U3gf7GVokgm+X8JP0WG1dyzZ7UddnmC9LGpUMRRQmQ=="}}`,
 		PrivValidatorKey:        `{"address":"3C5042645BAD50A98F0A7D567F862E1A861C23C5","pub_key":{"type":"tendermint/PubKeyEd25519","value":"/0bCEBBwUIrjqYr+pKfzHly+SBMjkA/hcCR9oswxnrk="},"priv_key":{"type":"tendermint/PrivKeyEd25519","value":"iks74YM/Di06VI4JPZ3zOxrKfQ0iwwgXhNa6aIzaduf/RsIQEHBQiuOpiv6kp/MeXL5IEyOQD+FwJH2izDGeuQ=="}}`,
-		ValidatorAddress:        s.validators[0].String(),
+		ValidatorAddress:        tmpVal.String(),
 		Moniker:                 "moniker",
 		Identity:                "identity",
 		Website:                 "website",
@@ -470,7 +434,7 @@ func (s *TestMsgTx) TestStaking() {
 	// delegate
 	delegateMsg := types.DelegateMsg{
 		Amount:  "1000",
-		ValAddr: s.validators[0].String(),
+		ValAddr: s.network.Validators[0].ValAddress.String(),
 	}
 	s.xplac.Delegate(delegateMsg)
 
@@ -484,7 +448,7 @@ func (s *TestMsgTx) TestStaking() {
 	// unbonding
 	unbondMsg := types.UnbondMsg{
 		Amount:  "1000",
-		ValAddr: s.validators[0].String(),
+		ValAddr: s.network.Validators[0].ValAddress.String(),
 	}
 	s.xplac.Unbond(unbondMsg)
 
@@ -498,8 +462,8 @@ func (s *TestMsgTx) TestStaking() {
 	// redelegation
 	redelegateMsg := types.RedelegateMsg{
 		Amount:     "1000",
-		ValSrcAddr: s.validators[0].String(),
-		ValDstAddr: s.validators[1].String(),
+		ValSrcAddr: s.network.Validators[0].ValAddress.String(),
+		ValDstAddr: s.network.Validators[1].ValAddress.String(),
 	}
 	s.xplac.Redelegate(redelegateMsg)
 
@@ -511,7 +475,8 @@ func (s *TestMsgTx) TestStaking() {
 	s.Require().Equal(mstaking.StakingRedelegateMsgType, s.xplac.GetMsgType())
 }
 
-func (s *TestMsgTx) TestUpgrade() {
+func (s *ClientTestSuite) TestUpgradeTx() {
+	s.xplac.WithPrivateKey(s.accounts[0].PrivKey)
 	// software upgrade
 	softwareUpgradeMsg := types.SoftwareUpgradeMsg{
 		UpgradeName:   "Upgrade Name",
@@ -546,7 +511,8 @@ func (s *TestMsgTx) TestUpgrade() {
 	s.Require().Equal(mupgrade.UpgradeCancelSoftwareUpgradeMsgType, s.xplac.GetMsgType())
 }
 
-func (s *TestMsgTx) TestWasm() {
+func (s *ClientTestSuite) TestWasmTx() {
+	s.xplac.WithPrivateKey(s.accounts[0].PrivKey)
 	// store code
 	storeMsg := types.StoreMsg{
 		FilePath:              testWasmFilePath,
@@ -633,10 +599,4 @@ func (s *TestMsgTx) TestWasm() {
 	s.Require().Equal(makeMigrateMsg, s.xplac.GetMsg())
 	s.Require().Equal(mwasm.WasmModule, s.xplac.GetModule())
 	s.Require().Equal(mwasm.WasmMigrateMsgType, s.xplac.GetMsgType())
-}
-
-func TestMsgTxSuite(t *testing.T) {
-	cfg := network.DefaultConfig()
-	cfg.ChainID = testutil.TestChainId
-	suite.Run(t, NewTestMsgTx(cfg))
 }

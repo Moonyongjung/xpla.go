@@ -6,3 +6,4 @@ docs
 yarn.lock
 backup/
 coverage.out
+test_coverage.sh

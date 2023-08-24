@@ -6,10 +6,10 @@ import (
 
 	"github.com/Moonyongjung/xpla.go/client"
 	"github.com/Moonyongjung/xpla.go/client/xplago_helper"
-	"github.com/Moonyongjung/xpla.go/util/testutil"
+	"github.com/Moonyongjung/xpla.go/types"
 	"github.com/gogo/protobuf/jsonpb"
 
-	"github.com/cosmos/cosmos-sdk/testutil/network"
+	"github.com/Moonyongjung/xpla.go/util/testutil/network"
 	minttypes "github.com/cosmos/cosmos-sdk/x/mint/types"
 	"github.com/stretchr/testify/suite"
 )
@@ -62,9 +62,9 @@ func (s *IntegrationTestSuite) TestParams() {
 		var queryParamsResponse minttypes.QueryParamsResponse
 		jsonpb.Unmarshal(strings.NewReader(res), &queryParamsResponse)
 
-		s.Require().Equal("stake", queryParamsResponse.Params.MintDenom)
-		s.Require().Equal("0.130000000000000000", queryParamsResponse.Params.InflationRateChange.String())
-		s.Require().Equal("0.200000000000000000", queryParamsResponse.Params.InflationMax.String())
+		s.Require().Equal(types.XplaDenom, queryParamsResponse.Params.MintDenom)
+		s.Require().Equal("0.000000000000000000", queryParamsResponse.Params.InflationRateChange.String())
+		s.Require().Equal("0.000000000000000000", queryParamsResponse.Params.InflationMax.String())
 		s.Require().Equal("0.070000000000000000", queryParamsResponse.Params.InflationMin.String())
 		s.Require().Equal("0.670000000000000000", queryParamsResponse.Params.GoalBonded.String())
 		s.Require().Equal(uint64(6311520), queryParamsResponse.Params.BlocksPerYear)
@@ -86,7 +86,7 @@ func (s *IntegrationTestSuite) TestInflation() {
 		var queryInflationResponse minttypes.QueryInflationResponse
 		jsonpb.Unmarshal(strings.NewReader(res), &queryInflationResponse)
 
-		s.Require().Equal("0.130000014448822130", queryInflationResponse.Inflation.String())
+		s.Require().Equal("0.070000000000000000", queryInflationResponse.Inflation.String())
 	}
 	s.xplac = xplago_helper.ResetXplac(s.xplac)
 }
@@ -105,7 +105,7 @@ func (s *IntegrationTestSuite) TestAnnualProvisions() {
 		var queryAnnualProvisionsResponse minttypes.QueryAnnualProvisionsResponse
 		jsonpb.Unmarshal(strings.NewReader(res), &queryAnnualProvisionsResponse)
 
-		s.Require().Equal("130000014448822130000.000000000000000000", queryAnnualProvisionsResponse.AnnualProvisions.String())
+		s.Require().Equal("70000000000000000000.000000000000000000", queryAnnualProvisionsResponse.AnnualProvisions.String())
 
 	}
 	s.xplac = xplago_helper.ResetXplac(s.xplac)
@@ -113,7 +113,6 @@ func (s *IntegrationTestSuite) TestAnnualProvisions() {
 
 func TestIntegrationTestSuite(t *testing.T) {
 	cfg := network.DefaultConfig()
-	cfg.ChainID = testutil.TestChainId
 	cfg.NumValidators = validatorNumber
 	suite.Run(t, NewIntegrationTestSuite(cfg))
 }
