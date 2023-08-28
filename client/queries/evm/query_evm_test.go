@@ -14,8 +14,6 @@ import (
 	"github.com/Moonyongjung/xpla.go/util"
 	"github.com/Moonyongjung/xpla.go/util/testutil"
 	"github.com/Moonyongjung/xpla.go/util/testutil/network"
-	"github.com/gogo/protobuf/jsonpb"
-	"golang.org/x/crypto/sha3"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
@@ -26,8 +24,10 @@ import (
 	ethtypes "github.com/ethereum/go-ethereum/core/types"
 	ethermint "github.com/evmos/ethermint/types"
 	evmtypes "github.com/evmos/ethermint/x/evm/types"
+	"github.com/gogo/protobuf/jsonpb"
 	"github.com/stretchr/testify/suite"
 	ctypes "github.com/tendermint/tendermint/rpc/core/types"
+	"golang.org/x/crypto/sha3"
 )
 
 var (
