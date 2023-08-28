@@ -18,6 +18,16 @@
 </div>
 Xpla.go is a Golang SDK for writing applications that interact with the Xpla blockchain and provides simple abstractions over core data structures, serialization, key management, and API request generation.
 
+## Version compatibility
+
+|xpla.go|XPLA|Note|
+|:---:|:---:|:---:|
+|v0.1.1-v0.1.3|v1.2.2||
+|v0.1.0|v1.2.0||
+|v0.0.10-v0.0.12|v1.2.0|Beta version|
+|v0.0.1-v0.0.9|v1.1.0|Beta version|
+
+
 ## Usage
 Usage of modules and xpla client.
 
