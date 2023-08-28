@@ -9,12 +9,11 @@ import (
 	"github.com/Moonyongjung/xpla.go/client"
 	"github.com/Moonyongjung/xpla.go/client/xplago_helper"
 	"github.com/Moonyongjung/xpla.go/types"
-	"github.com/Moonyongjung/xpla.go/util/testutil"
 	"github.com/gogo/protobuf/jsonpb"
 
+	"github.com/Moonyongjung/xpla.go/util/testutil/network"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	clitestutil "github.com/cosmos/cosmos-sdk/testutil/cli"
-	"github.com/cosmos/cosmos-sdk/testutil/network"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/feegrant"
 	"github.com/cosmos/cosmos-sdk/x/feegrant/client/cli"
@@ -53,7 +52,7 @@ func (s *IntegrationTestSuite) SetupSuite() {
 	s.createGrant(granter, grantee)
 
 	_, err := feegrant.NewGrant(granter, grantee, &feegrant.BasicAllowance{
-		SpendLimit: sdk.NewCoins(sdk.NewCoin("stake", sdk.NewInt(100))),
+		SpendLimit: sdk.NewCoins(sdk.NewCoin(types.XplaDenom, sdk.NewInt(100))),
 	})
 	s.Require().NoError(err)
 
@@ -160,7 +159,6 @@ func getFormattedExpiration(duration int64) string {
 
 func TestIntegrationTestSuite(t *testing.T) {
 	cfg := network.DefaultConfig()
-	cfg.ChainID = testutil.TestChainId
 	cfg.NumValidators = validatorNumber
 	suite.Run(t, NewIntegrationTestSuite(cfg))
 }

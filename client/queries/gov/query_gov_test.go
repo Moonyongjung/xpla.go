@@ -8,13 +8,15 @@ import (
 	"github.com/Moonyongjung/xpla.go/client"
 	"github.com/Moonyongjung/xpla.go/client/xplago_helper"
 	"github.com/Moonyongjung/xpla.go/types"
-	"github.com/Moonyongjung/xpla.go/util/testutil"
 	"github.com/gogo/protobuf/jsonpb"
 
-	"github.com/cosmos/cosmos-sdk/testutil/network"
+	"github.com/Moonyongjung/xpla.go/util/testutil/network"
+	cmclient "github.com/cosmos/cosmos-sdk/client"
+	"github.com/cosmos/cosmos-sdk/client/flags"
+	"github.com/cosmos/cosmos-sdk/testutil"
+	clitestutil "github.com/cosmos/cosmos-sdk/testutil/cli"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	govcli "github.com/cosmos/cosmos-sdk/x/gov/client/cli"
-	govtestutil "github.com/cosmos/cosmos-sdk/x/gov/client/testutil"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 	"github.com/stretchr/testify/suite"
 )
@@ -44,31 +46,31 @@ func (s *IntegrationTestSuite) SetupSuite() {
 	val := s.network.Validators[0]
 
 	// create a proposal with deposit
-	_, err := govtestutil.MsgSubmitProposal(val.ClientCtx, val.Address.String(),
+	_, err := MsgSubmitProposal(val.ClientCtx, val.Address.String(),
 		"Text Proposal 1", "Where is the title!?", govtypes.ProposalTypeText,
 		fmt.Sprintf("--%s=%s", govcli.FlagDeposit, sdk.NewCoin(s.cfg.BondDenom, govtypes.DefaultMinDepositTokens).String()))
 	s.Require().NoError(err)
 	s.Require().NoError(s.network.WaitForNextBlock())
 
 	// vote for proposal
-	_, err = govtestutil.MsgVote(val.ClientCtx, val.Address.String(), "1", "yes")
+	_, err = MsgVote(val.ClientCtx, val.Address.String(), "1", "yes")
 	s.Require().NoError(err)
 
 	// create a proposal without deposit
-	_, err = govtestutil.MsgSubmitProposal(val.ClientCtx, val.Address.String(),
+	_, err = MsgSubmitProposal(val.ClientCtx, val.Address.String(),
 		"Text Proposal 2", "Where is the title!?", govtypes.ProposalTypeText)
 	s.Require().NoError(err)
 	s.Require().NoError(s.network.WaitForNextBlock())
 
 	// create a proposal3 with deposit
-	_, err = govtestutil.MsgSubmitProposal(val.ClientCtx, val.Address.String(),
+	_, err = MsgSubmitProposal(val.ClientCtx, val.Address.String(),
 		"Text Proposal 3", "Where is the title!?", govtypes.ProposalTypeText,
 		fmt.Sprintf("--%s=%s", govcli.FlagDeposit, sdk.NewCoin(s.cfg.BondDenom, govtypes.DefaultMinDepositTokens).String()))
 	s.Require().NoError(err)
 	s.Require().NoError(s.network.WaitForNextBlock())
 
 	// vote for proposal3 as val
-	_, err = govtestutil.MsgVote(val.ClientCtx, val.Address.String(), "3", "yes=0.6,no=0.3,abstain=0.05,no_with_veto=0.05")
+	_, err = MsgVote(val.ClientCtx, val.Address.String(), "3", "yes=0.6,no=0.3,abstain=0.05,no_with_veto=0.05")
 	s.Require().NoError(err)
 	s.Require().NoError(s.network.WaitForNextBlock())
 
@@ -157,7 +159,7 @@ func (s *IntegrationTestSuite) TestDeposit() {
 		s.Require().Equal(val, queryDepositResponse.Deposit.Depositor)
 		s.Require().Equal(val, queryDepositResponse.Deposit.Depositor)
 		s.Require().Equal(govtypes.DefaultMinDepositTokens, queryDepositResponse.Deposit.Amount[0].Amount)
-		s.Require().Equal("stake", queryDepositResponse.Deposit.Amount[0].Denom)
+		s.Require().Equal(types.XplaDenom, queryDepositResponse.Deposit.Amount[0].Denom)
 	}
 	s.xplac = xplago_helper.ResetXplac(s.xplac)
 }
@@ -282,7 +284,7 @@ func (s *IntegrationTestSuite) TestGovParams() {
 			s.Require().Equal("0.000000000000000000", queryParamsResponse3.TallyParams.Threshold.String())
 			s.Require().Equal("0.000000000000000000", queryParamsResponse3.TallyParams.VetoThreshold.String())
 			s.Require().Equal("0s", queryParamsResponse3.VotingParams.VotingPeriod.String())
-			s.Require().Equal("stake", queryParamsResponse3.DepositParams.MinDeposit[0].Denom)
+			s.Require().Equal(types.XplaDenom, queryParamsResponse3.DepositParams.MinDeposit[0].Denom)
 			s.Require().Equal("10000000", queryParamsResponse3.DepositParams.MinDeposit[0].Amount.String())
 			s.Require().Equal("48h0m0s", queryParamsResponse3.DepositParams.MaxDepositPeriod.String())
 
@@ -334,7 +336,7 @@ func (s *IntegrationTestSuite) TestGovParams() {
 			var queryParamsResponse4 govtypes.QueryParamsResponse
 			jsonpb.Unmarshal(strings.NewReader(res4), &queryParamsResponse4)
 
-			expectedResult := `{"voting_params":{"voting_period":172800000000000},"tally_params":{"quorum":"0.334000000000000000","threshold":"0.500000000000000000","veto_threshold":"0.334000000000000000"},"deposit_params":{"min_deposit":[{"denom":"stake","amount":"10000000"}],"max_deposit_period":172800000000000}}`
+			expectedResult := `{"voting_params":{"voting_period":172800000000000},"tally_params":{"quorum":"0.334000000000000000","threshold":"0.500000000000000000","veto_threshold":"0.334000000000000000"},"deposit_params":{"min_deposit":[{"denom":"axpla","amount":"10000000"}],"max_deposit_period":172800000000000}}`
 			s.Require().Equal(res4, expectedResult)
 		}
 
@@ -342,9 +344,41 @@ func (s *IntegrationTestSuite) TestGovParams() {
 	s.xplac = xplago_helper.ResetXplac(s.xplac)
 }
 
+var commonArgs = []string{
+	fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
+	fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastBlock),
+	fmt.Sprintf("--%s=%s", flags.FlagFees, sdk.NewCoins(sdk.NewCoin(types.XplaDenom, sdk.NewInt(10))).String()),
+}
+
+// MsgSubmitProposal creates a tx for submit proposal
+func MsgSubmitProposal(clientCtx cmclient.Context, from, title, description, proposalType string, extraArgs ...string) (testutil.BufferWriter, error) {
+	args := append([]string{
+		fmt.Sprintf("--%s=%s", govcli.FlagTitle, title),
+		fmt.Sprintf("--%s=%s", govcli.FlagDescription, description),
+		fmt.Sprintf("--%s=%s", govcli.FlagProposalType, proposalType),
+		fmt.Sprintf("--%s=%s", flags.FlagFrom, from),
+	}, commonArgs...)
+
+	args = append(args, extraArgs...)
+
+	return clitestutil.ExecTestCLICmd(clientCtx, govcli.NewCmdSubmitProposal(), args)
+}
+
+// MsgVote votes for a proposal
+func MsgVote(clientCtx cmclient.Context, from, id, vote string, extraArgs ...string) (testutil.BufferWriter, error) {
+	args := append([]string{
+		id,
+		vote,
+		fmt.Sprintf("--%s=%s", flags.FlagFrom, from),
+	}, commonArgs...)
+
+	args = append(args, extraArgs...)
+
+	return clitestutil.ExecTestCLICmd(clientCtx, govcli.NewCmdWeightedVote(), args)
+}
+
 func TestIntegrationTestSuite(t *testing.T) {
 	cfg := network.DefaultConfig()
-	cfg.ChainID = testutil.TestChainId
 	cfg.NumValidators = validatorNumber
 	suite.Run(t, NewIntegrationTestSuite(cfg))
 }

@@ -6,16 +6,15 @@ import (
 
 	"github.com/Moonyongjung/xpla.go/client"
 	"github.com/Moonyongjung/xpla.go/client/xplago_helper"
-	"github.com/Moonyongjung/xpla.go/util/testutil"
 	"github.com/gogo/protobuf/jsonpb"
 
-	"github.com/cosmos/cosmos-sdk/testutil/network"
+	"github.com/Moonyongjung/xpla.go/util/testutil/network"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 	"github.com/stretchr/testify/suite"
 )
 
 var (
-	validatorNumber = 2
+	validatorNumber = 1
 )
 
 type IntegrationTestSuite struct {
@@ -64,14 +63,13 @@ func (s *IntegrationTestSuite) TestModulesVersion() {
 		var queryModuleVersionsResponse upgradetypes.QueryModuleVersionsResponse
 		jsonpb.Unmarshal(strings.NewReader(res), &queryModuleVersionsResponse)
 
-		s.Require().Equal(16, len(queryModuleVersionsResponse.ModuleVersions))
+		s.Require().Equal(24, len(queryModuleVersionsResponse.ModuleVersions))
 	}
 	s.xplac = xplago_helper.ResetXplac(s.xplac)
 }
 
 func TestIntegrationTestSuite(t *testing.T) {
 	cfg := network.DefaultConfig()
-	cfg.ChainID = testutil.TestChainId
 	cfg.NumValidators = validatorNumber
 	suite.Run(t, NewIntegrationTestSuite(cfg))
 }

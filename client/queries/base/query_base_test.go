@@ -12,9 +12,9 @@ import (
 	"github.com/Moonyongjung/xpla.go/util/testutil"
 	"github.com/gogo/protobuf/jsonpb"
 
+	"github.com/Moonyongjung/xpla.go/util/testutil/network"
 	"github.com/cosmos/cosmos-sdk/client/grpc/tmservice"
 	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
-	"github.com/cosmos/cosmos-sdk/testutil/network"
 	"github.com/stretchr/testify/suite"
 	ctypes "github.com/tendermint/tendermint/rpc/core/types"
 )

@@ -9,14 +9,13 @@ import (
 	"github.com/Moonyongjung/xpla.go/client"
 	"github.com/Moonyongjung/xpla.go/client/xplago_helper"
 	"github.com/Moonyongjung/xpla.go/types"
-	"github.com/Moonyongjung/xpla.go/util/testutil"
 	"github.com/gogo/protobuf/jsonpb"
 
+	"github.com/Moonyongjung/xpla.go/util/testutil/network"
 	cmclient "github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	sdktestutil "github.com/cosmos/cosmos-sdk/testutil"
 	clitestutil "github.com/cosmos/cosmos-sdk/testutil/cli"
-	"github.com/cosmos/cosmos-sdk/testutil/network"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	disttypes "github.com/cosmos/cosmos-sdk/x/distribution/types"
 	stakingcli "github.com/cosmos/cosmos-sdk/x/staking/client/cli"
@@ -48,10 +47,9 @@ func (s *IntegrationTestSuite) SetupSuite() {
 	val := s.network.Validators[0]
 	val2 := s.network.Validators[1]
 
-	del, err := sdk.ParseCoinNormalized("1000stake")
-	s.Require().NoError(err)
+	del := sdk.NewCoin(types.XplaDenom, sdk.NewInt(1000))
 
-	_, err = msgDelegateExec(
+	_, err := msgDelegateExec(
 		val.ClientCtx,
 		val.Address,
 		val2.ValAddress,
@@ -114,7 +112,7 @@ func (s *IntegrationTestSuite) TestValidatorOutstandingRewards() {
 		var queryValidatorOutstandingRewardsResponse disttypes.QueryValidatorOutstandingRewardsResponse
 		jsonpb.Unmarshal(strings.NewReader(res), &queryValidatorOutstandingRewardsResponse)
 
-		s.Require().Equal("stake", queryValidatorOutstandingRewardsResponse.Rewards.Rewards[0].Denom)
+		s.Require().Equal(types.XplaDenom, queryValidatorOutstandingRewardsResponse.Rewards.Rewards[0].Denom)
 		s.Require().NotEqual("0", queryValidatorOutstandingRewardsResponse.Rewards.Rewards[0].Amount.String())
 	}
 	s.xplac = xplago_helper.ResetXplac(s.xplac)
@@ -139,7 +137,7 @@ func (s *IntegrationTestSuite) TestDistCommission() {
 		var queryValidatorCommissionResponse disttypes.QueryValidatorCommissionResponse
 		jsonpb.Unmarshal(strings.NewReader(res), &queryValidatorCommissionResponse)
 
-		s.Require().Equal("stake", queryValidatorCommissionResponse.Commission.Commission[0].Denom)
+		s.Require().Equal(types.XplaDenom, queryValidatorCommissionResponse.Commission.Commission[0].Denom)
 		s.Require().NotEqual("0", queryValidatorCommissionResponse.Commission.Commission[0].Amount.String())
 
 	}
@@ -226,7 +224,7 @@ func (s *IntegrationTestSuite) TestCommunityPool() {
 		var queryCommunityPoolResponse disttypes.QueryCommunityPoolResponse
 		jsonpb.Unmarshal(strings.NewReader(res), &queryCommunityPoolResponse)
 
-		s.Require().Equal("stake", queryCommunityPoolResponse.Pool[0].Denom)
+		s.Require().Equal(types.XplaDenom, queryCommunityPoolResponse.Pool[0].Denom)
 		s.Require().NotEqual("0", queryCommunityPoolResponse.Pool[0].Amount.String())
 	}
 	s.xplac = xplago_helper.ResetXplac(s.xplac)
@@ -240,7 +238,7 @@ func msgDelegateExec(clientCtx cmclient.Context, delegator, validator, amount fm
 		fmt.Sprintf("--%s=%d", flags.FlagGas, 300000),
 		fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
 		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastBlock),
-		fmt.Sprintf("--%s=%s", flags.FlagFees, sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(10))).String()),
+		fmt.Sprintf("--%s=%s", flags.FlagFees, sdk.NewCoins(sdk.NewCoin(types.XplaDenom, sdk.NewInt(10))).String()),
 	}
 
 	args = append(args, extraArgs...)
@@ -249,7 +247,6 @@ func msgDelegateExec(clientCtx cmclient.Context, delegator, validator, amount fm
 }
 func TestIntegrationTestSuite(t *testing.T) {
 	cfg := network.DefaultConfig()
-	cfg.ChainID = testutil.TestChainId
 	cfg.NumValidators = validatorNumber
 	suite.Run(t, NewIntegrationTestSuite(cfg))
 }

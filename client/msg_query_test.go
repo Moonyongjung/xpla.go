@@ -2,10 +2,7 @@ package client_test
 
 import (
 	"fmt"
-	"math/rand"
-	"testing"
 
-	"github.com/Moonyongjung/xpla.go/client"
 	"github.com/Moonyongjung/xpla.go/client/xplago_helper"
 	mauth "github.com/Moonyongjung/xpla.go/core/auth"
 	mauthz "github.com/Moonyongjung/xpla.go/core/authz"
@@ -25,15 +22,14 @@ import (
 	mupgrade "github.com/Moonyongjung/xpla.go/core/upgrade"
 	mwasm "github.com/Moonyongjung/xpla.go/core/wasm"
 	"github.com/Moonyongjung/xpla.go/types"
-	"github.com/Moonyongjung/xpla.go/util/testutil"
 
-	"github.com/cosmos/cosmos-sdk/testutil/network"
+	cmclient "github.com/cosmos/cosmos-sdk/client"
+	"github.com/cosmos/cosmos-sdk/client/flags"
+	sdktestutil "github.com/cosmos/cosmos-sdk/testutil"
+	clitestutil "github.com/cosmos/cosmos-sdk/testutil/cli"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 	govcli "github.com/cosmos/cosmos-sdk/x/gov/client/cli"
-	govtestutil "github.com/cosmos/cosmos-sdk/x/gov/client/testutil"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
-	"github.com/stretchr/testify/suite"
 )
 
 var (
@@ -48,48 +44,7 @@ var (
 	testWasmFilePath       = "../util/testutil/test_files/cw721_metadata_onchain.wasm"
 )
 
-type TestMsgQuery struct {
-	suite.Suite
-
-	xplac      *client.XplaClient
-	accounts   []simtypes.Account
-	validators []sdk.ValAddress
-	testTxHash string
-	apis       []string
-
-	cfg     network.Config
-	network *network.Network
-}
-
-func NewTestMsgQuery(cfg network.Config) *TestMsgQuery {
-	return &TestMsgQuery{cfg: cfg}
-}
-
-func (s *TestMsgQuery) SetupSuite() {
-	s.xplac = client.NewXplaClient(testutil.TestChainId)
-
-	src := rand.NewSource(1)
-	r := rand.New(src)
-	s.accounts = testutil.RandomAccounts(r, 5)
-	for _, acc := range s.accounts {
-		s.validators = append(s.validators, sdk.ValAddress(acc.Address))
-	}
-	s.testTxHash = "B6BBBB649F19E8970EF274C0083FE945FD38AD8C524D68BB3FE3A20D72DF03C4"
-
-	s.network = network.New(s.T(), s.cfg)
-	s.Require().NoError(s.network.WaitForNextBlock())
-
-	s.apis = []string{
-		s.network.Validators[0].APIAddress,
-		s.network.Validators[0].AppConfig.GRPC.Address,
-	}
-}
-func (s *TestMsgQuery) TearDownSuite() {
-	s.T().Log("tearing down integration test suite")
-	s.network.Cleanup()
-}
-
-func (s *TestMsgQuery) TestAuth() {
+func (s *ClientTestSuite) TestAuth() {
 	// auth params
 	s.xplac.AuthParams()
 
@@ -149,7 +104,7 @@ func (s *TestMsgQuery) TestAuth() {
 	s.Require().Equal(mauth.AuthQueryTxMsgType, s.xplac.GetMsgType())
 }
 
-func (s *TestMsgQuery) TestAuthz() {
+func (s *ClientTestSuite) TestAuthz() {
 	// query authz grants
 	queryAuthzGrantMsg := types.QueryAuthzGrantMsg{
 		Grantee: s.accounts[0].Address.String(),
@@ -191,7 +146,7 @@ func (s *TestMsgQuery) TestAuthz() {
 	s.Require().Equal(mauthz.AuthzQueryGrantsByGranterMsgType, s.xplac.GetMsgType())
 }
 
-func (s *TestMsgQuery) TestBank() {
+func (s *ClientTestSuite) TestBank() {
 	// bank all balances
 	bankBalancesMsg := types.BankBalancesMsg{
 		Address: s.accounts[0].Address.String(),
@@ -266,7 +221,7 @@ func (s *TestMsgQuery) TestBank() {
 	s.Require().Equal(mbank.BankTotalSupplyOfMsgType, s.xplac.GetMsgType())
 }
 
-func (s *TestMsgQuery) TestBase() {
+func (s *ClientTestSuite) TestBase() {
 	// node info
 	s.xplac.NodeInfo()
 
@@ -334,7 +289,8 @@ func (s *TestMsgQuery) TestBase() {
 	s.Require().Equal(mbase.BaseValidatorSetByHeightMsgType, s.xplac.GetMsgType())
 }
 
-func (s *TestMsgQuery) TestDistribution() {
+func (s *ClientTestSuite) TestDistribution() {
+	val := s.network.Validators[0].ValAddress.String()
 	// query dist params
 	s.xplac.DistributionParams()
 
@@ -347,7 +303,7 @@ func (s *TestMsgQuery) TestDistribution() {
 
 	// validator outstanding rewards
 	validatorOutstandingRewardsMsg := types.ValidatorOutstandingRewardsMsg{
-		ValidatorAddr: s.validators[0].String(),
+		ValidatorAddr: val,
 	}
 	s.xplac.ValidatorOutstandingRewards(validatorOutstandingRewardsMsg)
 
@@ -360,7 +316,7 @@ func (s *TestMsgQuery) TestDistribution() {
 
 	// dist commission
 	queryDistCommissionMsg := types.QueryDistCommissionMsg{
-		ValidatorAddr: s.validators[0].String(),
+		ValidatorAddr: val,
 	}
 	s.xplac.DistCommission(queryDistCommissionMsg)
 
@@ -373,7 +329,7 @@ func (s *TestMsgQuery) TestDistribution() {
 
 	// dist slashes
 	queryDistSlashesMsg := types.QueryDistSlashesMsg{
-		ValidatorAddr: s.validators[0].String(),
+		ValidatorAddr: val,
 	}
 	s.xplac.DistSlashes(queryDistSlashesMsg)
 
@@ -387,7 +343,7 @@ func (s *TestMsgQuery) TestDistribution() {
 	// dist rewards
 	queryDistRewardsMsg := types.QueryDistRewardsMsg{
 		DelegatorAddr: s.accounts[0].Address.String(),
-		ValidatorAddr: s.validators[0].String(),
+		ValidatorAddr: val,
 	}
 	s.xplac.DistRewards(queryDistRewardsMsg)
 
@@ -422,7 +378,7 @@ func (s *TestMsgQuery) TestDistribution() {
 	s.Require().Equal(mdist.DistributionQueryCommunityPoolMsgType, s.xplac.GetMsgType())
 }
 
-func (s *TestMsgQuery) TestEvidence() {
+func (s *ClientTestSuite) TestEvidence() {
 	// all evidence
 	s.xplac.QueryEvidence()
 
@@ -447,7 +403,7 @@ func (s *TestMsgQuery) TestEvidence() {
 	s.Require().Equal(mevidence.EvidenceQueryMsgType, s.xplac.GetMsgType())
 }
 
-func (s *TestMsgQuery) TestEvm() {
+func (s *ClientTestSuite) TestEvm() {
 	// call contract
 	callSolContractMsg := types.CallSolContractMsg{
 		ContractAddress:      testSolContractAddress,
@@ -736,7 +692,7 @@ func (s *TestMsgQuery) TestEvm() {
 	s.Require().Equal(mevm.EvmEthCoinbaseMsgType, s.xplac.GetMsgType())
 }
 
-func (s *TestMsgQuery) TestFeegrant() {
+func (s *ClientTestSuite) TestFeegrant() {
 	// feegrant
 	queryFeeGrantMsg := types.QueryFeeGrantMsg{
 		Grantee: s.accounts[0].Address.String(),
@@ -778,16 +734,16 @@ func (s *TestMsgQuery) TestFeegrant() {
 	s.Require().Equal(mfeegrant.FeegrantQueryGrantsByGranterMsgType, s.xplac.GetMsgType())
 }
 
-func (s *TestMsgQuery) TestGov() {
+func (s *ClientTestSuite) TestGov() {
 	val := s.network.Validators[0]
 
-	_, err := govtestutil.MsgSubmitProposal(val.ClientCtx, val.Address.String(),
+	_, err := MsgSubmitProposal(val.ClientCtx, val.Address.String(),
 		"Text Proposal 1", "Where is the title!?", govtypes.ProposalTypeText,
 		fmt.Sprintf("--%s=%s", govcli.FlagDeposit, sdk.NewCoin(s.cfg.BondDenom, govtypes.DefaultMinDepositTokens).String()))
 	s.Require().NoError(err)
 	s.Require().NoError(s.network.WaitForNextBlock())
 
-	_, err = govtestutil.MsgVote(val.ClientCtx, val.Address.String(), "1", "yes=0.6,no=0.3,abstain=0.05,no_with_veto=0.05")
+	_, err = MsgVote(val.ClientCtx, val.Address.String(), "1", "yes=0.6,no=0.3,abstain=0.05,no_with_veto=0.05")
 	s.Require().NoError(err)
 	s.Require().NoError(s.network.WaitForNextBlock())
 
@@ -955,7 +911,7 @@ func (s *TestMsgQuery) TestGov() {
 	s.Require().Equal(mgov.GovQueryProposerMsgType, s.xplac.GetMsgType())
 }
 
-func (s *TestMsgQuery) TestMint() {
+func (s *ClientTestSuite) TestMint() {
 	// mint params
 	s.xplac.MintParams()
 
@@ -987,7 +943,7 @@ func (s *TestMsgQuery) TestMint() {
 	s.Require().Equal(mmint.MintQueryAnnualProvisionsMsgType, s.xplac.GetMsgType())
 }
 
-func (s *TestMsgQuery) TestIBC() {
+func (s *ClientTestSuite) TestIBC() {
 	// client states
 	s.xplac.IbcClientStates()
 
@@ -1335,7 +1291,7 @@ func (s *TestMsgQuery) TestIBC() {
 	s.Require().Equal(mibc.IbcTransferParamsMsgType, s.xplac.GetMsgType())
 }
 
-func (s *TestMsgQuery) TestParams() {
+func (s *ClientTestSuite) TestParams() {
 	// raw params by subspace
 	subspaceMsg := types.SubspaceMsg{
 		Subspace: "staking",
@@ -1351,7 +1307,7 @@ func (s *TestMsgQuery) TestParams() {
 	s.Require().Equal(mparams.ParamsQuerySubpsaceMsgType, s.xplac.GetMsgType())
 }
 
-func (s *TestMsgQuery) TestReward() {
+func (s *ClientTestSuite) TestReward() {
 	// reward params
 	s.xplac.RewardParams()
 
@@ -1373,7 +1329,7 @@ func (s *TestMsgQuery) TestReward() {
 	s.Require().Equal(mreward.RewardQueryRewardPoolMsgType, s.xplac.GetMsgType())
 }
 
-func (s *TestMsgQuery) TestSlashing() {
+func (s *ClientTestSuite) TestSlashing() {
 	// slashing params
 	s.xplac.SlashingParams()
 
@@ -1408,7 +1364,9 @@ func (s *TestMsgQuery) TestSlashing() {
 	s.Require().Equal(mslashing.SlashingQuerySigningInfoMsgType, s.xplac.GetMsgType())
 }
 
-func (s *TestMsgQuery) TestStaking() {
+func (s *ClientTestSuite) TestStaking() {
+	val := s.network.Validators[0].ValAddress.String()
+	val2 := s.network.Validators[1].ValAddress.String()
 	// query validators
 	s.xplac.QueryValidators()
 
@@ -1421,7 +1379,7 @@ func (s *TestMsgQuery) TestStaking() {
 
 	// query validator
 	queryValidatorMsg := types.QueryValidatorMsg{
-		ValidatorAddr: s.validators[0].String(),
+		ValidatorAddr: val,
 	}
 
 	s.xplac.QueryValidators(queryValidatorMsg)
@@ -1436,7 +1394,7 @@ func (s *TestMsgQuery) TestStaking() {
 	// delegation
 	queryDelegationMsg := types.QueryDelegationMsg{
 		DelegatorAddr: s.accounts[0].Address.String(),
-		ValidatorAddr: s.validators[0].String(),
+		ValidatorAddr: val,
 	}
 
 	s.xplac.QueryDelegation(queryDelegationMsg)
@@ -1464,7 +1422,7 @@ func (s *TestMsgQuery) TestStaking() {
 
 	// delegations to
 	queryDelegationMsg = types.QueryDelegationMsg{
-		ValidatorAddr: s.validators[0].String(),
+		ValidatorAddr: val,
 	}
 
 	s.xplac.QueryDelegation(queryDelegationMsg)
@@ -1479,7 +1437,7 @@ func (s *TestMsgQuery) TestStaking() {
 	// unbonding delegation
 	queryUnbondingDelegationMsg := types.QueryUnbondingDelegationMsg{
 		DelegatorAddr: s.accounts[0].Address.String(),
-		ValidatorAddr: s.validators[0].String(),
+		ValidatorAddr: val,
 	}
 
 	s.xplac.QueryUnbondingDelegation(queryUnbondingDelegationMsg)
@@ -1507,7 +1465,7 @@ func (s *TestMsgQuery) TestStaking() {
 
 	// unbonding delegations from
 	queryUnbondingDelegationMsg = types.QueryUnbondingDelegationMsg{
-		ValidatorAddr: s.validators[0].String(),
+		ValidatorAddr: val,
 	}
 
 	s.xplac.QueryUnbondingDelegation(queryUnbondingDelegationMsg)
@@ -1522,8 +1480,8 @@ func (s *TestMsgQuery) TestStaking() {
 	// redelegation
 	queryRedelegationMsg := types.QueryRedelegationMsg{
 		DelegatorAddr:    s.accounts[0].Address.String(),
-		SrcValidatorAddr: s.validators[0].String(),
-		DstValidatorAddr: s.validators[1].String(),
+		SrcValidatorAddr: val,
+		DstValidatorAddr: val2,
 	}
 
 	s.xplac.QueryRedelegation(queryRedelegationMsg)
@@ -1551,7 +1509,7 @@ func (s *TestMsgQuery) TestStaking() {
 
 	// redelegations from
 	queryRedelegationMsg = types.QueryRedelegationMsg{
-		SrcValidatorAddr: s.validators[0].String(),
+		SrcValidatorAddr: val,
 	}
 
 	s.xplac.QueryRedelegation(queryRedelegationMsg)
@@ -1598,7 +1556,7 @@ func (s *TestMsgQuery) TestStaking() {
 	s.Require().Equal(mstaking.StakingQueryStakingParamsMsgType, s.xplac.GetMsgType())
 }
 
-func (s *TestMsgQuery) TestUpgrade() {
+func (s *ClientTestSuite) TestUpgrade() {
 	// upgrade applied
 	appliedMsg := types.AppliedMsg{
 		UpgradeName: "upgrade name",
@@ -1646,7 +1604,7 @@ func (s *TestMsgQuery) TestUpgrade() {
 	s.Require().Equal(mupgrade.UpgradePlanMsgType, s.xplac.GetMsgType())
 }
 
-func (s *TestMsgQuery) TestWasm() {
+func (s *ClientTestSuite) TestWasm() {
 	// call contract
 	queryMsg := types.QueryMsg{
 		ContractAddress: testCWContractAddress,
@@ -1771,8 +1729,35 @@ func (s *TestMsgQuery) TestWasm() {
 	s.Require().Equal(mwasm.WasmLibwasmvmVersionMsgType, s.xplac.GetMsgType())
 }
 
-func TestMsgQuerySuite(t *testing.T) {
-	cfg := network.DefaultConfig()
-	cfg.ChainID = testutil.TestChainId
-	suite.Run(t, NewTestMsgQuery(cfg))
+var commonArgs = []string{
+	fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
+	fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastBlock),
+	fmt.Sprintf("--%s=%s", flags.FlagFees, sdk.NewCoins(sdk.NewCoin(types.XplaDenom, sdk.NewInt(10))).String()),
+}
+
+// MsgSubmitProposal creates a tx for submit proposal
+func MsgSubmitProposal(clientCtx cmclient.Context, from, title, description, proposalType string, extraArgs ...string) (sdktestutil.BufferWriter, error) {
+	args := append([]string{
+		fmt.Sprintf("--%s=%s", govcli.FlagTitle, title),
+		fmt.Sprintf("--%s=%s", govcli.FlagDescription, description),
+		fmt.Sprintf("--%s=%s", govcli.FlagProposalType, proposalType),
+		fmt.Sprintf("--%s=%s", flags.FlagFrom, from),
+	}, commonArgs...)
+
+	args = append(args, extraArgs...)
+
+	return clitestutil.ExecTestCLICmd(clientCtx, govcli.NewCmdSubmitProposal(), args)
+}
+
+// MsgVote votes for a proposal
+func MsgVote(clientCtx cmclient.Context, from, id, vote string, extraArgs ...string) (sdktestutil.BufferWriter, error) {
+	args := append([]string{
+		id,
+		vote,
+		fmt.Sprintf("--%s=%s", flags.FlagFrom, from),
+	}, commonArgs...)
+
+	args = append(args, extraArgs...)
+
+	return clitestutil.ExecTestCLICmd(clientCtx, govcli.NewCmdWeightedVote(), args)
 }

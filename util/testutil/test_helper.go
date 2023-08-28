@@ -4,30 +4,23 @@ import (
 	"bytes"
 	"encoding/hex"
 	"encoding/json"
-	"fmt"
 	"math/rand"
 	"strconv"
 	"time"
 
-	"github.com/Moonyongjung/xpla.go/types"
 	xgoerrors "github.com/Moonyongjung/xpla.go/types/errors"
 	"github.com/Moonyongjung/xpla.go/util"
 
-	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/crypto/hd"
 	"github.com/cosmos/cosmos-sdk/crypto/keyring"
 	"github.com/cosmos/cosmos-sdk/crypto/keys/ed25519"
 	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
-	servertypes "github.com/cosmos/cosmos-sdk/server/types"
-	storetypes "github.com/cosmos/cosmos-sdk/store/types"
-	"github.com/cosmos/cosmos-sdk/testutil/network"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/types/simulation"
 	"github.com/cosmos/cosmos-sdk/types/tx/signing"
 	authsign "github.com/cosmos/cosmos-sdk/x/auth/signing"
-	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 	minttypes "github.com/cosmos/cosmos-sdk/x/mint/types"
 	simutil "github.com/cosmos/cosmos-sdk/x/simulation"
@@ -38,12 +31,11 @@ import (
 	dbm "github.com/tendermint/tm-db"
 	xapp "github.com/xpladev/xpla/app"
 	"github.com/xpladev/xpla/app/helpers"
-	"github.com/xpladev/xpla/app/params"
 )
 
 const (
 	DefaultTestGenTxGas = 1000000
-	TestChainId         = "cude_47-5"
+	TestChainId         = "cube_47-5"
 )
 
 func Setup(isCheckTx bool, invCheckPeriod uint) *xapp.XplaApp {
@@ -323,48 +315,6 @@ func NewPubKeyFromHex(pk string) (res cryptotypes.PubKey) {
 		panic(errors.Wrap(errors.ErrInvalidPubKey, "invalid pubkey size"))
 	}
 	return &ed25519.PubKey{Key: pkBytes}
-}
-
-// DefaultConfig returns a sane default configuration suitable for nearly all
-// testing requirements.
-func DefaultConfig() network.Config {
-	encCfg := util.MakeEncodingConfig()
-
-	return network.Config{
-		Codec:             encCfg.Marshaler,
-		TxConfig:          encCfg.TxConfig,
-		LegacyAmino:       encCfg.Amino,
-		InterfaceRegistry: encCfg.InterfaceRegistry,
-		AccountRetriever:  authtypes.AccountRetriever{},
-		AppConstructor:    NewAppConstructor(encCfg),
-		GenesisState:      xapp.ModuleBasics.DefaultGenesis(encCfg.Marshaler),
-		TimeoutCommit:     2 * time.Second,
-		ChainID:           TestChainId,
-		NumValidators:     4,
-		BondDenom:         types.XplaDenom,
-		MinGasPrices:      fmt.Sprintf("0.000006%s", types.XplaDenom),
-		AccountTokens:     sdk.TokensFromConsensusPower(1000, sdk.DefaultPowerReduction),
-		StakingTokens:     sdk.TokensFromConsensusPower(500, sdk.DefaultPowerReduction),
-		BondedTokens:      sdk.TokensFromConsensusPower(100, sdk.DefaultPowerReduction),
-		PruningStrategy:   storetypes.PruningOptionNothing,
-		CleanupDir:        true,
-		// SigningAlgo:       string(hd.EthSecp256k1Type),
-		SigningAlgo:    string(hd.Secp256k1Type),
-		KeyringOptions: []keyring.Option{},
-	}
-}
-
-// NewAppConstructor returns a new AppConstructor
-func NewAppConstructor(encodingCfg params.EncodingConfig) network.AppConstructor {
-	return func(val network.Validator) servertypes.Application {
-		return xapp.NewXplaApp(
-			val.Ctx.Logger, dbm.NewMemDB(), nil, true, make(map[int64]bool), val.Ctx.Config.RootDir, 0,
-			encodingCfg,
-			helpers.EmptyAppOptions{},
-			baseapp.SetPruning(storetypes.NewPruningOptionsFromString(val.AppConfig.Pruning)),
-			baseapp.SetMinGasPrices(val.AppConfig.MinGasPrices),
-		)
-	}
 }
 
 func NewTestMnemonic(entropy []byte) (string, error) {

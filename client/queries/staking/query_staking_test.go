@@ -8,17 +8,15 @@ import (
 	"github.com/Moonyongjung/xpla.go/client"
 	"github.com/Moonyongjung/xpla.go/client/xplago_helper"
 	"github.com/Moonyongjung/xpla.go/types"
-	"github.com/Moonyongjung/xpla.go/util/testutil"
 	"github.com/gogo/protobuf/jsonpb"
 
+	"github.com/Moonyongjung/xpla.go/util/testutil/network"
 	cmclient "github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	sdktestutil "github.com/cosmos/cosmos-sdk/testutil"
 	clitestutil "github.com/cosmos/cosmos-sdk/testutil/cli"
-	"github.com/cosmos/cosmos-sdk/testutil/network"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	stakingcli "github.com/cosmos/cosmos-sdk/x/staking/client/cli"
-	stakingtestutil "github.com/cosmos/cosmos-sdk/x/staking/client/testutil"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	"github.com/stretchr/testify/suite"
 )
@@ -48,13 +46,13 @@ func (s *IntegrationTestSuite) SetupSuite() {
 	val := s.network.Validators[0]
 	val2 := s.network.Validators[1]
 
-	del, err := sdk.ParseCoinNormalized("1000stake")
+	del, err := sdk.ParseCoinNormalized("1000axpla")
 	s.Require().NoError(err)
 
-	unbond, err := sdk.ParseCoinNormalized("10stake")
+	unbond, err := sdk.ParseCoinNormalized("10axpla")
 	s.Require().NoError(err)
 
-	_, err = msgDelegateExec(
+	_, err = MsgDelegateExec(
 		val.ClientCtx,
 		val.Address,
 		val2.ValAddress,
@@ -64,7 +62,7 @@ func (s *IntegrationTestSuite) SetupSuite() {
 	s.Require().NoError(s.network.WaitForNextBlock())
 
 	// redelegate
-	_, err = stakingtestutil.MsgRedelegateExec(
+	_, err = MsgRedelegateExec(
 		val.ClientCtx,
 		val.Address,
 		val.ValAddress,
@@ -76,7 +74,7 @@ func (s *IntegrationTestSuite) SetupSuite() {
 	s.Require().NoError(s.network.WaitForNextBlock())
 
 	// unbonding
-	_, err = stakingtestutil.MsgUnbondExec(val.ClientCtx, val.Address, val.ValAddress, unbond)
+	_, err = MsgUnbondExec(val.ClientCtx, val.Address, val.ValAddress, unbond)
 	s.Require().NoError(err)
 	s.Require().NoError(s.network.WaitForNextBlock())
 
@@ -506,7 +504,7 @@ func (s *IntegrationTestSuite) TestParams() {
 		var queryParamsResponse stakingtypes.QueryParamsResponse
 		jsonpb.Unmarshal(strings.NewReader(res), &queryParamsResponse)
 
-		s.Require().Equal("stake", queryParamsResponse.Params.BondDenom)
+		s.Require().Equal("axpla", queryParamsResponse.Params.BondDenom)
 		s.Require().Equal(uint32(100), queryParamsResponse.Params.MaxValidators)
 		s.Require().Equal(uint32(7), queryParamsResponse.Params.MaxEntries)
 		s.Require().Equal(uint32(10000), queryParamsResponse.Params.HistoricalEntries)
@@ -515,24 +513,60 @@ func (s *IntegrationTestSuite) TestParams() {
 	s.xplac = xplago_helper.ResetXplac(s.xplac)
 }
 
-func msgDelegateExec(clientCtx cmclient.Context, delegator, validator, amount fmt.Stringer, extraArgs ...string) (sdktestutil.BufferWriter, error) {
+var commonArgs = []string{
+	fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
+	fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastBlock),
+	fmt.Sprintf("--%s=%s", flags.FlagFees, sdk.NewCoins(sdk.NewCoin(types.XplaDenom, sdk.NewInt(10))).String()),
+}
+
+// MsgRedelegateExec creates a redelegate message.
+func MsgRedelegateExec(clientCtx cmclient.Context, from, src, dst, amount fmt.Stringer,
+	extraArgs ...string,
+) (sdktestutil.BufferWriter, error) {
+	args := []string{
+		src.String(),
+		dst.String(),
+		amount.String(),
+		fmt.Sprintf("--%s=%s", flags.FlagFrom, from.String()),
+		fmt.Sprintf("--%s=%d", flags.FlagGas, 300000),
+	}
+	args = append(args, extraArgs...)
+
+	args = append(args, commonArgs...)
+	return clitestutil.ExecTestCLICmd(clientCtx, stakingcli.NewRedelegateCmd(), args)
+}
+
+// MsgUnbondExec creates a unbond message.
+func MsgUnbondExec(clientCtx cmclient.Context, from fmt.Stringer, valAddress,
+	amount fmt.Stringer, extraArgs ...string,
+) (sdktestutil.BufferWriter, error) {
+	args := []string{
+		valAddress.String(),
+		amount.String(),
+		fmt.Sprintf("--%s=%s", flags.FlagFrom, from.String()),
+		fmt.Sprintf("--%s=%d", flags.FlagGas, 300000),
+	}
+
+	args = append(args, commonArgs...)
+	args = append(args, extraArgs...)
+	return clitestutil.ExecTestCLICmd(clientCtx, stakingcli.NewUnbondCmd(), args)
+}
+
+func MsgDelegateExec(clientCtx cmclient.Context, delegator, validator, amount fmt.Stringer, extraArgs ...string) (sdktestutil.BufferWriter, error) {
 	args := []string{
 		validator.String(),
 		amount.String(),
 		fmt.Sprintf("--%s=%s", flags.FlagFrom, delegator.String()),
 		fmt.Sprintf("--%s=%d", flags.FlagGas, 300000),
-		fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
-		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastBlock),
-		fmt.Sprintf("--%s=%s", flags.FlagFees, sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(10))).String()),
 	}
 
 	args = append(args, extraArgs...)
+	args = append(args, commonArgs...)
 
 	return clitestutil.ExecTestCLICmd(clientCtx, stakingcli.NewDelegateCmd(), args)
 }
 func TestIntegrationTestSuite(t *testing.T) {
 	cfg := network.DefaultConfig()
-	cfg.ChainID = testutil.TestChainId
 	cfg.NumValidators = validatorNumber
 	suite.Run(t, NewIntegrationTestSuite(cfg))
 }
