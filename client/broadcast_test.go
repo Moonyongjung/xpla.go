@@ -99,3 +99,50 @@ func (s *ClientTestSuite) TestBroadcastMode() {
 	}
 	s.xplac = xplago_helper.ResetXplac(s.xplac)
 }
+
+func (s *ClientTestSuite) TestBroadcastEVM() {
+	from := s.accounts[0]
+	to := s.accounts[1]
+	s.xplac.WithPrivateKey(s.accounts[0].PrivKey).
+		WithURL(s.apis[0]).
+		WithEvmRpc("http://" + s.network.Validators[0].AppConfig.JSONRPC.Address)
+
+	// check before send
+	bankBalancesMsg := types.BankBalancesMsg{
+		Address: to.Address.String(),
+	}
+	beforeToRes, err := s.xplac.BankBalances(bankBalancesMsg).Query()
+	s.Require().NoError(err)
+
+	var beforeQueryAllBalancesResponse banktypes.QueryAllBalancesResponse
+	jsonpb.Unmarshal(strings.NewReader(beforeToRes), &beforeQueryAllBalancesResponse)
+
+	// broadcast transaction - evm send coin
+	sendCoinMsg := types.SendCoinMsg{
+		FromAddress: from.PubKey.Address().String(),
+		ToAddress:   to.PubKey.Address().String(),
+		Amount:      testSendAmount,
+	}
+	txbytes, err := s.xplac.EvmSendCoin(sendCoinMsg).CreateAndSignTx()
+	s.Require().NoError(err)
+
+	_, err = s.xplac.Broadcast(txbytes)
+	s.Require().NoError(err)
+	s.Require().NoError(s.network.WaitForNextBlock())
+
+	// check after send
+	bankBalancesMsg = types.BankBalancesMsg{
+		Address: to.Address.String(),
+	}
+	afterToRes, err := s.xplac.BankBalances(bankBalancesMsg).Query()
+	s.Require().NoError(err)
+
+	var afterQueryAllBalancesResponse banktypes.QueryAllBalancesResponse
+	jsonpb.Unmarshal(strings.NewReader(afterToRes), &afterQueryAllBalancesResponse)
+
+	s.Require().Equal(
+		testSendAmount,
+		afterQueryAllBalancesResponse.Balances[0].Amount.Sub(beforeQueryAllBalancesResponse.Balances[0].Amount).String(),
+	)
+	s.xplac = xplago_helper.ResetXplac(s.xplac)
+}
