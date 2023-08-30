@@ -30,8 +30,9 @@ type TestSuite struct {
 }
 
 const (
-	unsignedTxPath = "../util/testutil/test_files/unsignedTx.json"
-	signedTxPath   = "../util/testutil/test_files/signedTx.json"
+	unsignedTxPath  = "../util/testutil/test_files/unsignedTx.json"
+	signedTxPath    = "../util/testutil/test_files/signedTx.json"
+	signedEVMTxPath = "../util/testutil/test_files/signedEVMTx.json"
 )
 
 func (suite *TestSuite) SetupTest() {
@@ -195,6 +196,33 @@ func (suite *TestSuite) TestSimulateCreateAndSignTx() {
 	newTxbytes, err := xplac.EncodingConfig.TxConfig.TxEncoder()(newTx)
 	suite.Require().NoError(err)
 	suite.Require().Equal(txbytes, newTxbytes)
+}
+
+func (suite *TestSuite) TestSimulateEVMCreateAndSignTx() {
+	s := rand.NewSource(1)
+	r := rand.New(s)
+	accounts := suite.getTestingAccounts(r, 4)
+	from := accounts[0]
+
+	testABIJsonFilePath := "../util/testutil/test_files/abi.json"
+	testBytecodeJsonFilePath := "../util/testutil/test_files/bytecode.json"
+
+	xplac := NewXplaClient(testutil.TestChainId)
+	xplac.WithPrivateKey(from.PrivKey)
+
+	// deploy
+	deploySolContractMsg := types.DeploySolContractMsg{
+		ABIJsonFilePath:      testABIJsonFilePath,
+		BytecodeJsonFilePath: testBytecodeJsonFilePath,
+		Args:                 nil,
+	}
+	txbytes, err := xplac.DeploySolidityContract(deploySolContractMsg).CreateAndSignTx()
+	suite.Require().NoError(err)
+
+	file, err := os.ReadFile(signedEVMTxPath)
+	suite.Require().NoError(err)
+
+	suite.Require().Equal(txbytes, file)
 }
 
 func (suite *TestSuite) TestSimulateEncodeAndDecodeTx() {

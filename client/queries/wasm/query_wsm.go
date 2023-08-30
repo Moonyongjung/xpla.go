@@ -187,7 +187,7 @@ func queryByLcdWasm(i queries.IXplaClient) (string, error) {
 
 	// Wasm download
 	case i.Ixplac.GetMsgType() == mwasm.WasmDownloadMsgType:
-		return "", util.LogErr(errors.ErrNotSupport, "unsupported download wasm file by using LCD. query delegations of a delegator")
+		return "", util.LogErr(errors.ErrNotSupport, "unsupported download wasm file by using LCD")
 
 	// Wasm code info
 	case i.Ixplac.GetMsgType() == mwasm.WasmCodeInfoMsgType:
