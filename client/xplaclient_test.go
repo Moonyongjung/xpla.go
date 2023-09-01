@@ -7,7 +7,7 @@ import (
 	"testing"
 
 	"github.com/Moonyongjung/xpla.go/client"
-	"github.com/Moonyongjung/xpla.go/client/xplago_helper"
+	"github.com/Moonyongjung/xpla.go/client/client_helper"
 	mbank "github.com/Moonyongjung/xpla.go/core/bank"
 	"github.com/Moonyongjung/xpla.go/types"
 	"github.com/Moonyongjung/xpla.go/util"
@@ -110,8 +110,8 @@ func TestNewXplaClient(t *testing.T) {
 }
 
 var (
-	validatorNumberForBroadcast = 2
-	testSendAmount              = "1000"
+	validatorNumber = 2
+	testSendAmount  = "1000"
 )
 
 type ClientTestSuite struct {
@@ -208,7 +208,7 @@ func (s *ClientTestSuite) SetupSuite() {
 	s.Require().NoError(err)
 	s.Require().NoError(s.network.WaitForNextBlock())
 
-	s.xplac = xplago_helper.NewTestXplaClient()
+	s.xplac = client_helper.NewTestXplaClient()
 
 	s.apis = []string{
 		s.network.Validators[0].APIAddress,
@@ -223,6 +223,6 @@ func (s *ClientTestSuite) TearDownSuite() {
 
 func TestClientTestSuite(t *testing.T) {
 	cfg := network.DefaultConfig()
-	cfg.NumValidators = validatorNumberForBroadcast
+	cfg.NumValidators = validatorNumber
 	suite.Run(t, NewClientTestSuite(cfg))
 }
