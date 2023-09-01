@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"github.com/Moonyongjung/xpla.go/client"
-	"github.com/Moonyongjung/xpla.go/client/xplago_helper"
+	"github.com/Moonyongjung/xpla.go/client/client_helper"
 	"github.com/Moonyongjung/xpla.go/types"
 	"github.com/gogo/protobuf/jsonpb"
 
@@ -61,7 +61,7 @@ func (s *IntegrationTestSuite) SetupSuite() {
 	s.Require().NoError(err)
 	s.Require().NoError(s.network.WaitForNextBlock())
 
-	s.xplac = xplago_helper.NewTestXplaClient()
+	s.xplac = client_helper.NewTestXplaClient()
 	s.apis = []string{
 		s.network.Validators[0].APIAddress,
 		s.network.Validators[0].AppConfig.GRPC.Address,
@@ -118,7 +118,7 @@ func (s *IntegrationTestSuite) TestAuthzGrant() {
 
 		s.Require().Equal(1, len(queryGranteeGrantsResponse.Grants))
 	}
-	s.xplac = xplago_helper.ResetXplac(s.xplac)
+	s.xplac = client_helper.ResetXplac(s.xplac)
 }
 
 func ExecGrant(val *network.Validator, args []string) (testutil.BufferWriter, error) {

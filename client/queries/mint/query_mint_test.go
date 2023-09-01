@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/Moonyongjung/xpla.go/client"
-	"github.com/Moonyongjung/xpla.go/client/xplago_helper"
+	"github.com/Moonyongjung/xpla.go/client/client_helper"
 	"github.com/Moonyongjung/xpla.go/types"
 	"github.com/gogo/protobuf/jsonpb"
 
@@ -36,7 +36,7 @@ func (s *IntegrationTestSuite) SetupSuite() {
 	s.network = network.New(s.T(), s.cfg)
 	s.Require().NoError(s.network.WaitForNextBlock())
 
-	s.xplac = xplago_helper.NewTestXplaClient()
+	s.xplac = client_helper.NewTestXplaClient()
 	s.apis = []string{
 		s.network.Validators[0].APIAddress,
 		s.network.Validators[0].AppConfig.GRPC.Address,
@@ -69,7 +69,7 @@ func (s *IntegrationTestSuite) TestParams() {
 		s.Require().Equal("0.670000000000000000", queryParamsResponse.Params.GoalBonded.String())
 		s.Require().Equal(uint64(6311520), queryParamsResponse.Params.BlocksPerYear)
 	}
-	s.xplac = xplago_helper.ResetXplac(s.xplac)
+	s.xplac = client_helper.ResetXplac(s.xplac)
 }
 
 func (s *IntegrationTestSuite) TestInflation() {
@@ -88,7 +88,7 @@ func (s *IntegrationTestSuite) TestInflation() {
 
 		s.Require().Equal("0.070000000000000000", queryInflationResponse.Inflation.String())
 	}
-	s.xplac = xplago_helper.ResetXplac(s.xplac)
+	s.xplac = client_helper.ResetXplac(s.xplac)
 }
 
 func (s *IntegrationTestSuite) TestAnnualProvisions() {
@@ -108,7 +108,7 @@ func (s *IntegrationTestSuite) TestAnnualProvisions() {
 		s.Require().Equal("70000000000000000000.000000000000000000", queryAnnualProvisionsResponse.AnnualProvisions.String())
 
 	}
-	s.xplac = xplago_helper.ResetXplac(s.xplac)
+	s.xplac = client_helper.ResetXplac(s.xplac)
 }
 
 func TestIntegrationTestSuite(t *testing.T) {

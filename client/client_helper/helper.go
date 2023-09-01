@@ -1,4 +1,4 @@
-package xplago_helper
+package client_helper
 
 import (
 	"github.com/Moonyongjung/xpla.go/client"

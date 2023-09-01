@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/Moonyongjung/xpla.go/client"
-	"github.com/Moonyongjung/xpla.go/client/xplago_helper"
+	"github.com/Moonyongjung/xpla.go/client/client_helper"
 	"github.com/Moonyongjung/xpla.go/types"
 	"github.com/Moonyongjung/xpla.go/util"
 	"github.com/gogo/protobuf/jsonpb"
@@ -48,7 +48,7 @@ func (s *IntegrationTestSuite) SetupSuite() {
 	s.network = network.New(s.T(), s.cfg)
 	s.Require().NoError(s.network.WaitForNextBlock())
 
-	s.xplac = xplago_helper.NewTestXplaClient()
+	s.xplac = client_helper.NewTestXplaClient()
 	s.apis = []string{
 		s.network.Validators[0].APIAddress,
 		s.network.Validators[0].AppConfig.GRPC.Address,
@@ -110,7 +110,7 @@ func (s *IntegrationTestSuite) TestAllBalancesAndBalance() {
 			s.Require().Equal(bal1, balanceResponse.Balance.Amount.BigInt())
 		}
 	}
-	s.xplac = xplago_helper.ResetXplac(s.xplac)
+	s.xplac = client_helper.ResetXplac(s.xplac)
 }
 
 func (s *IntegrationTestSuite) TestDenomMetadata() {
@@ -142,7 +142,7 @@ func (s *IntegrationTestSuite) TestDenomMetadata() {
 
 		s.Require().Equal(types.XplaDenom, denomMetadataResponse.Metadata.Base)
 	}
-	s.xplac = xplago_helper.ResetXplac(s.xplac)
+	s.xplac = client_helper.ResetXplac(s.xplac)
 }
 
 func (s *IntegrationTestSuite) TestBankTotal() {
@@ -185,7 +185,7 @@ func (s *IntegrationTestSuite) TestBankTotal() {
 
 		s.Require().Equal(denom1, supplyOfResponse.Amount.Denom)
 	}
-	s.xplac = xplago_helper.ResetXplac(s.xplac)
+	s.xplac = client_helper.ResetXplac(s.xplac)
 }
 
 func TestIntegrationTestSuite(t *testing.T) {

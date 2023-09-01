@@ -7,7 +7,7 @@ import (
 	"testing"
 
 	"github.com/Moonyongjung/xpla.go/client"
-	"github.com/Moonyongjung/xpla.go/client/xplago_helper"
+	"github.com/Moonyongjung/xpla.go/client/client_helper"
 	mbank "github.com/Moonyongjung/xpla.go/core/bank"
 	"github.com/Moonyongjung/xpla.go/types"
 	"github.com/Moonyongjung/xpla.go/util"
@@ -208,7 +208,7 @@ func (s *ClientTestSuite) SetupSuite() {
 	s.Require().NoError(err)
 	s.Require().NoError(s.network.WaitForNextBlock())
 
-	s.xplac = xplago_helper.NewTestXplaClient()
+	s.xplac = client_helper.NewTestXplaClient()
 
 	s.apis = []string{
 		s.network.Validators[0].APIAddress,

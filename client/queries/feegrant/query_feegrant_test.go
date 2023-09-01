@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/Moonyongjung/xpla.go/client"
-	"github.com/Moonyongjung/xpla.go/client/xplago_helper"
+	"github.com/Moonyongjung/xpla.go/client/client_helper"
 	"github.com/Moonyongjung/xpla.go/types"
 	"github.com/gogo/protobuf/jsonpb"
 
@@ -56,7 +56,7 @@ func (s *IntegrationTestSuite) SetupSuite() {
 	})
 	s.Require().NoError(err)
 
-	s.xplac = xplago_helper.NewTestXplaClient()
+	s.xplac = client_helper.NewTestXplaClient()
 	s.apis = []string{
 		s.network.Validators[0].APIAddress,
 		s.network.Validators[0].AppConfig.GRPC.Address,
@@ -119,7 +119,7 @@ func (s *IntegrationTestSuite) TestFeegrants() {
 		s.Require().Equal(granter.String(), queryAllowancesResponse.Allowances[0].Granter)
 		s.Require().Equal(grantee.String(), queryAllowancesResponse.Allowances[0].Grantee)
 	}
-	s.xplac = xplago_helper.ResetXplac(s.xplac)
+	s.xplac = client_helper.ResetXplac(s.xplac)
 }
 
 func (s *IntegrationTestSuite) createGrant(granter, grantee sdk.Address) {

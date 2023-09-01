@@ -3,7 +3,7 @@ package client_test
 import (
 	"strings"
 
-	"github.com/Moonyongjung/xpla.go/client/xplago_helper"
+	"github.com/Moonyongjung/xpla.go/client/client_helper"
 	"github.com/Moonyongjung/xpla.go/types"
 	"github.com/Moonyongjung/xpla.go/util"
 
@@ -63,7 +63,7 @@ func (s *ClientTestSuite) TestBroadcast() {
 			afterQueryAllBalancesResponse.Balances[0].Amount.Sub(beforeQueryAllBalancesResponse.Balances[0].Amount).String(),
 		)
 	}
-	s.xplac = xplago_helper.ResetXplac(s.xplac)
+	s.xplac = client_helper.ResetXplac(s.xplac)
 }
 
 func (s *ClientTestSuite) TestBroadcastMode() {
@@ -97,7 +97,7 @@ func (s *ClientTestSuite) TestBroadcastMode() {
 		newSeq := util.FromStringToInt(s.xplac.GetSequence()) + 1
 		s.xplac.WithSequence(util.FromIntToString(newSeq))
 	}
-	s.xplac = xplago_helper.ResetXplac(s.xplac)
+	s.xplac = client_helper.ResetXplac(s.xplac)
 }
 
 func (s *ClientTestSuite) TestBroadcastEVM() {
@@ -144,5 +144,5 @@ func (s *ClientTestSuite) TestBroadcastEVM() {
 		testSendAmount,
 		afterQueryAllBalancesResponse.Balances[0].Amount.Sub(beforeQueryAllBalancesResponse.Balances[0].Amount).String(),
 	)
-	s.xplac = xplago_helper.ResetXplac(s.xplac)
+	s.xplac = client_helper.ResetXplac(s.xplac)
 }

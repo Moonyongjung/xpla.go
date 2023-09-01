@@ -7,7 +7,7 @@ import (
 	"testing"
 
 	"github.com/Moonyongjung/xpla.go/client"
-	"github.com/Moonyongjung/xpla.go/client/xplago_helper"
+	"github.com/Moonyongjung/xpla.go/client/client_helper"
 	"github.com/Moonyongjung/xpla.go/types"
 	"github.com/Moonyongjung/xpla.go/util"
 	"github.com/Moonyongjung/xpla.go/util/testutil"
@@ -113,7 +113,7 @@ func (s *IntegrationTestSuite) SetupSuite() {
 	s.network = network.New(s.T(), s.cfg)
 	s.Require().NoError(s.network.WaitForNextBlock())
 
-	s.xplac = xplago_helper.NewTestXplaClient()
+	s.xplac = client_helper.NewTestXplaClient()
 	s.apis = []string{
 		s.network.Validators[0].APIAddress,
 		s.network.Validators[0].AppConfig.GRPC.Address,
@@ -203,7 +203,7 @@ func (s *IntegrationTestSuite) TestQueryContract() {
 		json.Unmarshal([]byte(res), &m)
 		s.Require().Equal(s.accounts[0].Address.String(), m.Data.Minter)
 	}
-	s.xplac = xplago_helper.ResetXplac(s.xplac)
+	s.xplac = client_helper.ResetXplac(s.xplac)
 
 }
 
@@ -227,7 +227,7 @@ func (s *IntegrationTestSuite) TestListCode() {
 		s.Require().Equal("", queryCodeResponse.CodeInfos[0].InstantiatePermission.Address)
 		s.Require().Equal(wasmtypes.AccessTypeEverybody, queryCodeResponse.CodeInfos[0].InstantiatePermission.Permission)
 	}
-	s.xplac = xplago_helper.ResetXplac(s.xplac)
+	s.xplac = client_helper.ResetXplac(s.xplac)
 }
 
 func (s *IntegrationTestSuite) TestListContractByCode() {
@@ -269,7 +269,7 @@ func (s *IntegrationTestSuite) TestListContractByCode() {
 		}
 
 	}
-	s.xplac = xplago_helper.ResetXplac(s.xplac)
+	s.xplac = client_helper.ResetXplac(s.xplac)
 }
 
 func (s *IntegrationTestSuite) TestCodeInfo() {
@@ -297,7 +297,7 @@ func (s *IntegrationTestSuite) TestCodeInfo() {
 		s.Require().Equal("", queryCodeResponse.InstantiatePermission.Address)
 		s.Require().Equal(wasmtypes.AccessTypeEverybody, queryCodeResponse.InstantiatePermission.Permission)
 	}
-	s.xplac = xplago_helper.ResetXplac(s.xplac)
+	s.xplac = client_helper.ResetXplac(s.xplac)
 }
 
 func (s *IntegrationTestSuite) TestContractInfo() {
@@ -322,7 +322,7 @@ func (s *IntegrationTestSuite) TestContractInfo() {
 		s.Require().Equal(util.FromStringToUint64(s.wasmCodeID), queryContractInfoResponse.CodeID)
 		s.Require().Equal(testContractLabel, queryContractInfoResponse.Label)
 	}
-	s.xplac = xplago_helper.ResetXplac(s.xplac)
+	s.xplac = client_helper.ResetXplac(s.xplac)
 }
 
 func (s *IntegrationTestSuite) TestContractStateAll() {
@@ -349,7 +349,7 @@ func (s *IntegrationTestSuite) TestContractStateAll() {
 		s.Require().Equal("6E66745F696E666F", queryAllContractStateResponse.Models[2].Key.String())
 		s.Require().Equal([]byte(`{"name":"cw721-metadata-onchain","symbol":"CW721"}`), queryAllContractStateResponse.Models[2].Value)
 	}
-	s.xplac = xplago_helper.ResetXplac(s.xplac)
+	s.xplac = client_helper.ResetXplac(s.xplac)
 }
 
 func (s *IntegrationTestSuite) TestContractHistory() {
@@ -374,7 +374,7 @@ func (s *IntegrationTestSuite) TestContractHistory() {
 		s.T().Log(wasmtypes.ContractCodeHistoryOperationTypeInit, queryContractHistoryResponse.Entries[0].Operation)
 		s.T().Log([]byte(`{"name":"cw721-metadata-onchain","symbol":"CW721","minter":"`+s.accounts[0].Address.String()+`"}`), queryContractHistoryResponse.Entries[0].Msg.Bytes())
 	}
-	s.xplac = xplago_helper.ResetXplac(s.xplac)
+	s.xplac = client_helper.ResetXplac(s.xplac)
 }
 
 func (s *IntegrationTestSuite) TestPinned() {
@@ -395,7 +395,7 @@ func (s *IntegrationTestSuite) TestPinned() {
 		s.T().Log(res)
 		s.Require().Len(queryPinnedCodesResponse.CodeIDs, 0)
 	}
-	s.xplac = xplago_helper.ResetXplac(s.xplac)
+	s.xplac = client_helper.ResetXplac(s.xplac)
 }
 
 func (s *IntegrationTestSuite) TestLibWasmvmVersion() {
@@ -410,7 +410,7 @@ func (s *IntegrationTestSuite) TestLibWasmvmVersion() {
 		s.Require().NoError(err)
 		s.Require().Equal("1.0.1", res)
 	}
-	s.xplac = xplago_helper.ResetXplac(s.xplac)
+	s.xplac = client_helper.ResetXplac(s.xplac)
 }
 
 func TestIntegrationTestSuite(t *testing.T) {

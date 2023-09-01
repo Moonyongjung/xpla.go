@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"github.com/Moonyongjung/xpla.go/client"
-	"github.com/Moonyongjung/xpla.go/client/xplago_helper"
+	"github.com/Moonyongjung/xpla.go/client/client_helper"
 	"github.com/Moonyongjung/xpla.go/types"
 
 	"github.com/Moonyongjung/xpla.go/util/testutil/network"
@@ -50,7 +50,7 @@ func (s *IntegrationTestSuite) SetupSuite() {
 	_, _, err := kb.NewMnemonic("newAccount", keyring.English, sdk.GetConfig().GetFullBIP44Path(), keyring.DefaultBIP39Passphrase, hd.Secp256k1)
 	s.Require().NoError(err)
 
-	s.xplac = xplago_helper.NewTestXplaClient()
+	s.xplac = client_helper.NewTestXplaClient()
 	s.apis = []string{
 		s.network.Validators[0].APIAddress,
 		s.network.Validators[0].AppConfig.GRPC.Address,
@@ -81,7 +81,7 @@ func (s *IntegrationTestSuite) TestQueryParams() {
 		s.Require().Equal(uint64(590), authParamsResponse.Params.SigVerifyCostED25519)
 		s.Require().Equal(uint64(1000), authParamsResponse.Params.SigVerifyCostSecp256k1)
 	}
-	s.xplac = xplago_helper.ResetXplac(s.xplac)
+	s.xplac = client_helper.ResetXplac(s.xplac)
 }
 
 func (s *IntegrationTestSuite) TestAccAddress() {
@@ -113,7 +113,7 @@ func (s *IntegrationTestSuite) TestAccAddress() {
 		s.Require().Equal(uint64(0), ethAccount.AccountNumber)
 
 	}
-	s.xplac = xplago_helper.ResetXplac(s.xplac)
+	s.xplac = client_helper.ResetXplac(s.xplac)
 }
 
 func (s *IntegrationTestSuite) TestAccounts() {
@@ -135,7 +135,7 @@ func (s *IntegrationTestSuite) TestAccounts() {
 		// 2 validator, 7 module accounts
 		s.Require().Len(accountsResponse.Accounts, 9)
 	}
-	s.xplac = xplago_helper.ResetXplac(s.xplac)
+	s.xplac = client_helper.ResetXplac(s.xplac)
 }
 
 func (s *IntegrationTestSuite) TestQueryTxByEventAndQueryTx() {
@@ -200,7 +200,7 @@ func (s *IntegrationTestSuite) TestQueryTxByEventAndQueryTx() {
 			s.Require().Equal(txHash, txResponse.TxHash)
 		}
 	}
-	s.xplac = xplago_helper.ResetXplac(s.xplac)
+	s.xplac = client_helper.ResetXplac(s.xplac)
 }
 
 func (s *IntegrationTestSuite) createBankMsg(val *network.Validator, toAddr sdk.AccAddress, amount sdk.Coins, extraFlags ...string) (sdktestutil.BufferWriter, error) {

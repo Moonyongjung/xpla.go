@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/Moonyongjung/xpla.go/client"
-	"github.com/Moonyongjung/xpla.go/client/xplago_helper"
+	"github.com/Moonyongjung/xpla.go/client/client_helper"
 	"github.com/Moonyongjung/xpla.go/types"
 	"github.com/gogo/protobuf/jsonpb"
 
@@ -37,7 +37,7 @@ func (s *IntegrationTestSuite) SetupSuite() {
 	s.network = network.New(s.T(), s.cfg)
 	s.Require().NoError(s.network.WaitForNextBlock())
 
-	s.xplac = xplago_helper.NewTestXplaClient()
+	s.xplac = client_helper.NewTestXplaClient()
 	s.apis = []string{
 		s.network.Validators[0].APIAddress,
 		s.network.Validators[0].AppConfig.GRPC.Address,
@@ -69,7 +69,7 @@ func (s *IntegrationTestSuite) TestParams() {
 		s.Require().Equal("0.050000000000000000", queryParamsResponse.Params.SlashFractionDoubleSign.String())
 		s.Require().Equal("0.010000000000000000", queryParamsResponse.Params.SlashFractionDowntime.String())
 	}
-	s.xplac = xplago_helper.ResetXplac(s.xplac)
+	s.xplac = client_helper.ResetXplac(s.xplac)
 }
 
 func (s *IntegrationTestSuite) TestSigningInfos() {
@@ -111,7 +111,7 @@ func (s *IntegrationTestSuite) TestSigningInfos() {
 		s.Require().Equal(int64(0), querySigningInfosResponse.Info[1].MissedBlocksCounter)
 
 	}
-	s.xplac = xplago_helper.ResetXplac(s.xplac)
+	s.xplac = client_helper.ResetXplac(s.xplac)
 }
 
 func TestIntegrationTestSuite(t *testing.T) {

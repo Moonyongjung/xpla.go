@@ -3,7 +3,7 @@ package client_test
 import (
 	"fmt"
 
-	"github.com/Moonyongjung/xpla.go/client/xplago_helper"
+	"github.com/Moonyongjung/xpla.go/client/client_helper"
 	mauth "github.com/Moonyongjung/xpla.go/core/auth"
 	mauthz "github.com/Moonyongjung/xpla.go/core/authz"
 	mbank "github.com/Moonyongjung/xpla.go/core/bank"
@@ -852,7 +852,7 @@ func (s *ClientTestSuite) TestGov() {
 		s.Require().Equal(mgov.GovModule, s.xplac.GetModule())
 		s.Require().Equal(mgov.GovTallyMsgType, s.xplac.GetMsgType())
 	}
-	s.xplac = xplago_helper.ResetXplac(s.xplac)
+	s.xplac = client_helper.ResetXplac(s.xplac)
 
 	// gov params
 	s.xplac.GovParams()
