@@ -66,7 +66,10 @@ func (xplac *XplaClient) CreateAndSignTx() ([]byte, error) {
 			return nil, err
 		}
 
-		builder = convertAndSetBuilder(xplac, builder, gasLimit, feeAmount)
+		builder, err = convertAndSetBuilder(xplac, builder, gasLimit, feeAmount)
+		if err != nil {
+			return nil, err
+		}
 
 		// Set default sign mode (DIRECT=1)
 		if xplac.Opts.SignMode == signing.SignMode_SIGN_MODE_UNSPECIFIED {
@@ -125,7 +128,10 @@ func (xplac *XplaClient) CreateUnsignedTx() ([]byte, error) {
 		return nil, err
 	}
 
-	builder = convertAndSetBuilder(xplac, builder, gasLimit, feeAmount)
+	builder, err = convertAndSetBuilder(xplac, builder, gasLimit, feeAmount)
+	if err != nil {
+		return nil, err
+	}
 
 	sdkTx := builder.GetTx()
 	txBytes, err := xplac.EncodingConfig.TxConfig.TxEncoder()(sdkTx)

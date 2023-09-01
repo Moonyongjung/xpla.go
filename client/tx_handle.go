@@ -54,147 +54,148 @@ func setTxBuilderMsg(xplac *XplaClient) (cmclient.TxBuilder, error) {
 
 	builder := xplac.EncodingConfig.TxConfig.NewTxBuilder()
 
+	switch {
 	// Authz module
-	if xplac.MsgType == mauthz.AuthzGrantMsgType {
+	case xplac.MsgType == mauthz.AuthzGrantMsgType:
 		convertMsg, _ := xplac.Msg.(authz.MsgGrant)
 		builder.SetMsgs(&convertMsg)
 
-	} else if xplac.MsgType == mauthz.AuthzRevokeMsgType {
+	case xplac.MsgType == mauthz.AuthzRevokeMsgType:
 		convertMsg, _ := xplac.Msg.(authz.MsgRevoke)
 		builder.SetMsgs(&convertMsg)
 
-	} else if xplac.MsgType == mauthz.AuthzExecMsgType {
+	case xplac.MsgType == mauthz.AuthzExecMsgType:
 		convertMsg, _ := xplac.Msg.(authz.MsgExec)
 		builder.SetMsgs(&convertMsg)
 
 		// Bank module
-	} else if xplac.MsgType == mbank.BankSendMsgType {
+	case xplac.MsgType == mbank.BankSendMsgType:
 		convertMsg, _ := xplac.Msg.(banktypes.MsgSend)
 		builder.SetMsgs(&convertMsg)
 
 		// Crisis module
-	} else if xplac.MsgType == mcrisis.CrisisInvariantBrokenMsgType {
+	case xplac.MsgType == mcrisis.CrisisInvariantBrokenMsgType:
 		convertMsg, _ := xplac.Msg.(crisistypes.MsgVerifyInvariant)
 		builder.SetMsgs(&convertMsg)
 
 		// Distribution module
-	} else if xplac.MsgType == mdist.DistributionFundCommunityPoolMsgType {
+	case xplac.MsgType == mdist.DistributionFundCommunityPoolMsgType:
 		convertMsg, _ := xplac.Msg.(disttypes.MsgFundCommunityPool)
 		builder.SetMsgs(&convertMsg)
 
-	} else if xplac.MsgType == mdist.DistributionProposalCommunityPoolSpendMsgType {
+	case xplac.MsgType == mdist.DistributionProposalCommunityPoolSpendMsgType:
 		convertMsg, _ := xplac.Msg.(govtypes.MsgSubmitProposal)
 		builder.SetMsgs(&convertMsg)
 
-	} else if xplac.MsgType == mdist.DistributionWithdrawRewardsMsgType {
+	case xplac.MsgType == mdist.DistributionWithdrawRewardsMsgType:
 		convertMsg, _ := xplac.Msg.([]sdk.Msg)
 		builder.SetMsgs(convertMsg...)
 
-	} else if xplac.MsgType == mdist.DistributionWithdrawAllRewardsMsgType {
+	case xplac.MsgType == mdist.DistributionWithdrawAllRewardsMsgType:
 		convertMsg, _ := xplac.Msg.([]sdk.Msg)
 		builder.SetMsgs(convertMsg...)
 
-	} else if xplac.MsgType == mdist.DistributionSetWithdrawAddrMsgType {
+	case xplac.MsgType == mdist.DistributionSetWithdrawAddrMsgType:
 		convertMsg, _ := xplac.Msg.(disttypes.MsgSetWithdrawAddress)
 		builder.SetMsgs(&convertMsg)
 
 		// Feegrant module
-	} else if xplac.MsgType == mfeegrant.FeegrantGrantMsgType {
+	case xplac.MsgType == mfeegrant.FeegrantGrantMsgType:
 		convertMsg, _ := xplac.Msg.(feegrant.MsgGrantAllowance)
 		builder.SetMsgs(&convertMsg)
 
-	} else if xplac.MsgType == mfeegrant.FeegrantRevokeGrantMsgType {
+	case xplac.MsgType == mfeegrant.FeegrantRevokeGrantMsgType:
 		convertMsg, _ := xplac.Msg.(feegrant.MsgRevokeAllowance)
 		builder.SetMsgs(&convertMsg)
 
 		// Gov module
-	} else if xplac.MsgType == mgov.GovSubmitProposalMsgType {
+	case xplac.MsgType == mgov.GovSubmitProposalMsgType:
 		convertMsg, _ := xplac.Msg.(govtypes.MsgSubmitProposal)
 		builder.SetMsgs(&convertMsg)
 
-	} else if xplac.MsgType == mgov.GovDepositMsgType {
+	case xplac.MsgType == mgov.GovDepositMsgType:
 		convertMsg, _ := xplac.Msg.(govtypes.MsgDeposit)
 		builder.SetMsgs(&convertMsg)
 
-	} else if xplac.MsgType == mgov.GovVoteMsgType {
+	case xplac.MsgType == mgov.GovVoteMsgType:
 		convertMsg, _ := xplac.Msg.(govtypes.MsgVote)
 		builder.SetMsgs(&convertMsg)
 
-	} else if xplac.MsgType == mgov.GovWeightedVoteMsgType {
+	case xplac.MsgType == mgov.GovWeightedVoteMsgType:
 		convertMsg, _ := xplac.Msg.(govtypes.MsgVoteWeighted)
 		builder.SetMsgs(&convertMsg)
 
 		// Params module
-	} else if xplac.MsgType == mparams.ParamsProposalParamChangeMsgType {
+	case xplac.MsgType == mparams.ParamsProposalParamChangeMsgType:
 		convertMsg, _ := xplac.Msg.(govtypes.MsgSubmitProposal)
 		builder.SetMsgs(&convertMsg)
 
 		// Reward module
-	} else if xplac.MsgType == mreward.RewardFundFeeCollectorMsgType {
+	case xplac.MsgType == mreward.RewardFundFeeCollectorMsgType:
 		convertMsg, _ := xplac.Msg.(rewardtypes.MsgFundFeeCollector)
 		builder.SetMsgs(&convertMsg)
 
 		// slashing module
-	} else if xplac.MsgType == mslashing.SlahsingUnjailMsgType {
+	case xplac.MsgType == mslashing.SlahsingUnjailMsgType:
 		convertMsg, _ := xplac.Msg.(slashingtypes.MsgUnjail)
 		builder.SetMsgs(&convertMsg)
 
 		// Staking module
-	} else if xplac.MsgType == mstaking.StakingCreateValidatorMsgType {
+	case xplac.MsgType == mstaking.StakingCreateValidatorMsgType:
 		convertMsg, _ := xplac.Msg.(sdk.Msg)
 		builder.SetMsgs(convertMsg)
 
-	} else if xplac.MsgType == mstaking.StakingEditValidatorMsgType {
+	case xplac.MsgType == mstaking.StakingEditValidatorMsgType:
 		convertMsg, _ := xplac.Msg.(stakingtypes.MsgEditValidator)
 		builder.SetMsgs(&convertMsg)
 
-	} else if xplac.MsgType == mstaking.StakingDelegateMsgType {
+	case xplac.MsgType == mstaking.StakingDelegateMsgType:
 		convertMsg, _ := xplac.Msg.(stakingtypes.MsgDelegate)
 		builder.SetMsgs(&convertMsg)
 
-	} else if xplac.MsgType == mstaking.StakingUnbondMsgType {
+	case xplac.MsgType == mstaking.StakingUnbondMsgType:
 		convertMsg, _ := xplac.Msg.(stakingtypes.MsgUndelegate)
 		builder.SetMsgs(&convertMsg)
 
-	} else if xplac.MsgType == mstaking.StakingRedelegateMsgType {
+	case xplac.MsgType == mstaking.StakingRedelegateMsgType:
 		convertMsg, _ := xplac.Msg.(stakingtypes.MsgBeginRedelegate)
 		builder.SetMsgs(&convertMsg)
 
 		// Upgrade module
-	} else if xplac.MsgType == mupgrade.UpgradeProposalSoftwareUpgradeMsgType {
+	case xplac.MsgType == mupgrade.UpgradeProposalSoftwareUpgradeMsgType:
 		convertMsg, _ := xplac.Msg.(govtypes.MsgSubmitProposal)
 		builder.SetMsgs(&convertMsg)
 
-	} else if xplac.MsgType == mupgrade.UpgradeCancelSoftwareUpgradeMsgType {
+	case xplac.MsgType == mupgrade.UpgradeCancelSoftwareUpgradeMsgType:
 		convertMsg, _ := xplac.Msg.(govtypes.MsgSubmitProposal)
 		builder.SetMsgs(&convertMsg)
 
 		// Wasm module
-	} else if xplac.MsgType == mwasm.WasmStoreMsgType {
+	case xplac.MsgType == mwasm.WasmStoreMsgType:
 		convertMsg, _ := xplac.Msg.(wasm.MsgStoreCode)
 		builder.SetMsgs(&convertMsg)
 
-	} else if xplac.MsgType == mwasm.WasmInstantiateMsgType {
+	case xplac.MsgType == mwasm.WasmInstantiateMsgType:
 		convertMsg, _ := xplac.Msg.(wasm.MsgInstantiateContract)
 		builder.SetMsgs(&convertMsg)
 
-	} else if xplac.MsgType == mwasm.WasmExecuteMsgType {
+	case xplac.MsgType == mwasm.WasmExecuteMsgType:
 		convertMsg, _ := xplac.Msg.(wasm.MsgExecuteContract)
 		builder.SetMsgs(&convertMsg)
 
-	} else if xplac.MsgType == mwasm.WasmClearContractAdminMsgType {
+	case xplac.MsgType == mwasm.WasmClearContractAdminMsgType:
 		convertMsg, _ := xplac.Msg.(wasm.MsgClearAdmin)
 		builder.SetMsgs(&convertMsg)
 
-	} else if xplac.MsgType == mwasm.WasmSetContractAdminMsgType {
+	case xplac.MsgType == mwasm.WasmSetContractAdminMsgType:
 		convertMsg, _ := xplac.Msg.(wasm.MsgUpdateAdmin)
 		builder.SetMsgs(&convertMsg)
 
-	} else if xplac.MsgType == mwasm.WasmMigrateMsgType {
+	case xplac.MsgType == mwasm.WasmMigrateMsgType:
 		convertMsg, _ := xplac.Msg.(wasm.MsgMigrateContract)
 		builder.SetMsgs(&convertMsg)
 
-	} else {
+	default:
 		return nil, util.LogErr(errors.ErrInvalidMsgType, xplac.MsgType)
 	}
 
@@ -202,8 +203,11 @@ func setTxBuilderMsg(xplac *XplaClient) (cmclient.TxBuilder, error) {
 }
 
 // Set information for transaction builder.
-func convertAndSetBuilder(xplac *XplaClient, builder cmclient.TxBuilder, gasLimit string, feeAmount string) cmclient.TxBuilder {
-	feeAmountDenomRemove, _ := util.FromStringToBigInt(util.DenomRemove(feeAmount))
+func convertAndSetBuilder(xplac *XplaClient, builder cmclient.TxBuilder, gasLimit string, feeAmount string) (cmclient.TxBuilder, error) {
+	feeAmountDenomRemove, err := util.FromStringToBigInt(util.DenomRemove(feeAmount))
+	if err != nil {
+		return nil, err
+	}
 	feeAmountCoin := sdk.Coin{
 		Amount: sdk.NewIntFromBigInt(feeAmountDenomRemove),
 		Denom:  types.XplaDenom,
@@ -221,7 +225,7 @@ func convertAndSetBuilder(xplac *XplaClient, builder cmclient.TxBuilder, gasLimi
 	builder.SetGasLimit(util.FromStringToUint64(gasLimit))
 	builder.SetFeeGranter(xplac.Opts.FeeGranter)
 
-	return builder
+	return builder, nil
 }
 
 // Sign transaction by using given private key.

@@ -64,58 +64,59 @@ func (xplac *XplaClient) Query() (string, error) {
 	qt := setQueryType(xplac)
 	ixplaClient := queries.NewIXplaClient(xplac, qt)
 
-	if xplac.Module == mauth.AuthModule {
+	switch {
+	case xplac.Module == mauth.AuthModule:
 		return qauth.QueryAuth(*ixplaClient)
 
-	} else if xplac.Module == mauthz.AuthzModule {
+	case xplac.Module == mauthz.AuthzModule:
 		return qauthz.QueryAuthz(*ixplaClient)
 
-	} else if xplac.Module == mbank.BankModule {
+	case xplac.Module == mbank.BankModule:
 		return qbank.QueryBank(*ixplaClient)
 
-	} else if xplac.Module == mbase.Base {
+	case xplac.Module == mbase.Base:
 		return qbase.QueryBase(*ixplaClient)
 
-	} else if xplac.Module == mdist.DistributionModule {
+	case xplac.Module == mdist.DistributionModule:
 		return qdist.QueryDistribution(*ixplaClient)
 
-	} else if xplac.Module == mevidence.EvidenceModule {
+	case xplac.Module == mevidence.EvidenceModule:
 		return qevidence.QueryEvidence(*ixplaClient)
 
-	} else if xplac.Module == mevm.EvmModule {
+	case xplac.Module == mevm.EvmModule:
 		return qevm.QueryEvm(*ixplaClient)
 
-	} else if xplac.Module == mfeegrant.FeegrantModule {
+	case xplac.Module == mfeegrant.FeegrantModule:
 		return qfeegrant.QueryFeegrant(*ixplaClient)
 
-	} else if xplac.Module == mgov.GovModule {
+	case xplac.Module == mgov.GovModule:
 		return qgov.QueryGov(*ixplaClient)
 
-	} else if xplac.Module == mibc.IbcModule {
+	case xplac.Module == mibc.IbcModule:
 		return qibc.QueryIbc(*ixplaClient)
 
-	} else if xplac.Module == mmint.MintModule {
+	case xplac.Module == mmint.MintModule:
 		return qmint.QueryMint(*ixplaClient)
 
-	} else if xplac.Module == mparams.ParamsModule {
+	case xplac.Module == mparams.ParamsModule:
 		return qparams.QueryParams(*ixplaClient)
 
-	} else if xplac.Module == mreward.RewardModule {
+	case xplac.Module == mreward.RewardModule:
 		return qreward.QueryReward(*ixplaClient)
 
-	} else if xplac.Module == mslashing.SlashingModule {
+	case xplac.Module == mslashing.SlashingModule:
 		return qslashing.QuerySlashing(*ixplaClient)
 
-	} else if xplac.Module == mstaking.StakingModule {
+	case xplac.Module == mstaking.StakingModule:
 		return qstaking.QueryStaking(*ixplaClient)
 
-	} else if xplac.Module == mupgrade.UpgradeModule {
+	case xplac.Module == mupgrade.UpgradeModule:
 		return qupgrade.QueryUpgrade(*ixplaClient)
 
-	} else if xplac.Module == mwasm.WasmModule {
+	case xplac.Module == mwasm.WasmModule:
 		return qwasm.QueryWasm(*ixplaClient)
 
-	} else {
+	default:
 		return "", util.LogErr(errors.ErrInvalidRequest, "invalid module")
 	}
 }
