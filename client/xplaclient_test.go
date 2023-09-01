@@ -110,8 +110,8 @@ func TestNewXplaClient(t *testing.T) {
 }
 
 var (
-	validatorNumberForBroadcast = 2
-	testSendAmount              = "1000"
+	validatorNumber = 2
+	testSendAmount  = "1000"
 )
 
 type ClientTestSuite struct {
@@ -223,6 +223,6 @@ func (s *ClientTestSuite) TearDownSuite() {
 
 func TestClientTestSuite(t *testing.T) {
 	cfg := network.DefaultConfig()
-	cfg.NumValidators = validatorNumberForBroadcast
+	cfg.NumValidators = validatorNumber
 	suite.Run(t, NewClientTestSuite(cfg))
 }
