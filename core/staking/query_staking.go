@@ -1,8 +1,7 @@
 package staking
 
 import (
-	"github.com/Moonyongjung/xpla.go/client/queries"
-	mstaking "github.com/Moonyongjung/xpla.go/core/staking"
+	"github.com/Moonyongjung/xpla.go/core"
 	"github.com/Moonyongjung/xpla.go/types"
 	"github.com/Moonyongjung/xpla.go/types/errors"
 	"github.com/Moonyongjung/xpla.go/util"
@@ -17,7 +16,7 @@ var res proto.Message
 var err error
 
 // Query client for staking module.
-func QueryStaking(i queries.IXplaClient) (string, error) {
+func QueryStaking(i core.QueryClient) (string, error) {
 	if i.QueryType == types.QueryGrpc {
 		return queryByGrpcStaking(i)
 	} else {
@@ -25,12 +24,12 @@ func QueryStaking(i queries.IXplaClient) (string, error) {
 	}
 }
 
-func queryByGrpcStaking(i queries.IXplaClient) (string, error) {
+func queryByGrpcStaking(i core.QueryClient) (string, error) {
 	queryClient := stakingtypes.NewQueryClient(i.Ixplac.GetGrpcClient())
 
 	switch {
 	// Skating validator
-	case i.Ixplac.GetMsgType() == mstaking.StakingQueryValidatorMsgType:
+	case i.Ixplac.GetMsgType() == StakingQueryValidatorMsgType:
 		convertMsg, _ := i.Ixplac.GetMsg().(stakingtypes.QueryValidatorRequest)
 		res, err = queryClient.Validator(
 			i.Ixplac.GetContext(),
@@ -41,7 +40,7 @@ func queryByGrpcStaking(i queries.IXplaClient) (string, error) {
 		}
 
 	// Staking validators
-	case i.Ixplac.GetMsgType() == mstaking.StakingQueryValidatorsMsgType:
+	case i.Ixplac.GetMsgType() == StakingQueryValidatorsMsgType:
 		convertMsg, _ := i.Ixplac.GetMsg().(stakingtypes.QueryValidatorsRequest)
 		res, err = queryClient.Validators(
 			i.Ixplac.GetContext(),
@@ -52,7 +51,7 @@ func queryByGrpcStaking(i queries.IXplaClient) (string, error) {
 		}
 
 	// Staking delegation
-	case i.Ixplac.GetMsgType() == mstaking.StakingQueryDelegationMsgType:
+	case i.Ixplac.GetMsgType() == StakingQueryDelegationMsgType:
 		convertMsg, _ := i.Ixplac.GetMsg().(stakingtypes.QueryDelegationRequest)
 		res, err = queryClient.Delegation(
 			i.Ixplac.GetContext(),
@@ -63,7 +62,7 @@ func queryByGrpcStaking(i queries.IXplaClient) (string, error) {
 		}
 
 	// Staking delegations
-	case i.Ixplac.GetMsgType() == mstaking.StakingQueryDelegationsMsgType:
+	case i.Ixplac.GetMsgType() == StakingQueryDelegationsMsgType:
 		convertMsg, _ := i.Ixplac.GetMsg().(stakingtypes.QueryDelegatorDelegationsRequest)
 		res, err = queryClient.DelegatorDelegations(
 			i.Ixplac.GetContext(),
@@ -74,7 +73,7 @@ func queryByGrpcStaking(i queries.IXplaClient) (string, error) {
 		}
 
 	// Staking delegations to
-	case i.Ixplac.GetMsgType() == mstaking.StakingQueryDelegationsToMsgType:
+	case i.Ixplac.GetMsgType() == StakingQueryDelegationsToMsgType:
 		convertMsg, _ := i.Ixplac.GetMsg().(stakingtypes.QueryValidatorDelegationsRequest)
 		res, err = queryClient.ValidatorDelegations(
 			i.Ixplac.GetContext(),
@@ -85,7 +84,7 @@ func queryByGrpcStaking(i queries.IXplaClient) (string, error) {
 		}
 
 	// Staking unbonding delegation
-	case i.Ixplac.GetMsgType() == mstaking.StakingQueryUnbondingDelegationMsgType:
+	case i.Ixplac.GetMsgType() == StakingQueryUnbondingDelegationMsgType:
 		convertMsg, _ := i.Ixplac.GetMsg().(stakingtypes.QueryUnbondingDelegationRequest)
 		res, err = queryClient.UnbondingDelegation(
 			i.Ixplac.GetContext(),
@@ -96,7 +95,7 @@ func queryByGrpcStaking(i queries.IXplaClient) (string, error) {
 		}
 
 	// Staking unbonding delegations
-	case i.Ixplac.GetMsgType() == mstaking.StakingQueryUnbondingDelegationsMsgType:
+	case i.Ixplac.GetMsgType() == StakingQueryUnbondingDelegationsMsgType:
 		convertMsg, _ := i.Ixplac.GetMsg().(stakingtypes.QueryDelegatorUnbondingDelegationsRequest)
 		res, err = queryClient.DelegatorUnbondingDelegations(
 			i.Ixplac.GetContext(),
@@ -107,7 +106,7 @@ func queryByGrpcStaking(i queries.IXplaClient) (string, error) {
 		}
 
 	// Staking unbonding delegations from
-	case i.Ixplac.GetMsgType() == mstaking.StakingQueryUnbondingDelegationsFromMsgType:
+	case i.Ixplac.GetMsgType() == StakingQueryUnbondingDelegationsFromMsgType:
 		convertMsg, _ := i.Ixplac.GetMsg().(stakingtypes.QueryValidatorUnbondingDelegationsRequest)
 		res, err = queryClient.ValidatorUnbondingDelegations(
 			i.Ixplac.GetContext(),
@@ -118,9 +117,9 @@ func queryByGrpcStaking(i queries.IXplaClient) (string, error) {
 		}
 
 	// Staking redelegations
-	case i.Ixplac.GetMsgType() == mstaking.StakingQueryRedelegationMsgType ||
-		i.Ixplac.GetMsgType() == mstaking.StakingQueryRedelegationsMsgType ||
-		i.Ixplac.GetMsgType() == mstaking.StakingQueryRedelegationsFromMsgType:
+	case i.Ixplac.GetMsgType() == StakingQueryRedelegationMsgType ||
+		i.Ixplac.GetMsgType() == StakingQueryRedelegationsMsgType ||
+		i.Ixplac.GetMsgType() == StakingQueryRedelegationsFromMsgType:
 		convertMsg, _ := i.Ixplac.GetMsg().(stakingtypes.QueryRedelegationsRequest)
 		res, err = queryClient.Redelegations(
 			i.Ixplac.GetContext(),
@@ -131,7 +130,7 @@ func queryByGrpcStaking(i queries.IXplaClient) (string, error) {
 		}
 
 	// Staking historical information
-	case i.Ixplac.GetMsgType() == mstaking.StakingHistoricalInfoMsgType:
+	case i.Ixplac.GetMsgType() == StakingHistoricalInfoMsgType:
 		convertMsg, _ := i.Ixplac.GetMsg().(stakingtypes.QueryHistoricalInfoRequest)
 		res, err = queryClient.HistoricalInfo(
 			i.Ixplac.GetContext(),
@@ -142,7 +141,7 @@ func queryByGrpcStaking(i queries.IXplaClient) (string, error) {
 		}
 
 	// Staking pool
-	case i.Ixplac.GetMsgType() == mstaking.StakingQueryStakingPoolMsgType:
+	case i.Ixplac.GetMsgType() == StakingQueryStakingPoolMsgType:
 		convertMsg, _ := i.Ixplac.GetMsg().(stakingtypes.QueryPoolRequest)
 		res, err = queryClient.Pool(
 			i.Ixplac.GetContext(),
@@ -153,7 +152,7 @@ func queryByGrpcStaking(i queries.IXplaClient) (string, error) {
 		}
 
 	// Staking params
-	case i.Ixplac.GetMsgType() == mstaking.StakingQueryStakingParamsMsgType:
+	case i.Ixplac.GetMsgType() == StakingQueryStakingParamsMsgType:
 		convertMsg, _ := i.Ixplac.GetMsg().(stakingtypes.QueryParamsRequest)
 		res, err = queryClient.Params(
 			i.Ixplac.GetContext(),
@@ -167,7 +166,7 @@ func queryByGrpcStaking(i queries.IXplaClient) (string, error) {
 		return "", util.LogErr(errors.ErrInvalidMsgType, i.Ixplac.GetMsgType())
 	}
 
-	out, err = queries.PrintProto(i, res)
+	out, err = core.PrintProto(i, res)
 	if err != nil {
 		return "", err
 	}
@@ -187,80 +186,80 @@ const (
 	stakingParamsLabel               = "params"
 )
 
-func queryByLcdStaking(i queries.IXplaClient) (string, error) {
+func queryByLcdStaking(i core.QueryClient) (string, error) {
 	url := util.MakeQueryLcdUrl(stakingv1beta1.Query_ServiceDesc.Metadata.(string))
 
 	switch {
 	// Skating validator
-	case i.Ixplac.GetMsgType() == mstaking.StakingQueryValidatorMsgType:
+	case i.Ixplac.GetMsgType() == StakingQueryValidatorMsgType:
 		convertMsg, _ := i.Ixplac.GetMsg().(stakingtypes.QueryValidatorRequest)
 
 		url = url + util.MakeQueryLabels(stakingValidatorsLabel, convertMsg.ValidatorAddr)
 
 	// Staking validators
-	case i.Ixplac.GetMsgType() == mstaking.StakingQueryValidatorsMsgType:
+	case i.Ixplac.GetMsgType() == StakingQueryValidatorsMsgType:
 		url = url + stakingValidatorsLabel
 
 	// Staking delegation
-	case i.Ixplac.GetMsgType() == mstaking.StakingQueryDelegationMsgType:
+	case i.Ixplac.GetMsgType() == StakingQueryDelegationMsgType:
 		convertMsg, _ := i.Ixplac.GetMsg().(stakingtypes.QueryDelegationRequest)
 
 		url = url + util.MakeQueryLabels(stakingDelegatorsLabel, convertMsg.DelegatorAddr, stakingValidatorsLabel, convertMsg.ValidatorAddr)
 
 	// Staking delegations
-	case i.Ixplac.GetMsgType() == mstaking.StakingQueryDelegationsMsgType:
+	case i.Ixplac.GetMsgType() == StakingQueryDelegationsMsgType:
 		convertMsg, _ := i.Ixplac.GetMsg().(stakingtypes.QueryDelegatorDelegationsRequest)
 
 		url = url + util.MakeQueryLabels(stakingDelegatorsLabel, convertMsg.DelegatorAddr, stakingValidatorsLabel)
 
 	// Staking delegations to
-	case i.Ixplac.GetMsgType() == mstaking.StakingQueryDelegationsToMsgType:
+	case i.Ixplac.GetMsgType() == StakingQueryDelegationsToMsgType:
 		convertMsg, _ := i.Ixplac.GetMsg().(stakingtypes.QueryValidatorDelegationsRequest)
 
 		url = url + util.MakeQueryLabels(stakingValidatorsLabel, convertMsg.ValidatorAddr, stakingDelegationsLabel)
 
 	// Staking unbonding delegation
-	case i.Ixplac.GetMsgType() == mstaking.StakingQueryUnbondingDelegationMsgType:
+	case i.Ixplac.GetMsgType() == StakingQueryUnbondingDelegationMsgType:
 		convertMsg, _ := i.Ixplac.GetMsg().(stakingtypes.QueryUnbondingDelegationRequest)
 
 		url = url + util.MakeQueryLabels(stakingValidatorsLabel, convertMsg.ValidatorAddr, stakingDelegationsLabel, convertMsg.DelegatorAddr, stakingUnbondingDelegationLabel)
 
 	// Staking unbonding delegations
-	case i.Ixplac.GetMsgType() == mstaking.StakingQueryUnbondingDelegationsMsgType:
+	case i.Ixplac.GetMsgType() == StakingQueryUnbondingDelegationsMsgType:
 		convertMsg, _ := i.Ixplac.GetMsg().(stakingtypes.QueryDelegatorUnbondingDelegationsRequest)
 
 		url = url + util.MakeQueryLabels(stakingDelegatorsLabel, convertMsg.DelegatorAddr, stakingUnbondingDelegationsLabel)
 
 	// Staking unbonding delegations from
-	case i.Ixplac.GetMsgType() == mstaking.StakingQueryUnbondingDelegationsFromMsgType:
+	case i.Ixplac.GetMsgType() == StakingQueryUnbondingDelegationsFromMsgType:
 		convertMsg, _ := i.Ixplac.GetMsg().(stakingtypes.QueryValidatorUnbondingDelegationsRequest)
 
 		url = url + util.MakeQueryLabels(stakingValidatorsLabel, convertMsg.ValidatorAddr, stakingUnbondingDelegationsLabel)
 
 	// Staking redelegations
-	case i.Ixplac.GetMsgType() == mstaking.StakingQueryRedelegationMsgType ||
-		i.Ixplac.GetMsgType() == mstaking.StakingQueryRedelegationsFromMsgType:
+	case i.Ixplac.GetMsgType() == StakingQueryRedelegationMsgType ||
+		i.Ixplac.GetMsgType() == StakingQueryRedelegationsFromMsgType:
 
 		return "", util.LogErr(errors.ErrNotSupport, "unsupported querying delegations by using LCD. query delegations of a delegator")
 
 	// Staking redelegations
-	case i.Ixplac.GetMsgType() == mstaking.StakingQueryRedelegationsMsgType:
+	case i.Ixplac.GetMsgType() == StakingQueryRedelegationsMsgType:
 		convertMsg, _ := i.Ixplac.GetMsg().(stakingtypes.QueryRedelegationsRequest)
 
 		url = url + util.MakeQueryLabels(stakingDelegatorsLabel, convertMsg.DelegatorAddr, stakingRedelegationsLabel)
 
 	// Staking historical information
-	case i.Ixplac.GetMsgType() == mstaking.StakingHistoricalInfoMsgType:
+	case i.Ixplac.GetMsgType() == StakingHistoricalInfoMsgType:
 		convertMsg, _ := i.Ixplac.GetMsg().(stakingtypes.QueryHistoricalInfoRequest)
 
 		url = url + util.MakeQueryLabels(stakingHistoricalInfoLabel, util.FromInt64ToString(convertMsg.Height))
 
 	// Staking pool
-	case i.Ixplac.GetMsgType() == mstaking.StakingQueryStakingPoolMsgType:
+	case i.Ixplac.GetMsgType() == StakingQueryStakingPoolMsgType:
 		url = url + stakingPoolLabel
 
 	// Staking params
-	case i.Ixplac.GetMsgType() == mstaking.StakingQueryStakingParamsMsgType:
+	case i.Ixplac.GetMsgType() == StakingQueryStakingParamsMsgType:
 		url = url + stakingParamsLabel
 
 	default:

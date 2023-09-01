@@ -1,8 +1,7 @@
 package ibc
 
 import (
-	"github.com/Moonyongjung/xpla.go/client/queries"
-	mibc "github.com/Moonyongjung/xpla.go/core/ibc"
+	"github.com/Moonyongjung/xpla.go/core"
 	"github.com/Moonyongjung/xpla.go/types"
 	"github.com/Moonyongjung/xpla.go/types/errors"
 	"github.com/Moonyongjung/xpla.go/util"
@@ -21,7 +20,7 @@ var res proto.Message
 var err error
 
 // Query client for gov module.
-func QueryIbc(i queries.IXplaClient) (string, error) {
+func QueryIbc(i core.QueryClient) (string, error) {
 	if i.QueryType == types.QueryGrpc {
 		return queryByGrpcIbc(i)
 	} else {
@@ -29,7 +28,7 @@ func QueryIbc(i queries.IXplaClient) (string, error) {
 	}
 }
 
-func queryByGrpcIbc(i queries.IXplaClient) (string, error) {
+func queryByGrpcIbc(i core.QueryClient) (string, error) {
 	ibcclientQueryClient := ibcclient.NewQueryClient(i.Ixplac.GetGrpcClient())
 	ibcconnectionQueryClient := ibcconnection.NewQueryClient(i.Ixplac.GetGrpcClient())
 	ibccchannelQueryClient := ibcchannel.NewQueryClient(i.Ixplac.GetGrpcClient())
@@ -37,7 +36,7 @@ func queryByGrpcIbc(i queries.IXplaClient) (string, error) {
 
 	switch {
 	// IBC client states
-	case i.Ixplac.GetMsgType() == mibc.IbcClientStatesMsgType:
+	case i.Ixplac.GetMsgType() == IbcClientStatesMsgType:
 
 		convertMsg, _ := i.Ixplac.GetMsg().(ibcclient.QueryClientStatesRequest)
 		res, err = ibcclientQueryClient.ClientStates(
@@ -49,7 +48,7 @@ func queryByGrpcIbc(i queries.IXplaClient) (string, error) {
 		}
 
 	// IBC client state
-	case i.Ixplac.GetMsgType() == mibc.IbcClientStateMsgType:
+	case i.Ixplac.GetMsgType() == IbcClientStateMsgType:
 
 		convertMsg, _ := i.Ixplac.GetMsg().(ibcclient.QueryClientStateRequest)
 		res, err = ibcclientQueryClient.ClientState(
@@ -61,7 +60,7 @@ func queryByGrpcIbc(i queries.IXplaClient) (string, error) {
 		}
 
 	// IBC client status
-	case i.Ixplac.GetMsgType() == mibc.IbcClientStatusMsgType:
+	case i.Ixplac.GetMsgType() == IbcClientStatusMsgType:
 
 		convertMsg, _ := i.Ixplac.GetMsg().(ibcclient.QueryClientStatusRequest)
 		res, err = ibcclientQueryClient.ClientStatus(
@@ -73,7 +72,7 @@ func queryByGrpcIbc(i queries.IXplaClient) (string, error) {
 		}
 
 	// IBC client consensus states
-	case i.Ixplac.GetMsgType() == mibc.IbcClientConsensusStatesMsgType:
+	case i.Ixplac.GetMsgType() == IbcClientConsensusStatesMsgType:
 
 		convertMsg, _ := i.Ixplac.GetMsg().(ibcclient.QueryConsensusStatesRequest)
 		res, err = ibcclientQueryClient.ConsensusStates(
@@ -85,7 +84,7 @@ func queryByGrpcIbc(i queries.IXplaClient) (string, error) {
 		}
 
 	// IBC client consensus state heights
-	case i.Ixplac.GetMsgType() == mibc.IbcClientConsensusStateHeightsMsgType:
+	case i.Ixplac.GetMsgType() == IbcClientConsensusStateHeightsMsgType:
 
 		convertMsg, _ := i.Ixplac.GetMsg().(ibcclient.QueryConsensusStateHeightsRequest)
 		res, err = ibcclientQueryClient.ConsensusStateHeights(
@@ -97,7 +96,7 @@ func queryByGrpcIbc(i queries.IXplaClient) (string, error) {
 		}
 
 	// IBC client consensus state
-	case i.Ixplac.GetMsgType() == mibc.IbcClientConsensusStateMsgType:
+	case i.Ixplac.GetMsgType() == IbcClientConsensusStateMsgType:
 
 		convertMsg, _ := i.Ixplac.GetMsg().(ibcclient.QueryConsensusStateRequest)
 		res, err = ibcclientQueryClient.ConsensusState(
@@ -109,7 +108,7 @@ func queryByGrpcIbc(i queries.IXplaClient) (string, error) {
 		}
 
 	// IBC client tendermint header
-	case i.Ixplac.GetMsgType() == mibc.IbcClientHeaderMsgType:
+	case i.Ixplac.GetMsgType() == IbcClientHeaderMsgType:
 
 		convertMsg, _ := i.Ixplac.GetMsg().(cmclient.Context)
 		header, _, err := ibcclientutils.QueryTendermintHeader(convertMsg)
@@ -120,7 +119,7 @@ func queryByGrpcIbc(i queries.IXplaClient) (string, error) {
 		res = &header
 
 	// IBC client self consensus state
-	case i.Ixplac.GetMsgType() == mibc.IbcClientSelfConsensusStateMsgType:
+	case i.Ixplac.GetMsgType() == IbcClientSelfConsensusStateMsgType:
 
 		convertMsg, _ := i.Ixplac.GetMsg().(cmclient.Context)
 		state, _, err := ibcclientutils.QuerySelfConsensusState(convertMsg)
@@ -131,7 +130,7 @@ func queryByGrpcIbc(i queries.IXplaClient) (string, error) {
 		res = state
 
 	// IBC client params
-	case i.Ixplac.GetMsgType() == mibc.IbcClientParamsMsgType:
+	case i.Ixplac.GetMsgType() == IbcClientParamsMsgType:
 
 		convertMsg, _ := i.Ixplac.GetMsg().(ibcclient.QueryClientParamsRequest)
 		res, err = ibcclientQueryClient.ClientParams(
@@ -143,7 +142,7 @@ func queryByGrpcIbc(i queries.IXplaClient) (string, error) {
 		}
 
 	// IBC connection connections
-	case i.Ixplac.GetMsgType() == mibc.IbcConnectionConnectionsMsgType:
+	case i.Ixplac.GetMsgType() == IbcConnectionConnectionsMsgType:
 
 		convertMsg, _ := i.Ixplac.GetMsg().(ibcconnection.QueryConnectionsRequest)
 		res, err = ibcconnectionQueryClient.Connections(
@@ -155,7 +154,7 @@ func queryByGrpcIbc(i queries.IXplaClient) (string, error) {
 		}
 
 	// IBC connection connection
-	case i.Ixplac.GetMsgType() == mibc.IbcConnectionConnectionMsgType:
+	case i.Ixplac.GetMsgType() == IbcConnectionConnectionMsgType:
 
 		convertMsg, _ := i.Ixplac.GetMsg().(ibcconnection.QueryConnectionRequest)
 		res, err = ibcconnectionQueryClient.Connection(
@@ -167,7 +166,7 @@ func queryByGrpcIbc(i queries.IXplaClient) (string, error) {
 		}
 
 	// IBC connection a client connections
-	case i.Ixplac.GetMsgType() == mibc.IbcConnectionClientConnectionsMsgType:
+	case i.Ixplac.GetMsgType() == IbcConnectionClientConnectionsMsgType:
 
 		convertMsg, _ := i.Ixplac.GetMsg().(ibcconnection.QueryClientConnectionsRequest)
 		res, err = ibcconnectionQueryClient.ClientConnections(
@@ -179,7 +178,7 @@ func queryByGrpcIbc(i queries.IXplaClient) (string, error) {
 		}
 
 	// IBC channels
-	case i.Ixplac.GetMsgType() == mibc.IbcChannelChannelsMsgType:
+	case i.Ixplac.GetMsgType() == IbcChannelChannelsMsgType:
 
 		convertMsg, _ := i.Ixplac.GetMsg().(ibcchannel.QueryChannelsRequest)
 		res, err = ibccchannelQueryClient.Channels(
@@ -191,7 +190,7 @@ func queryByGrpcIbc(i queries.IXplaClient) (string, error) {
 		}
 
 	// IBC a channel
-	case i.Ixplac.GetMsgType() == mibc.IbcChannelChannelMsgType:
+	case i.Ixplac.GetMsgType() == IbcChannelChannelMsgType:
 
 		convertMsg, _ := i.Ixplac.GetMsg().(ibcchannel.QueryChannelRequest)
 		res, err = ibccchannelQueryClient.Channel(
@@ -203,7 +202,7 @@ func queryByGrpcIbc(i queries.IXplaClient) (string, error) {
 		}
 
 	// IBC channel connections
-	case i.Ixplac.GetMsgType() == mibc.IbcChannelConnectionsMsgType:
+	case i.Ixplac.GetMsgType() == IbcChannelConnectionsMsgType:
 
 		convertMsg, _ := i.Ixplac.GetMsg().(ibcchannel.QueryConnectionChannelsRequest)
 		res, err = ibccchannelQueryClient.ConnectionChannels(
@@ -215,7 +214,7 @@ func queryByGrpcIbc(i queries.IXplaClient) (string, error) {
 		}
 
 	// IBC channel client state
-	case i.Ixplac.GetMsgType() == mibc.IbcChannelClientStateMsgType:
+	case i.Ixplac.GetMsgType() == IbcChannelClientStateMsgType:
 
 		convertMsg, _ := i.Ixplac.GetMsg().(ibcchannel.QueryChannelClientStateRequest)
 		res, err = ibccchannelQueryClient.ChannelClientState(
@@ -227,7 +226,7 @@ func queryByGrpcIbc(i queries.IXplaClient) (string, error) {
 		}
 
 	// IBC channel packet commitments
-	case i.Ixplac.GetMsgType() == mibc.IbcChannelPacketCommitmentsMsgType:
+	case i.Ixplac.GetMsgType() == IbcChannelPacketCommitmentsMsgType:
 
 		convertMsg, _ := i.Ixplac.GetMsg().(ibcchannel.QueryPacketCommitmentsRequest)
 		res, err = ibccchannelQueryClient.PacketCommitments(
@@ -239,7 +238,7 @@ func queryByGrpcIbc(i queries.IXplaClient) (string, error) {
 		}
 
 	// IBC channel packet commitment by sequece
-	case i.Ixplac.GetMsgType() == mibc.IbcChannelPacketCommitmentMsgType:
+	case i.Ixplac.GetMsgType() == IbcChannelPacketCommitmentMsgType:
 
 		convertMsg, _ := i.Ixplac.GetMsg().(ibcchannel.QueryPacketCommitmentRequest)
 		res, err = ibccchannelQueryClient.PacketCommitment(
@@ -251,7 +250,7 @@ func queryByGrpcIbc(i queries.IXplaClient) (string, error) {
 		}
 
 	// IBC channel packet receipt
-	case i.Ixplac.GetMsgType() == mibc.IbcChannelPacketReceiptMsgType:
+	case i.Ixplac.GetMsgType() == IbcChannelPacketReceiptMsgType:
 
 		convertMsg, _ := i.Ixplac.GetMsg().(ibcchannel.QueryPacketReceiptRequest)
 		res, err = ibccchannelQueryClient.PacketReceipt(
@@ -263,7 +262,7 @@ func queryByGrpcIbc(i queries.IXplaClient) (string, error) {
 		}
 
 	// IBC channel packet ack
-	case i.Ixplac.GetMsgType() == mibc.IbcChannelPacketAckMsgType:
+	case i.Ixplac.GetMsgType() == IbcChannelPacketAckMsgType:
 
 		convertMsg, _ := i.Ixplac.GetMsg().(ibcchannel.QueryPacketAcknowledgementRequest)
 		res, err = ibccchannelQueryClient.PacketAcknowledgement(
@@ -275,7 +274,7 @@ func queryByGrpcIbc(i queries.IXplaClient) (string, error) {
 		}
 
 	// IBC channel unreceived packets
-	case i.Ixplac.GetMsgType() == mibc.IbcChannelUnreceivedPacketsMsgType:
+	case i.Ixplac.GetMsgType() == IbcChannelUnreceivedPacketsMsgType:
 
 		convertMsg, _ := i.Ixplac.GetMsg().(ibcchannel.QueryUnreceivedPacketsRequest)
 		res, err = ibccchannelQueryClient.UnreceivedPackets(
@@ -287,7 +286,7 @@ func queryByGrpcIbc(i queries.IXplaClient) (string, error) {
 		}
 
 	// IBC channel unreceived acks
-	case i.Ixplac.GetMsgType() == mibc.IbcChannelUnreceivedAcksMsgType:
+	case i.Ixplac.GetMsgType() == IbcChannelUnreceivedAcksMsgType:
 
 		convertMsg, _ := i.Ixplac.GetMsg().(ibcchannel.QueryUnreceivedAcksRequest)
 		res, err = ibccchannelQueryClient.UnreceivedAcks(
@@ -299,7 +298,7 @@ func queryByGrpcIbc(i queries.IXplaClient) (string, error) {
 		}
 
 	// IBC channel next sequence receive
-	case i.Ixplac.GetMsgType() == mibc.IbcChannelNextSequenceMsgType:
+	case i.Ixplac.GetMsgType() == IbcChannelNextSequenceMsgType:
 
 		convertMsg, _ := i.Ixplac.GetMsg().(ibcchannel.QueryNextSequenceReceiveRequest)
 		res, err = ibccchannelQueryClient.NextSequenceReceive(
@@ -311,7 +310,7 @@ func queryByGrpcIbc(i queries.IXplaClient) (string, error) {
 		}
 
 	// IBC transfer denom traces
-	case i.Ixplac.GetMsgType() == mibc.IbcTransferDenomTracesMsgType:
+	case i.Ixplac.GetMsgType() == IbcTransferDenomTracesMsgType:
 
 		convertMsg, _ := i.Ixplac.GetMsg().(ibctransfer.QueryDenomTracesRequest)
 		res, err = ibctransferQueryClient.DenomTraces(
@@ -323,7 +322,7 @@ func queryByGrpcIbc(i queries.IXplaClient) (string, error) {
 		}
 
 	// IBC transfer denom trace
-	case i.Ixplac.GetMsgType() == mibc.IbcTransferDenomTraceMsgType:
+	case i.Ixplac.GetMsgType() == IbcTransferDenomTraceMsgType:
 
 		convertMsg, _ := i.Ixplac.GetMsg().(ibctransfer.QueryDenomTraceRequest)
 		res, err = ibctransferQueryClient.DenomTrace(
@@ -335,7 +334,7 @@ func queryByGrpcIbc(i queries.IXplaClient) (string, error) {
 		}
 
 	// IBC transfer denom hash
-	case i.Ixplac.GetMsgType() == mibc.IbcTransferDenomHashMsgType:
+	case i.Ixplac.GetMsgType() == IbcTransferDenomHashMsgType:
 		convertMsg, _ := i.Ixplac.GetMsg().(ibctransfer.QueryDenomHashRequest)
 		res, err = ibctransferQueryClient.DenomHash(
 			i.Ixplac.GetContext(),
@@ -346,14 +345,14 @@ func queryByGrpcIbc(i queries.IXplaClient) (string, error) {
 		}
 
 	// IBC transfer escrow address
-	case i.Ixplac.GetMsgType() == mibc.IbcTransferEscrowAddressMsgType:
+	case i.Ixplac.GetMsgType() == IbcTransferEscrowAddressMsgType:
 		convertMsg, _ := i.Ixplac.GetMsg().(types.IbcEscrowAddressMsg)
 
 		addr := ibctransfer.GetEscrowAddress(convertMsg.PortId, convertMsg.ChannelId)
 		return addr.String(), nil
 
 	// IBC transfer params
-	case i.Ixplac.GetMsgType() == mibc.IbcTransferParamsMsgType:
+	case i.Ixplac.GetMsgType() == IbcTransferParamsMsgType:
 		convertMsg, _ := i.Ixplac.GetMsg().(ibctransfer.QueryParamsRequest)
 		res, err = ibctransferQueryClient.Params(
 			i.Ixplac.GetContext(),
@@ -367,7 +366,7 @@ func queryByGrpcIbc(i queries.IXplaClient) (string, error) {
 		return "", util.LogErr(errors.ErrInvalidMsgType, i.Ixplac.GetMsgType())
 	}
 
-	out, err = queries.PrintProto(i, res)
+	out, err = core.PrintProto(i, res)
 	if err != nil {
 		return "", err
 	}
@@ -401,7 +400,7 @@ const (
 	ibctransferEscrowAddressLabel = "escrow_address"
 )
 
-func queryByLcdIbc(i queries.IXplaClient) (string, error) {
+func queryByLcdIbc(i core.QueryClient) (string, error) {
 	var url string
 	ibcclientUrl := "/ibc/core/client/v1/"
 	ibcconnectionUrl := "/ibc/core/connection/v1/"
@@ -410,35 +409,35 @@ func queryByLcdIbc(i queries.IXplaClient) (string, error) {
 
 	switch {
 	// IBC client states
-	case i.Ixplac.GetMsgType() == mibc.IbcClientStatesMsgType:
+	case i.Ixplac.GetMsgType() == IbcClientStatesMsgType:
 		url = ibcclientUrl + ibcclientClientStatesLabel
 
 	// IBC client state
-	case i.Ixplac.GetMsgType() == mibc.IbcClientStateMsgType:
+	case i.Ixplac.GetMsgType() == IbcClientStateMsgType:
 		convertMsg, _ := i.Ixplac.GetMsg().(ibcclient.QueryClientStateRequest)
 
 		url = ibcclientUrl + util.MakeQueryLabels(ibcclientClientStatesLabel, convertMsg.ClientId)
 
 	// IBC client status
-	case i.Ixplac.GetMsgType() == mibc.IbcClientStatusMsgType:
+	case i.Ixplac.GetMsgType() == IbcClientStatusMsgType:
 		convertMsg, _ := i.Ixplac.GetMsg().(ibcclient.QueryClientStatusRequest)
 
 		url = ibcclientUrl + util.MakeQueryLabels(ibcclientClientStatusLabel, convertMsg.ClientId)
 
 	// IBC client consensus states
-	case i.Ixplac.GetMsgType() == mibc.IbcClientConsensusStatesMsgType:
+	case i.Ixplac.GetMsgType() == IbcClientConsensusStatesMsgType:
 		convertMsg, _ := i.Ixplac.GetMsg().(ibcclient.QueryConsensusStatesRequest)
 
 		url = ibcclientUrl + util.MakeQueryLabels(ibcclientClientConsensusStatesLabel, convertMsg.ClientId)
 
 	// IBC client consensus state heights
-	case i.Ixplac.GetMsgType() == mibc.IbcClientConsensusStateHeightsMsgType:
+	case i.Ixplac.GetMsgType() == IbcClientConsensusStateHeightsMsgType:
 		convertMsg, _ := i.Ixplac.GetMsg().(ibcclient.QueryConsensusStateHeightsRequest)
 
 		url = ibcclientUrl + util.MakeQueryLabels(ibcclientClientConsensusStatesLabel, convertMsg.ClientId, ibcclientHeightsLabel)
 
 	// IBC client consensus state height
-	case i.Ixplac.GetMsgType() == mibc.IbcClientConsensusStateMsgType:
+	case i.Ixplac.GetMsgType() == IbcClientConsensusStateMsgType:
 		convertMsg, _ := i.Ixplac.GetMsg().(ibcclient.QueryConsensusStateRequest)
 
 		url = ibcclientUrl + util.MakeQueryLabels(
@@ -451,81 +450,81 @@ func queryByLcdIbc(i queries.IXplaClient) (string, error) {
 		)
 
 	// IBC client tendermint header
-	case i.Ixplac.GetMsgType() == mibc.IbcClientHeaderMsgType:
+	case i.Ixplac.GetMsgType() == IbcClientHeaderMsgType:
 		return "", util.LogErr(errors.ErrNotSupport, "unsupported querying IBC client tendermint header by using LCD")
 
 	// IBC client self consensus state
-	case i.Ixplac.GetMsgType() == mibc.IbcClientSelfConsensusStateMsgType:
+	case i.Ixplac.GetMsgType() == IbcClientSelfConsensusStateMsgType:
 		return "", util.LogErr(errors.ErrNotSupport, "unsupported querying IBC client self consensus state by using LCD")
 
 	// IBC client params
-	case i.Ixplac.GetMsgType() == mibc.IbcClientParamsMsgType:
+	case i.Ixplac.GetMsgType() == IbcClientParamsMsgType:
 		url = "/ibc/client/v1/params"
 
 	// IBC connection connections
-	case i.Ixplac.GetMsgType() == mibc.IbcConnectionConnectionsMsgType:
+	case i.Ixplac.GetMsgType() == IbcConnectionConnectionsMsgType:
 		url = ibcconnectionUrl + ibcconnectionConnectionsLabel
 
 	// IBC connection connection
-	case i.Ixplac.GetMsgType() == mibc.IbcConnectionConnectionMsgType:
+	case i.Ixplac.GetMsgType() == IbcConnectionConnectionMsgType:
 		convertMsg, _ := i.Ixplac.GetMsg().(ibcconnection.QueryConnectionRequest)
 
 		url = ibcconnectionUrl + util.MakeQueryLabels(ibcconnectionConnectionsLabel, convertMsg.ConnectionId)
 
 	// IBC connection a client connections
-	case i.Ixplac.GetMsgType() == mibc.IbcConnectionClientConnectionsMsgType:
+	case i.Ixplac.GetMsgType() == IbcConnectionClientConnectionsMsgType:
 		convertMsg, _ := i.Ixplac.GetMsg().(ibcconnection.QueryClientConnectionsRequest)
 
 		url = ibcconnectionUrl + util.MakeQueryLabels(ibcconnectionClientConnectionsLabel, convertMsg.ClientId)
 
 	// IBC channels
-	case i.Ixplac.GetMsgType() == mibc.IbcChannelChannelsMsgType:
+	case i.Ixplac.GetMsgType() == IbcChannelChannelsMsgType:
 		url = ibcchannelUrl + ibcchannelChannelsLabel
 
 	// IBC a channel
-	case i.Ixplac.GetMsgType() == mibc.IbcChannelChannelMsgType:
+	case i.Ixplac.GetMsgType() == IbcChannelChannelMsgType:
 		convertMsg, _ := i.Ixplac.GetMsg().(ibcchannel.QueryChannelRequest)
 
 		url = ibcchannelUrl + util.MakeQueryLabels(ibcchannelChannelsLabel, convertMsg.ChannelId, ibcchannelPortsLabel, convertMsg.PortId)
 
 	// IBC channel connections
-	case i.Ixplac.GetMsgType() == mibc.IbcChannelConnectionsMsgType:
+	case i.Ixplac.GetMsgType() == IbcChannelConnectionsMsgType:
 		convertMsg, _ := i.Ixplac.GetMsg().(ibcchannel.QueryConnectionChannelsRequest)
 
 		url = ibcchannelUrl + util.MakeQueryLabels(ibcconnectionConnectionsLabel, convertMsg.Connection, ibcchannelChannelsLabel)
 
 	// IBC channel client state
-	case i.Ixplac.GetMsgType() == mibc.IbcChannelClientStateMsgType:
+	case i.Ixplac.GetMsgType() == IbcChannelClientStateMsgType:
 		convertMsg, _ := i.Ixplac.GetMsg().(ibcchannel.QueryChannelClientStateRequest)
 
 		url = ibcchannelUrl + util.MakeQueryLabels(ibcchannelChannelsLabel, convertMsg.ChannelId, ibcchannelPortsLabel, convertMsg.PortId, ibcchannelClientStateLabel)
 
 	// IBC channel packet commitments
-	case i.Ixplac.GetMsgType() == mibc.IbcChannelPacketCommitmentsMsgType:
+	case i.Ixplac.GetMsgType() == IbcChannelPacketCommitmentsMsgType:
 		convertMsg, _ := i.Ixplac.GetMsg().(ibcchannel.QueryPacketCommitmentsRequest)
 
 		url = ibcchannelUrl + util.MakeQueryLabels(ibcchannelChannelsLabel, convertMsg.ChannelId, ibcchannelPortsLabel, convertMsg.PortId, ibcchannelPacketCommitmentsLabel)
 
 	// IBC channel packet commitment by sequece
-	case i.Ixplac.GetMsgType() == mibc.IbcChannelPacketCommitmentMsgType:
+	case i.Ixplac.GetMsgType() == IbcChannelPacketCommitmentMsgType:
 		convertMsg, _ := i.Ixplac.GetMsg().(ibcchannel.QueryPacketCommitmentRequest)
 
 		url = ibcchannelUrl + util.MakeQueryLabels(ibcchannelChannelsLabel, convertMsg.ChannelId, ibcchannelPortsLabel, convertMsg.PortId, ibcchannelPacketCommitmentsLabel, util.FromUint64ToString(convertMsg.Sequence))
 
 	// IBC channel packet receipt
-	case i.Ixplac.GetMsgType() == mibc.IbcChannelPacketReceiptMsgType:
+	case i.Ixplac.GetMsgType() == IbcChannelPacketReceiptMsgType:
 		convertMsg, _ := i.Ixplac.GetMsg().(ibcchannel.QueryPacketReceiptRequest)
 
 		url = ibcchannelUrl + util.MakeQueryLabels(ibcchannelChannelsLabel, convertMsg.ChannelId, ibcchannelPortsLabel, convertMsg.PortId, ibcchannelPacketReceiptLabel, util.FromUint64ToString(convertMsg.Sequence))
 
 	// IBC channel packet ack
-	case i.Ixplac.GetMsgType() == mibc.IbcChannelPacketAckMsgType:
+	case i.Ixplac.GetMsgType() == IbcChannelPacketAckMsgType:
 		convertMsg, _ := i.Ixplac.GetMsg().(ibcchannel.QueryPacketAcknowledgementRequest)
 
 		url = ibcchannelUrl + util.MakeQueryLabels(ibcchannelChannelsLabel, convertMsg.ChannelId, ibcchannelPortsLabel, convertMsg.PortId, ibcchannelPacketAckLabel, util.FromUint64ToString(convertMsg.Sequence))
 
 	// IBC channel unreceived packets
-	case i.Ixplac.GetMsgType() == mibc.IbcChannelUnreceivedPacketsMsgType:
+	case i.Ixplac.GetMsgType() == IbcChannelUnreceivedPacketsMsgType:
 		convertMsg, _ := i.Ixplac.GetMsg().(ibcchannel.QueryUnreceivedPacketsRequest)
 
 		url = ibcchannelUrl + util.MakeQueryLabels(
@@ -539,7 +538,7 @@ func queryByLcdIbc(i queries.IXplaClient) (string, error) {
 		)
 
 	// IBC channel unreceived acks
-	case i.Ixplac.GetMsgType() == mibc.IbcChannelUnreceivedAcksMsgType:
+	case i.Ixplac.GetMsgType() == IbcChannelUnreceivedAcksMsgType:
 		convertMsg, _ := i.Ixplac.GetMsg().(ibcchannel.QueryUnreceivedAcksRequest)
 
 		url = ibcchannelUrl + util.MakeQueryLabels(
@@ -553,33 +552,33 @@ func queryByLcdIbc(i queries.IXplaClient) (string, error) {
 		)
 
 	// IBC channel next sequence receive
-	case i.Ixplac.GetMsgType() == mibc.IbcChannelNextSequenceMsgType:
+	case i.Ixplac.GetMsgType() == IbcChannelNextSequenceMsgType:
 		convertMsg, _ := i.Ixplac.GetMsg().(ibcchannel.QueryNextSequenceReceiveRequest)
 
 		url = ibcchannelUrl + util.MakeQueryLabels(ibcchannelChannelsLabel, convertMsg.ChannelId, ibcchannelPortsLabel, convertMsg.PortId, ibcchannelNextSequenceLabel)
 
 	// IBC transfer denom traces
-	case i.Ixplac.GetMsgType() == mibc.IbcTransferDenomTracesMsgType:
+	case i.Ixplac.GetMsgType() == IbcTransferDenomTracesMsgType:
 		url = ibctransferUrl + ibctransferDenomTracesLabel
 
 	// IBC transfer denom trace
-	case i.Ixplac.GetMsgType() == mibc.IbcTransferDenomTraceMsgType:
+	case i.Ixplac.GetMsgType() == IbcTransferDenomTraceMsgType:
 		convertMsg, _ := i.Ixplac.GetMsg().(ibctransfer.QueryDenomTraceRequest)
 
 		url = ibctransferUrl + util.MakeQueryLabels(ibctransferDenomTracesLabel, convertMsg.Hash)
 
 	// IBC transfer denom hash
-	case i.Ixplac.GetMsgType() == mibc.IbcTransferDenomHashMsgType:
+	case i.Ixplac.GetMsgType() == IbcTransferDenomHashMsgType:
 		return "", util.LogErr(errors.ErrNotSupport, "unsupported querying denom hash by using LCD")
 
 	// IBC transfer escrow address
-	case i.Ixplac.GetMsgType() == mibc.IbcTransferEscrowAddressMsgType:
+	case i.Ixplac.GetMsgType() == IbcTransferEscrowAddressMsgType:
 		convertMsg, _ := i.Ixplac.GetMsg().(types.IbcEscrowAddressMsg)
 
 		url = ibctransferUrl + util.MakeQueryLabels(ibcchannelChannelsLabel, convertMsg.ChannelId, ibcchannelPortsLabel, convertMsg.PortId, ibctransferEscrowAddressLabel)
 
 	// IBC transfer params
-	case i.Ixplac.GetMsgType() == mibc.IbcTransferParamsMsgType:
+	case i.Ixplac.GetMsgType() == IbcTransferParamsMsgType:
 		url = ibctransferUrl + "/params"
 
 	default:

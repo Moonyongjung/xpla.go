@@ -1,8 +1,7 @@
 package feegrant
 
 import (
-	"github.com/Moonyongjung/xpla.go/client/queries"
-	mfeegrant "github.com/Moonyongjung/xpla.go/core/feegrant"
+	"github.com/Moonyongjung/xpla.go/core"
 	"github.com/Moonyongjung/xpla.go/types"
 	"github.com/Moonyongjung/xpla.go/types/errors"
 	"github.com/Moonyongjung/xpla.go/util"
@@ -17,7 +16,7 @@ var res proto.Message
 var err error
 
 // Query client for fee-grant module.
-func QueryFeegrant(i queries.IXplaClient) (string, error) {
+func QueryFeegrant(i core.QueryClient) (string, error) {
 	if i.QueryType == types.QueryGrpc {
 		return queryByGrpcFeegrant(i)
 	} else {
@@ -26,12 +25,12 @@ func QueryFeegrant(i queries.IXplaClient) (string, error) {
 
 }
 
-func queryByGrpcFeegrant(i queries.IXplaClient) (string, error) {
+func queryByGrpcFeegrant(i core.QueryClient) (string, error) {
 	queryClient := feegrant.NewQueryClient(i.Ixplac.GetGrpcClient())
 
 	switch {
 	// Feegrant state
-	case i.Ixplac.GetMsgType() == mfeegrant.FeegrantQueryGrantMsgType:
+	case i.Ixplac.GetMsgType() == FeegrantQueryGrantMsgType:
 		convertMsg, _ := i.Ixplac.GetMsg().(feegrant.QueryAllowanceRequest)
 		res, err = queryClient.Allowance(
 			i.Ixplac.GetContext(),
@@ -42,7 +41,7 @@ func queryByGrpcFeegrant(i queries.IXplaClient) (string, error) {
 		}
 
 	// Feegrant grants by grantee
-	case i.Ixplac.GetMsgType() == mfeegrant.FeegrantQueryGrantsByGranteeMsgType:
+	case i.Ixplac.GetMsgType() == FeegrantQueryGrantsByGranteeMsgType:
 		convertMsg, _ := i.Ixplac.GetMsg().(feegrant.QueryAllowancesRequest)
 		res, err = queryClient.Allowances(
 			i.Ixplac.GetContext(),
@@ -53,7 +52,7 @@ func queryByGrpcFeegrant(i queries.IXplaClient) (string, error) {
 		}
 
 	// Feegrant grants by granter
-	case i.Ixplac.GetMsgType() == mfeegrant.FeegrantQueryGrantsByGranterMsgType:
+	case i.Ixplac.GetMsgType() == FeegrantQueryGrantsByGranterMsgType:
 		convertMsg, _ := i.Ixplac.GetMsg().(feegrant.QueryAllowancesByGranterRequest)
 		res, err = queryClient.AllowancesByGranter(
 			i.Ixplac.GetContext(),
@@ -67,7 +66,7 @@ func queryByGrpcFeegrant(i queries.IXplaClient) (string, error) {
 		return "", util.LogErr(errors.ErrInvalidMsgType, i.Ixplac.GetMsgType())
 	}
 
-	out, err = queries.PrintProto(i, res)
+	out, err = core.PrintProto(i, res)
 	if err != nil {
 		return "", err
 	}
@@ -80,24 +79,24 @@ const (
 	feegrantAllowancesLabel = "allowances"
 )
 
-func queryByLcdFeegrant(i queries.IXplaClient) (string, error) {
+func queryByLcdFeegrant(i core.QueryClient) (string, error) {
 	url := util.MakeQueryLcdUrl(feegrantv1beta1.Query_ServiceDesc.Metadata.(string))
 
 	switch {
 	// Feegrant state
-	case i.Ixplac.GetMsgType() == mfeegrant.FeegrantQueryGrantMsgType:
+	case i.Ixplac.GetMsgType() == FeegrantQueryGrantMsgType:
 		convertMsg, _ := i.Ixplac.GetMsg().(feegrant.QueryAllowanceRequest)
 
 		url = url + util.MakeQueryLabels(feegrantAllowanceLabel, convertMsg.Granter, convertMsg.Grantee)
 
 	// Feegrant grants by grantee
-	case i.Ixplac.GetMsgType() == mfeegrant.FeegrantQueryGrantsByGranteeMsgType:
+	case i.Ixplac.GetMsgType() == FeegrantQueryGrantsByGranteeMsgType:
 		convertMsg, _ := i.Ixplac.GetMsg().(feegrant.QueryAllowancesRequest)
 
 		url = url + util.MakeQueryLabels(feegrantAllowancesLabel, convertMsg.Grantee)
 
 	// Feegrant grants by granter
-	case i.Ixplac.GetMsgType() == mfeegrant.FeegrantQueryGrantsByGranterMsgType:
+	case i.Ixplac.GetMsgType() == FeegrantQueryGrantsByGranterMsgType:
 		return "", util.LogErr(errors.ErrNotSupport, "unsupported querying feegrant state(grants by granter) by using LCD")
 
 	default:

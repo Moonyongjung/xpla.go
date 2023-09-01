@@ -1,8 +1,7 @@
 package gov
 
 import (
-	"github.com/Moonyongjung/xpla.go/client/queries"
-	mgov "github.com/Moonyongjung/xpla.go/core/gov"
+	"github.com/Moonyongjung/xpla.go/core"
 	"github.com/Moonyongjung/xpla.go/types"
 	"github.com/Moonyongjung/xpla.go/types/errors"
 	"github.com/Moonyongjung/xpla.go/util"
@@ -19,7 +18,7 @@ var res proto.Message
 var err error
 
 // Query client for gov module.
-func QueryGov(i queries.IXplaClient) (string, error) {
+func QueryGov(i core.QueryClient) (string, error) {
 	if i.QueryType == types.QueryGrpc {
 		return queryByGrpcGov(i)
 	} else {
@@ -27,12 +26,12 @@ func QueryGov(i queries.IXplaClient) (string, error) {
 	}
 }
 
-func queryByGrpcGov(i queries.IXplaClient) (string, error) {
+func queryByGrpcGov(i core.QueryClient) (string, error) {
 	queryClient := govtypes.NewQueryClient(i.Ixplac.GetGrpcClient())
 
 	switch {
 	// Gov proposal
-	case i.Ixplac.GetMsgType() == mgov.GovQueryProposalMsgType:
+	case i.Ixplac.GetMsgType() == GovQueryProposalMsgType:
 		convertMsg, _ := i.Ixplac.GetMsg().(govtypes.QueryProposalRequest)
 		res, err = queryClient.Proposal(
 			i.Ixplac.GetContext(),
@@ -43,7 +42,7 @@ func queryByGrpcGov(i queries.IXplaClient) (string, error) {
 		}
 
 	// Gov proposals
-	case i.Ixplac.GetMsgType() == mgov.GovQueryProposalsMsgType:
+	case i.Ixplac.GetMsgType() == GovQueryProposalsMsgType:
 		convertMsg, _ := i.Ixplac.GetMsg().(govtypes.QueryProposalsRequest)
 		res, err = queryClient.Proposals(
 			i.Ixplac.GetContext(),
@@ -54,12 +53,12 @@ func queryByGrpcGov(i queries.IXplaClient) (string, error) {
 		}
 
 	// Gov deposit parameter
-	case i.Ixplac.GetMsgType() == mgov.GovQueryDepositParamsMsgType:
+	case i.Ixplac.GetMsgType() == GovQueryDepositParamsMsgType:
 		convertMsg, _ := i.Ixplac.GetMsg().(govtypes.QueryDepositParams)
 
 		var deposit govtypes.Deposit
 
-		clientCtx, err := queries.ClientForQuery(i)
+		clientCtx, err := core.ClientForQuery(i)
 		if err != nil {
 			return "", err
 		}
@@ -72,7 +71,7 @@ func queryByGrpcGov(i queries.IXplaClient) (string, error) {
 		res = &deposit
 
 	// Gov deposit
-	case i.Ixplac.GetMsgType() == mgov.GovQueryDepositRequestMsgType:
+	case i.Ixplac.GetMsgType() == GovQueryDepositRequestMsgType:
 		convertMsg, _ := i.Ixplac.GetMsg().(govtypes.QueryDepositRequest)
 		res, err = queryClient.Deposit(
 			i.Ixplac.GetContext(),
@@ -83,11 +82,11 @@ func queryByGrpcGov(i queries.IXplaClient) (string, error) {
 		}
 
 	// Gov deposits parameter
-	case i.Ixplac.GetMsgType() == mgov.GovQueryDepositsParamsMsgType:
+	case i.Ixplac.GetMsgType() == GovQueryDepositsParamsMsgType:
 		convertMsg, _ := i.Ixplac.GetMsg().(govtypes.QueryProposalParams)
 
 		var deposit govtypes.Deposits
-		clientCtx, err := queries.ClientForQuery(i)
+		clientCtx, err := core.ClientForQuery(i)
 		if err != nil {
 			return "", err
 		}
@@ -98,14 +97,14 @@ func queryByGrpcGov(i queries.IXplaClient) (string, error) {
 		}
 
 		clientCtx.LegacyAmino.MustUnmarshalJSON(resByTxQuery, &deposit)
-		out, err := queries.PrintObjectLegacy(i, deposit)
+		out, err := core.PrintObjectLegacy(i, deposit)
 		if err != nil {
 			return "", util.LogErr(errors.ErrParse, err)
 		}
 		return string(out), nil
 
 	// Gov deposits
-	case i.Ixplac.GetMsgType() == mgov.GovQueryDepositsRequestMsgType:
+	case i.Ixplac.GetMsgType() == GovQueryDepositsRequestMsgType:
 		convertMsg, _ := i.Ixplac.GetMsg().(govtypes.QueryDepositsRequest)
 		res, err = queryClient.Deposits(
 			i.Ixplac.GetContext(),
@@ -116,7 +115,7 @@ func queryByGrpcGov(i queries.IXplaClient) (string, error) {
 		}
 
 	// Gov tally
-	case i.Ixplac.GetMsgType() == mgov.GovTallyMsgType:
+	case i.Ixplac.GetMsgType() == GovTallyMsgType:
 		convertMsg, _ := i.Ixplac.GetMsg().(govtypes.QueryTallyResultRequest)
 		res, err = queryClient.TallyResult(
 			i.Ixplac.GetContext(),
@@ -127,7 +126,7 @@ func queryByGrpcGov(i queries.IXplaClient) (string, error) {
 		}
 
 	// Gov params
-	case i.Ixplac.GetMsgType() == mgov.GovQueryGovParamsMsgType:
+	case i.Ixplac.GetMsgType() == GovQueryGovParamsMsgType:
 		votingRes, err := queryClient.Params(
 			i.Ixplac.GetContext(),
 			&govtypes.QueryParamsRequest{ParamsType: "voting"},
@@ -165,7 +164,7 @@ func queryByGrpcGov(i queries.IXplaClient) (string, error) {
 		return string(bytes), nil
 
 	// Gov params of voting
-	case i.Ixplac.GetMsgType() == mgov.GovQueryGovParamVotingMsgType:
+	case i.Ixplac.GetMsgType() == GovQueryGovParamVotingMsgType:
 		convertMsg, _ := i.Ixplac.GetMsg().(govtypes.QueryParamsRequest)
 		resParams, err := queryClient.Params(
 			i.Ixplac.GetContext(),
@@ -182,7 +181,7 @@ func queryByGrpcGov(i queries.IXplaClient) (string, error) {
 		return string(bytes), nil
 
 	// Gov params of tally
-	case i.Ixplac.GetMsgType() == mgov.GovQueryGovParamTallyingMsgType:
+	case i.Ixplac.GetMsgType() == GovQueryGovParamTallyingMsgType:
 		convertMsg, _ := i.Ixplac.GetMsg().(govtypes.QueryParamsRequest)
 		resParams, err := queryClient.Params(
 			i.Ixplac.GetContext(),
@@ -199,7 +198,7 @@ func queryByGrpcGov(i queries.IXplaClient) (string, error) {
 		return string(bytes), nil
 
 	// Gov params of deposit
-	case i.Ixplac.GetMsgType() == mgov.GovQueryGovParamDepositMsgType:
+	case i.Ixplac.GetMsgType() == GovQueryGovParamDepositMsgType:
 		convertMsg, _ := i.Ixplac.GetMsg().(govtypes.QueryParamsRequest)
 		resParams, err := queryClient.Params(
 			i.Ixplac.GetContext(),
@@ -216,11 +215,11 @@ func queryByGrpcGov(i queries.IXplaClient) (string, error) {
 		return string(bytes), nil
 
 	// Gov proposer
-	case i.Ixplac.GetMsgType() == mgov.GovQueryProposerMsgType:
+	case i.Ixplac.GetMsgType() == GovQueryProposerMsgType:
 		convertMsg, _ := i.Ixplac.GetMsg().(string)
 		proposalId := util.FromStringToUint64(convertMsg)
 
-		clientCtx, err := queries.ClientForQuery(i)
+		clientCtx, err := core.ClientForQuery(i)
 		if err != nil {
 			return "", err
 		}
@@ -237,7 +236,7 @@ func queryByGrpcGov(i queries.IXplaClient) (string, error) {
 		return string(bytes), nil
 
 	// Gov vote
-	case i.Ixplac.GetMsgType() == mgov.GovQueryVoteMsgType:
+	case i.Ixplac.GetMsgType() == GovQueryVoteMsgType:
 		convertMsg, _ := i.Ixplac.GetMsg().(govtypes.QueryVoteRequest)
 		resVote, err := queryClient.Vote(
 			i.Ixplac.GetContext(),
@@ -247,7 +246,7 @@ func queryByGrpcGov(i queries.IXplaClient) (string, error) {
 			return "", util.LogErr(errors.ErrGrpcRequest, err)
 		}
 
-		clientCtx, err := queries.ClientForQuery(i)
+		clientCtx, err := core.ClientForQuery(i)
 		if err != nil {
 			return "", err
 		}
@@ -273,9 +272,9 @@ func queryByGrpcGov(i queries.IXplaClient) (string, error) {
 		res = &resVote.Vote
 
 	// Gov votes not passed
-	case i.Ixplac.GetMsgType() == mgov.GovQueryVotesNotPassedMsgType:
+	case i.Ixplac.GetMsgType() == GovQueryVotesNotPassedMsgType:
 		convertMsg, _ := i.Ixplac.GetMsg().(govtypes.QueryProposalVotesParams)
-		clientCtx, err := queries.ClientForQuery(i)
+		clientCtx, err := core.ClientForQuery(i)
 		if err != nil {
 			return "", err
 		}
@@ -287,14 +286,14 @@ func queryByGrpcGov(i queries.IXplaClient) (string, error) {
 		var votes govtypes.Votes
 
 		clientCtx.LegacyAmino.MustUnmarshalJSON(resByTxQuery, &votes)
-		out, err := queries.PrintObjectLegacy(i, votes)
+		out, err := core.PrintObjectLegacy(i, votes)
 		if err != nil {
 			return "", util.LogErr(errors.ErrParse, err)
 		}
 		return string(out), nil
 
 	// Gov votes passed
-	case i.Ixplac.GetMsgType() == mgov.GovQueryVotesPassedMsgType:
+	case i.Ixplac.GetMsgType() == GovQueryVotesPassedMsgType:
 		convertMsg, _ := i.Ixplac.GetMsg().(govtypes.QueryVotesRequest)
 		res, err = queryClient.Votes(
 			i.Ixplac.GetContext(),
@@ -308,7 +307,7 @@ func queryByGrpcGov(i queries.IXplaClient) (string, error) {
 		return "", util.LogErr(errors.ErrInvalidMsgType, i.Ixplac.GetMsgType())
 	}
 
-	out, err = queries.PrintProto(i, res)
+	out, err = core.PrintProto(i, res)
 	if err != nil {
 		return "", err
 	}
@@ -324,90 +323,90 @@ const (
 	govVotesLabel     = "votes"
 )
 
-func queryByLcdGov(i queries.IXplaClient) (string, error) {
+func queryByLcdGov(i core.QueryClient) (string, error) {
 	url := util.MakeQueryLcdUrl(govv1beta1.Query_ServiceDesc.Metadata.(string))
 
 	switch {
 	// Gov proposal
-	case i.Ixplac.GetMsgType() == mgov.GovQueryProposalMsgType:
+	case i.Ixplac.GetMsgType() == GovQueryProposalMsgType:
 		convertMsg, _ := i.Ixplac.GetMsg().(govtypes.QueryProposalRequest)
 
 		url = url + util.MakeQueryLabels(govProposalsLabel, util.FromUint64ToString(convertMsg.ProposalId))
 
 	// Gov proposals
-	case i.Ixplac.GetMsgType() == mgov.GovQueryProposalsMsgType:
+	case i.Ixplac.GetMsgType() == GovQueryProposalsMsgType:
 		url = url + govProposalsLabel
 
 	// Gov deposit parameter
-	case i.Ixplac.GetMsgType() == mgov.GovQueryDepositParamsMsgType:
+	case i.Ixplac.GetMsgType() == GovQueryDepositParamsMsgType:
 		convertMsg, _ := i.Ixplac.GetMsg().(govtypes.QueryDepositParams)
 
 		url = url + util.MakeQueryLabels(govProposalsLabel, util.FromUint64ToString(convertMsg.ProposalID), govDeposistsLabel, convertMsg.Depositor.String())
 
 	// Gov deposit
-	case i.Ixplac.GetMsgType() == mgov.GovQueryDepositRequestMsgType:
+	case i.Ixplac.GetMsgType() == GovQueryDepositRequestMsgType:
 		convertMsg, _ := i.Ixplac.GetMsg().(govtypes.QueryDepositRequest)
 
 		url = url + util.MakeQueryLabels(govProposalsLabel, util.FromUint64ToString(convertMsg.ProposalId), govDeposistsLabel, convertMsg.Depositor)
 
 	// Gov deposits parameter
-	case i.Ixplac.GetMsgType() == mgov.GovQueryDepositsParamsMsgType:
+	case i.Ixplac.GetMsgType() == GovQueryDepositsParamsMsgType:
 		convertMsg, _ := i.Ixplac.GetMsg().(govtypes.QueryProposalParams)
 
 		url = url + util.MakeQueryLabels(govProposalsLabel, util.FromUint64ToString(convertMsg.ProposalID), govDeposistsLabel)
 
 	// Gov deposits
-	case i.Ixplac.GetMsgType() == mgov.GovQueryDepositsRequestMsgType:
+	case i.Ixplac.GetMsgType() == GovQueryDepositsRequestMsgType:
 		convertMsg, _ := i.Ixplac.GetMsg().(govtypes.QueryDepositsRequest)
 
 		url = url + util.MakeQueryLabels(govProposalsLabel, util.FromUint64ToString(convertMsg.ProposalId), govDeposistsLabel)
 
 	// Gov tally
-	case i.Ixplac.GetMsgType() == mgov.GovTallyMsgType:
+	case i.Ixplac.GetMsgType() == GovTallyMsgType:
 		convertMsg, _ := i.Ixplac.GetMsg().(govtypes.QueryTallyResultRequest)
 
 		url = url + util.MakeQueryLabels(govProposalsLabel, util.FromUint64ToString(convertMsg.ProposalId), govTallyLabel)
 
 	// Gov params
-	case i.Ixplac.GetMsgType() == mgov.GovQueryGovParamsMsgType:
+	case i.Ixplac.GetMsgType() == GovQueryGovParamsMsgType:
 		return "", util.LogErr(errors.ErrNotSupport, "unsupported querying all gov params by using LCD. query each parameter(voting|tallying|deposit)")
 
 	// Gov params of voting
-	case i.Ixplac.GetMsgType() == mgov.GovQueryGovParamVotingMsgType:
+	case i.Ixplac.GetMsgType() == GovQueryGovParamVotingMsgType:
 		convertMsg, _ := i.Ixplac.GetMsg().(govtypes.QueryParamsRequest)
 
 		url = url + util.MakeQueryLabels(govParamsLabel, convertMsg.ParamsType)
 
 	// Gov params of tally
-	case i.Ixplac.GetMsgType() == mgov.GovQueryGovParamTallyingMsgType:
+	case i.Ixplac.GetMsgType() == GovQueryGovParamTallyingMsgType:
 		convertMsg, _ := i.Ixplac.GetMsg().(govtypes.QueryParamsRequest)
 
 		url = url + util.MakeQueryLabels(govParamsLabel, convertMsg.ParamsType)
 
 	// Gov params of deposit
-	case i.Ixplac.GetMsgType() == mgov.GovQueryGovParamDepositMsgType:
+	case i.Ixplac.GetMsgType() == GovQueryGovParamDepositMsgType:
 		convertMsg, _ := i.Ixplac.GetMsg().(govtypes.QueryParamsRequest)
 
 		url = url + util.MakeQueryLabels(govParamsLabel, convertMsg.ParamsType)
 
 	// Gov proposer
-	case i.Ixplac.GetMsgType() == mgov.GovQueryProposerMsgType:
+	case i.Ixplac.GetMsgType() == GovQueryProposerMsgType:
 		return "", util.LogErr(errors.ErrNotSupport, "unsupported querying proposer by using LCD")
 
 	// Gov vote
-	case i.Ixplac.GetMsgType() == mgov.GovQueryVoteMsgType:
+	case i.Ixplac.GetMsgType() == GovQueryVoteMsgType:
 		convertMsg, _ := i.Ixplac.GetMsg().(govtypes.QueryVoteRequest)
 
 		url = url + util.MakeQueryLabels(govProposalsLabel, util.FromUint64ToString(convertMsg.ProposalId), govVotesLabel, convertMsg.Voter)
 
 	// Gov votes not passed
-	case i.Ixplac.GetMsgType() == mgov.GovQueryVotesNotPassedMsgType:
+	case i.Ixplac.GetMsgType() == GovQueryVotesNotPassedMsgType:
 		convertMsg, _ := i.Ixplac.GetMsg().(govtypes.QueryProposalVotesParams)
 
 		url = url + util.MakeQueryLabels(govProposalsLabel, util.FromUint64ToString(convertMsg.ProposalID), govVotesLabel)
 
 	// Gov votes passed
-	case i.Ixplac.GetMsgType() == mgov.GovQueryVotesPassedMsgType:
+	case i.Ixplac.GetMsgType() == GovQueryVotesPassedMsgType:
 		convertMsg, _ := i.Ixplac.GetMsg().(govtypes.QueryVotesRequest)
 
 		url = url + util.MakeQueryLabels(govProposalsLabel, util.FromUint64ToString(convertMsg.ProposalId), govVotesLabel)

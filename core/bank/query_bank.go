@@ -1,8 +1,7 @@
 package bank
 
 import (
-	"github.com/Moonyongjung/xpla.go/client/queries"
-	mbank "github.com/Moonyongjung/xpla.go/core/bank"
+	"github.com/Moonyongjung/xpla.go/core"
 	"github.com/Moonyongjung/xpla.go/types"
 	"github.com/Moonyongjung/xpla.go/types/errors"
 	"github.com/Moonyongjung/xpla.go/util"
@@ -17,7 +16,7 @@ var res proto.Message
 var err error
 
 // Query client for bank module.
-func QueryBank(i queries.IXplaClient) (string, error) {
+func QueryBank(i core.QueryClient) (string, error) {
 	if i.QueryType == types.QueryGrpc {
 		return queryByGrpcBank(i)
 	} else {
@@ -25,12 +24,12 @@ func QueryBank(i queries.IXplaClient) (string, error) {
 	}
 }
 
-func queryByGrpcBank(i queries.IXplaClient) (string, error) {
+func queryByGrpcBank(i core.QueryClient) (string, error) {
 	queryClient := banktypes.NewQueryClient(i.Ixplac.GetGrpcClient())
 
 	switch {
 	// Bank balances
-	case i.Ixplac.GetMsgType() == mbank.BankAllBalancesMsgType:
+	case i.Ixplac.GetMsgType() == BankAllBalancesMsgType:
 		convertMsg, _ := i.Ixplac.GetMsg().(banktypes.QueryAllBalancesRequest)
 		res, err = queryClient.AllBalances(
 			i.Ixplac.GetContext(),
@@ -41,7 +40,7 @@ func queryByGrpcBank(i queries.IXplaClient) (string, error) {
 		}
 
 	// Bank balance
-	case i.Ixplac.GetMsgType() == mbank.BankBalanceMsgType:
+	case i.Ixplac.GetMsgType() == BankBalanceMsgType:
 		convertMsg, _ := i.Ixplac.GetMsg().(banktypes.QueryBalanceRequest)
 		res, err = queryClient.Balance(
 			i.Ixplac.GetContext(),
@@ -52,7 +51,7 @@ func queryByGrpcBank(i queries.IXplaClient) (string, error) {
 		}
 
 	// Bank denominations metadata
-	case i.Ixplac.GetMsgType() == mbank.BankDenomsMetadataMsgType:
+	case i.Ixplac.GetMsgType() == BankDenomsMetadataMsgType:
 		convertMsg, _ := i.Ixplac.GetMsg().(banktypes.QueryDenomsMetadataRequest)
 		res, err = queryClient.DenomsMetadata(
 			i.Ixplac.GetContext(),
@@ -63,7 +62,7 @@ func queryByGrpcBank(i queries.IXplaClient) (string, error) {
 		}
 
 	// Bank denomination metadata
-	case i.Ixplac.GetMsgType() == mbank.BankDenomMetadataMsgType:
+	case i.Ixplac.GetMsgType() == BankDenomMetadataMsgType:
 		convertMsg, _ := i.Ixplac.GetMsg().(banktypes.QueryDenomMetadataRequest)
 		res, err = queryClient.DenomMetadata(
 			i.Ixplac.GetContext(),
@@ -74,7 +73,7 @@ func queryByGrpcBank(i queries.IXplaClient) (string, error) {
 		}
 
 	// Bank total
-	case i.Ixplac.GetMsgType() == mbank.BankTotalMsgType:
+	case i.Ixplac.GetMsgType() == BankTotalMsgType:
 		convertMsg, _ := i.Ixplac.GetMsg().(banktypes.QueryTotalSupplyRequest)
 		res, err = queryClient.TotalSupply(
 			i.Ixplac.GetContext(),
@@ -85,7 +84,7 @@ func queryByGrpcBank(i queries.IXplaClient) (string, error) {
 		}
 
 	// Bank total supply
-	case i.Ixplac.GetMsgType() == mbank.BankTotalSupplyOfMsgType:
+	case i.Ixplac.GetMsgType() == BankTotalSupplyOfMsgType:
 		convertMsg, _ := i.Ixplac.GetMsg().(banktypes.QuerySupplyOfRequest)
 		res, err = queryClient.SupplyOf(
 			i.Ixplac.GetContext(),
@@ -99,7 +98,7 @@ func queryByGrpcBank(i queries.IXplaClient) (string, error) {
 		return "", util.LogErr(errors.ErrInvalidMsgType, i.Ixplac.GetMsgType())
 	}
 
-	out, err = queries.PrintProto(i, res)
+	out, err = core.PrintProto(i, res)
 	if err != nil {
 		return "", err
 	}
@@ -113,36 +112,36 @@ const (
 	bankSupplyLabel        = "supply"
 )
 
-func queryByLcdBank(i queries.IXplaClient) (string, error) {
+func queryByLcdBank(i core.QueryClient) (string, error) {
 	url := util.MakeQueryLcdUrl(bankv1beta1.Query_ServiceDesc.Metadata.(string))
 
 	switch {
 	// Bank balances
-	case i.Ixplac.GetMsgType() == mbank.BankAllBalancesMsgType:
+	case i.Ixplac.GetMsgType() == BankAllBalancesMsgType:
 		convertMsg, _ := i.Ixplac.GetMsg().(banktypes.QueryAllBalancesRequest)
 		url = url + util.MakeQueryLabels(bankBalancesLabel, convertMsg.Address)
 
 	// Bank balance
-	case i.Ixplac.GetMsgType() == mbank.BankBalanceMsgType:
+	case i.Ixplac.GetMsgType() == BankBalanceMsgType:
 		// not supported now.
 		convertMsg, _ := i.Ixplac.GetMsg().(banktypes.QueryBalanceRequest)
 		url = url + util.MakeQueryLabels(bankBalancesLabel, convertMsg.Address, convertMsg.Denom)
 
 	// Bank denominations metadata
-	case i.Ixplac.GetMsgType() == mbank.BankDenomsMetadataMsgType:
+	case i.Ixplac.GetMsgType() == BankDenomsMetadataMsgType:
 		url = url + bankDenomMetadataLabel
 
 	// Bank denomination metadata
-	case i.Ixplac.GetMsgType() == mbank.BankDenomMetadataMsgType:
+	case i.Ixplac.GetMsgType() == BankDenomMetadataMsgType:
 		convertMsg, _ := i.Ixplac.GetMsg().(banktypes.QueryDenomMetadataRequest)
 		url = url + util.MakeQueryLabels(bankDenomMetadataLabel, convertMsg.Denom)
 
 	// Bank total
-	case i.Ixplac.GetMsgType() == mbank.BankTotalMsgType:
+	case i.Ixplac.GetMsgType() == BankTotalMsgType:
 		url = url + bankSupplyLabel
 
 	// Bank total supply
-	case i.Ixplac.GetMsgType() == mbank.BankTotalSupplyOfMsgType:
+	case i.Ixplac.GetMsgType() == BankTotalSupplyOfMsgType:
 		convertMsg, _ := i.Ixplac.GetMsg().(banktypes.QuerySupplyOfRequest)
 		url = url + util.MakeQueryLabels(bankSupplyLabel, convertMsg.Denom)
 

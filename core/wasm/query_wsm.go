@@ -5,8 +5,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/Moonyongjung/xpla.go/client/queries"
-	mwasm "github.com/Moonyongjung/xpla.go/core/wasm"
+	"github.com/Moonyongjung/xpla.go/core"
 	"github.com/Moonyongjung/xpla.go/types"
 	"github.com/Moonyongjung/xpla.go/types/errors"
 	"github.com/Moonyongjung/xpla.go/util"
@@ -20,7 +19,7 @@ var res proto.Message
 var err error
 
 // Query client for wasm module.
-func QueryWasm(i queries.IXplaClient) (string, error) {
+func QueryWasm(i core.QueryClient) (string, error) {
 	if i.QueryType == types.QueryGrpc {
 		return queryByGrpcWasm(i)
 	} else {
@@ -28,12 +27,12 @@ func QueryWasm(i queries.IXplaClient) (string, error) {
 	}
 }
 
-func queryByGrpcWasm(i queries.IXplaClient) (string, error) {
+func queryByGrpcWasm(i core.QueryClient) (string, error) {
 	queryClient := wasmtypes.NewQueryClient(i.Ixplac.GetGrpcClient())
 
 	switch {
 	// Wasm query contract
-	case i.Ixplac.GetMsgType() == mwasm.WasmQueryContractMsgType:
+	case i.Ixplac.GetMsgType() == WasmQueryContractMsgType:
 		convertMsg, _ := i.Ixplac.GetMsg().(wasmtypes.QuerySmartContractStateRequest)
 		res, err = queryClient.SmartContractState(
 			i.Ixplac.GetContext(),
@@ -44,7 +43,7 @@ func queryByGrpcWasm(i queries.IXplaClient) (string, error) {
 		}
 
 	// Wasm list code
-	case i.Ixplac.GetMsgType() == mwasm.WasmListCodeMsgType:
+	case i.Ixplac.GetMsgType() == WasmListCodeMsgType:
 		convertMsg, _ := i.Ixplac.GetMsg().(wasmtypes.QueryCodesRequest)
 		res, err = queryClient.Codes(
 			i.Ixplac.GetContext(),
@@ -55,7 +54,7 @@ func queryByGrpcWasm(i queries.IXplaClient) (string, error) {
 		}
 
 	// Wasm list contract by code
-	case i.Ixplac.GetMsgType() == mwasm.WasmListContractByCodeMsgType:
+	case i.Ixplac.GetMsgType() == WasmListContractByCodeMsgType:
 		convertMsg, _ := i.Ixplac.GetMsg().(wasmtypes.QueryContractsByCodeRequest)
 		res, err = queryClient.ContractsByCode(
 			i.Ixplac.GetContext(),
@@ -66,7 +65,7 @@ func queryByGrpcWasm(i queries.IXplaClient) (string, error) {
 		}
 
 	// Wasm download
-	case i.Ixplac.GetMsgType() == mwasm.WasmDownloadMsgType:
+	case i.Ixplac.GetMsgType() == WasmDownloadMsgType:
 		convertMsg, _ := i.Ixplac.GetMsg().([]interface{})[0].(wasmtypes.QueryCodeRequest)
 		downloadFileName, _ := i.Ixplac.GetMsg().([]interface{})[1].(string)
 		if !strings.Contains(downloadFileName, ".wasm") {
@@ -83,7 +82,7 @@ func queryByGrpcWasm(i queries.IXplaClient) (string, error) {
 		return "download complete", nil
 
 	// Wasm code info
-	case i.Ixplac.GetMsgType() == mwasm.WasmCodeInfoMsgType:
+	case i.Ixplac.GetMsgType() == WasmCodeInfoMsgType:
 		convertMsg, _ := i.Ixplac.GetMsg().(wasmtypes.QueryCodeRequest)
 		res, err = queryClient.Code(
 			i.Ixplac.GetContext(),
@@ -94,7 +93,7 @@ func queryByGrpcWasm(i queries.IXplaClient) (string, error) {
 		}
 
 	// Wasm contract info
-	case i.Ixplac.GetMsgType() == mwasm.WasmContractInfoMsgType:
+	case i.Ixplac.GetMsgType() == WasmContractInfoMsgType:
 		convertMsg, _ := i.Ixplac.GetMsg().(wasmtypes.QueryContractInfoRequest)
 		res, err = queryClient.ContractInfo(
 			i.Ixplac.GetContext(),
@@ -105,7 +104,7 @@ func queryByGrpcWasm(i queries.IXplaClient) (string, error) {
 		}
 
 	// Wasm contract state all
-	case i.Ixplac.GetMsgType() == mwasm.WasmContractStateAllMsgType:
+	case i.Ixplac.GetMsgType() == WasmContractStateAllMsgType:
 		convertMsg, _ := i.Ixplac.GetMsg().(wasmtypes.QueryAllContractStateRequest)
 		res, err = queryClient.AllContractState(
 			i.Ixplac.GetContext(),
@@ -116,7 +115,7 @@ func queryByGrpcWasm(i queries.IXplaClient) (string, error) {
 		}
 
 	// Wasm contract history
-	case i.Ixplac.GetMsgType() == mwasm.WasmContractHistoryMsgType:
+	case i.Ixplac.GetMsgType() == WasmContractHistoryMsgType:
 		convertMsg, _ := i.Ixplac.GetMsg().(wasmtypes.QueryContractHistoryRequest)
 		res, err = queryClient.ContractHistory(
 			i.Ixplac.GetContext(),
@@ -127,7 +126,7 @@ func queryByGrpcWasm(i queries.IXplaClient) (string, error) {
 		}
 
 	// Wasm pinned
-	case i.Ixplac.GetMsgType() == mwasm.WasmPinnedMsgType:
+	case i.Ixplac.GetMsgType() == WasmPinnedMsgType:
 		convertMsg, _ := i.Ixplac.GetMsg().(wasmtypes.QueryPinnedCodesRequest)
 		res, err = queryClient.PinnedCodes(
 			i.Ixplac.GetContext(),
@@ -138,7 +137,7 @@ func queryByGrpcWasm(i queries.IXplaClient) (string, error) {
 		}
 
 	// Wasm libwasmvm version
-	case i.Ixplac.GetMsgType() == mwasm.WasmLibwasmvmVersionMsgType:
+	case i.Ixplac.GetMsgType() == WasmLibwasmvmVersionMsgType:
 		convertMsg, _ := i.Ixplac.GetMsg().(string)
 		return convertMsg, nil
 
@@ -146,7 +145,7 @@ func queryByGrpcWasm(i queries.IXplaClient) (string, error) {
 		return "", util.LogErr(errors.ErrInvalidMsgType, i.Ixplac.GetMsgType())
 	}
 
-	out, err = queries.PrintProto(i, res)
+	out, err = core.PrintProto(i, res)
 	if err != nil {
 		return "", err
 	}
@@ -164,62 +163,62 @@ const (
 	wasmPinnedLabel   = "pinned"
 )
 
-func queryByLcdWasm(i queries.IXplaClient) (string, error) {
+func queryByLcdWasm(i core.QueryClient) (string, error) {
 	url := "/cosmwasm/wasm/v1/"
 
 	switch {
 	// Wasm query contract
-	case i.Ixplac.GetMsgType() == mwasm.WasmQueryContractMsgType:
+	case i.Ixplac.GetMsgType() == WasmQueryContractMsgType:
 		convertMsg, _ := i.Ixplac.GetMsg().(wasmtypes.QuerySmartContractStateRequest)
 		based64EncodedData := base64.StdEncoding.EncodeToString([]byte(convertMsg.QueryData))
 
 		url = url + util.MakeQueryLabels(wasmContractLabel, convertMsg.Address, wasmSmartLabel, based64EncodedData)
 
 	// Wasm list code
-	case i.Ixplac.GetMsgType() == mwasm.WasmListCodeMsgType:
+	case i.Ixplac.GetMsgType() == WasmListCodeMsgType:
 		url = url + wasmCodeLabel
 
 	// Wasm list contract by code
-	case i.Ixplac.GetMsgType() == mwasm.WasmListContractByCodeMsgType:
+	case i.Ixplac.GetMsgType() == WasmListContractByCodeMsgType:
 		convertMsg, _ := i.Ixplac.GetMsg().(wasmtypes.QueryContractsByCodeRequest)
 
 		url = url + util.MakeQueryLabels(wasmCodeLabel, util.FromUint64ToString(convertMsg.CodeId))
 
 	// Wasm download
-	case i.Ixplac.GetMsgType() == mwasm.WasmDownloadMsgType:
+	case i.Ixplac.GetMsgType() == WasmDownloadMsgType:
 		return "", util.LogErr(errors.ErrNotSupport, "unsupported download wasm file by using LCD")
 
 	// Wasm code info
-	case i.Ixplac.GetMsgType() == mwasm.WasmCodeInfoMsgType:
+	case i.Ixplac.GetMsgType() == WasmCodeInfoMsgType:
 		convertMsg, _ := i.Ixplac.GetMsg().(wasmtypes.QueryCodeRequest)
 
 		url = url + util.MakeQueryLabels(wasmCodeLabel, util.FromUint64ToString(convertMsg.CodeId))
 
 	// Wasm contract info
-	case i.Ixplac.GetMsgType() == mwasm.WasmContractInfoMsgType:
+	case i.Ixplac.GetMsgType() == WasmContractInfoMsgType:
 		convertMsg, _ := i.Ixplac.GetMsg().(wasmtypes.QueryContractInfoRequest)
 
 		url = url + util.MakeQueryLabels(wasmContractLabel, convertMsg.Address)
 
 	// Wasm contract state all
-	case i.Ixplac.GetMsgType() == mwasm.WasmContractStateAllMsgType:
+	case i.Ixplac.GetMsgType() == WasmContractStateAllMsgType:
 		convertMsg, _ := i.Ixplac.GetMsg().(wasmtypes.QueryAllContractStateRequest)
 
 		url = url + util.MakeQueryLabels(wasmContractLabel, convertMsg.Address, wasmStateLabel)
 
 	// Wasm contract history
-	case i.Ixplac.GetMsgType() == mwasm.WasmContractHistoryMsgType:
+	case i.Ixplac.GetMsgType() == WasmContractHistoryMsgType:
 		convertMsg, _ := i.Ixplac.GetMsg().(wasmtypes.QueryContractHistoryRequest)
 
 		url = url + util.MakeQueryLabels(wasmContractLabel, convertMsg.Address, wasmHistoryLabel)
 
 	// Wasm pinned
-	case i.Ixplac.GetMsgType() == mwasm.WasmPinnedMsgType:
+	case i.Ixplac.GetMsgType() == WasmPinnedMsgType:
 
 		url = url + util.MakeQueryLabels(wasmCodesLabel, wasmPinnedLabel)
 
 	// Wasm libwasmvm version
-	case i.Ixplac.GetMsgType() == mwasm.WasmLibwasmvmVersionMsgType:
+	case i.Ixplac.GetMsgType() == WasmLibwasmvmVersionMsgType:
 		convertMsg, _ := i.Ixplac.GetMsg().(string)
 		return convertMsg, nil
 

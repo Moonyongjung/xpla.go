@@ -1,8 +1,7 @@
 package auth
 
 import (
-	"github.com/Moonyongjung/xpla.go/client/queries"
-	mauth "github.com/Moonyongjung/xpla.go/core/auth"
+	"github.com/Moonyongjung/xpla.go/core"
 	"github.com/Moonyongjung/xpla.go/types"
 	"github.com/Moonyongjung/xpla.go/types/errors"
 	"github.com/Moonyongjung/xpla.go/util"
@@ -19,7 +18,7 @@ var res proto.Message
 var err error
 
 // Query client for auth module.
-func QueryAuth(i queries.IXplaClient) (string, error) {
+func QueryAuth(i core.QueryClient) (string, error) {
 	if i.QueryType == types.QueryGrpc {
 		return queryByGrpcAuth(i)
 	} else {
@@ -27,12 +26,12 @@ func QueryAuth(i queries.IXplaClient) (string, error) {
 	}
 }
 
-func queryByGrpcAuth(i queries.IXplaClient) (string, error) {
+func queryByGrpcAuth(i core.QueryClient) (string, error) {
 	queryClient := authtypes.NewQueryClient(i.Ixplac.GetGrpcClient())
 
 	switch {
 	// Auth params
-	case i.Ixplac.GetMsgType() == mauth.AuthQueryParamsMsgType:
+	case i.Ixplac.GetMsgType() == AuthQueryParamsMsgType:
 		convertMsg, _ := i.Ixplac.GetMsg().(authtypes.QueryParamsRequest)
 		res, err = queryClient.Params(
 			i.Ixplac.GetContext(),
@@ -43,7 +42,7 @@ func queryByGrpcAuth(i queries.IXplaClient) (string, error) {
 		}
 
 	// Auth account
-	case i.Ixplac.GetMsgType() == mauth.AuthQueryAccAddressMsgType:
+	case i.Ixplac.GetMsgType() == AuthQueryAccAddressMsgType:
 		convertMsg, _ := i.Ixplac.GetMsg().(authtypes.QueryAccountRequest)
 		res, err = queryClient.Account(
 			i.Ixplac.GetContext(),
@@ -54,7 +53,7 @@ func queryByGrpcAuth(i queries.IXplaClient) (string, error) {
 		}
 
 	// Auth accounts
-	case i.Ixplac.GetMsgType() == mauth.AuthQueryAccountsMsgType:
+	case i.Ixplac.GetMsgType() == AuthQueryAccountsMsgType:
 		convertMsg, _ := i.Ixplac.GetMsg().(authtypes.QueryAccountsRequest)
 		res, err = queryClient.Accounts(
 			i.Ixplac.GetContext(),
@@ -65,12 +64,12 @@ func queryByGrpcAuth(i queries.IXplaClient) (string, error) {
 		}
 
 	// Auth tx by event
-	case i.Ixplac.GetMsgType() == mauth.AuthQueryTxsByEventsMsgType:
+	case i.Ixplac.GetMsgType() == AuthQueryTxsByEventsMsgType:
 		if i.Ixplac.GetRpc() == "" {
 			return "", util.LogErr(errors.ErrNotSatisfiedOptions, "query txs by events, need RPC URL when txs methods")
 		}
-		convertMsg, _ := i.Ixplac.GetMsg().(mauth.QueryTxsByEventParseMsg)
-		clientCtx, err := queries.ClientForQuery(i)
+		convertMsg, _ := i.Ixplac.GetMsg().(QueryTxsByEventParseMsg)
+		clientCtx, err := core.ClientForQuery(i)
 		if err != nil {
 			return "", err
 		}
@@ -81,13 +80,13 @@ func queryByGrpcAuth(i queries.IXplaClient) (string, error) {
 		}
 
 	// Auth tx
-	case i.Ixplac.GetMsgType() == mauth.AuthQueryTxMsgType:
+	case i.Ixplac.GetMsgType() == AuthQueryTxMsgType:
 		if i.Ixplac.GetRpc() == "" {
 			return "", util.LogErr(errors.ErrNotSatisfiedOptions, "auth query tx msg, need RPC URL when txs methods")
 		}
-		convertMsg, _ := i.Ixplac.GetMsg().(mauth.QueryTxParseMsg)
+		convertMsg, _ := i.Ixplac.GetMsg().(QueryTxParseMsg)
 
-		clientCtx, err := queries.ClientForQuery(i)
+		clientCtx, err := core.ClientForQuery(i)
 		if err != nil {
 			return "", err
 		}
@@ -108,7 +107,7 @@ func queryByGrpcAuth(i queries.IXplaClient) (string, error) {
 		return "", util.LogErr(errors.ErrInvalidMsgType, i.Ixplac.GetMsgType())
 	}
 
-	out, err = queries.PrintProto(i, res)
+	out, err = core.PrintProto(i, res)
 	if err != nil {
 		return "", err
 	}
@@ -122,27 +121,27 @@ const (
 	authTxsLabel      = "txs"
 )
 
-func queryByLcdAuth(i queries.IXplaClient) (string, error) {
+func queryByLcdAuth(i core.QueryClient) (string, error) {
 
 	url := util.MakeQueryLcdUrl(authv1beta1.Query_ServiceDesc.Metadata.(string))
 
 	switch {
 	// Auth params
-	case i.Ixplac.GetMsgType() == mauth.AuthQueryParamsMsgType:
+	case i.Ixplac.GetMsgType() == AuthQueryParamsMsgType:
 		url = url + authParamsLabel
 
 	// Auth account
-	case i.Ixplac.GetMsgType() == mauth.AuthQueryAccAddressMsgType:
+	case i.Ixplac.GetMsgType() == AuthQueryAccAddressMsgType:
 		convertMsg, _ := i.Ixplac.GetMsg().(authtypes.QueryAccountRequest)
 		url = url + util.MakeQueryLabels(authAccountsLabel, convertMsg.Address)
 
 	// Auth accounts
-	case i.Ixplac.GetMsgType() == mauth.AuthQueryAccountsMsgType:
+	case i.Ixplac.GetMsgType() == AuthQueryAccountsMsgType:
 		url = url + authAccountsLabel
 
 	// Auth tx by event
-	case i.Ixplac.GetMsgType() == mauth.AuthQueryTxsByEventsMsgType:
-		convertMsg, _ := i.Ixplac.GetMsg().(mauth.QueryTxsByEventParseMsg)
+	case i.Ixplac.GetMsgType() == AuthQueryTxsByEventsMsgType:
+		convertMsg, _ := i.Ixplac.GetMsg().(QueryTxsByEventParseMsg)
 
 		if len(convertMsg.TmEvents) > 1 {
 			return "", util.LogErr(errors.ErrNotSupport, "support only one event on the LCD")
@@ -160,8 +159,8 @@ func queryByLcdAuth(i queries.IXplaClient) (string, error) {
 		url = url + authTxsLabel + events + page + limit
 
 	// Auth tx
-	case i.Ixplac.GetMsgType() == mauth.AuthQueryTxMsgType:
-		convertMsg, _ := i.Ixplac.GetMsg().(mauth.QueryTxParseMsg)
+	case i.Ixplac.GetMsgType() == AuthQueryTxMsgType:
+		convertMsg, _ := i.Ixplac.GetMsg().(QueryTxParseMsg)
 
 		if len(convertMsg.TmEvents) > 1 {
 			return "", util.LogErr(errors.ErrNotSupport, "support only one event on the LCD")

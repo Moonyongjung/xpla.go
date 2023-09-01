@@ -3,8 +3,7 @@ package evm
 import (
 	"math/big"
 
-	"github.com/Moonyongjung/xpla.go/client/queries"
-	mevm "github.com/Moonyongjung/xpla.go/core/evm"
+	"github.com/Moonyongjung/xpla.go/core"
 	"github.com/Moonyongjung/xpla.go/types"
 	"github.com/Moonyongjung/xpla.go/types/errors"
 	"github.com/Moonyongjung/xpla.go/util"
@@ -13,7 +12,7 @@ import (
 )
 
 // Query client for evm module.
-func QueryEvm(i queries.IXplaClient) (string, error) {
+func QueryEvm(i core.QueryClient) (string, error) {
 	evmClient, err := util.NewEvmClient(i.Ixplac.GetEvmRpc(), i.Ixplac.GetContext())
 	if err != nil {
 		return "", err
@@ -45,8 +44,8 @@ func QueryEvm(i queries.IXplaClient) (string, error) {
 
 	switch {
 	// Evm call contract
-	case i.Ixplac.GetMsgType() == mevm.EvmCallSolContractMsgType:
-		convertMsg, _ := i.Ixplac.GetMsg().(mevm.CallSolContractParseMsg)
+	case i.Ixplac.GetMsgType() == EvmCallSolContractMsgType:
+		convertMsg, _ := i.Ixplac.GetMsg().(CallSolContractParseMsg)
 
 		convertMsg.CallMsg.Gas = util.FromStringToUint64(gasLimit)
 		convertMsg.CallMsg.GasPrice = gasPriceBigInt
@@ -69,7 +68,7 @@ func QueryEvm(i queries.IXplaClient) (string, error) {
 		return jsonReturn(callSolContractResponse)
 
 	// Evm transaction by hash
-	case i.Ixplac.GetMsgType() == mevm.EvmGetTransactionByHashMsgType:
+	case i.Ixplac.GetMsgType() == EvmGetTransactionByHashMsgType:
 		convertMsg, _ := i.Ixplac.GetMsg().(types.GetTransactionByHashMsg)
 		commonTxHash := util.FromStringHexToHash(convertMsg.TxHash)
 		tx, isPending, err := evmClient.Client.TransactionByHash(evmClient.Ctx, commonTxHash)
@@ -83,7 +82,7 @@ func QueryEvm(i queries.IXplaClient) (string, error) {
 		return jsonReturn(tx)
 
 	// Evm block by hash or height
-	case i.Ixplac.GetMsgType() == mevm.EvmGetBlockByHashHeightMsgType:
+	case i.Ixplac.GetMsgType() == EvmGetBlockByHashHeightMsgType:
 		convertMsg, _ := i.Ixplac.GetMsg().(types.GetBlockByHashHeightMsg)
 		var block *ethtypes.Block
 		var blockResponse types.BlockResponse
@@ -116,7 +115,7 @@ func QueryEvm(i queries.IXplaClient) (string, error) {
 		return jsonReturn(blockResponse)
 
 	// Evm account information
-	case i.Ixplac.GetMsgType() == mevm.EvmQueryAccountInfoMsgType:
+	case i.Ixplac.GetMsgType() == EvmQueryAccountInfoMsgType:
 		convertMsg, _ := i.Ixplac.GetMsg().(types.AccountInfoMsg)
 		account := util.FromStringToByte20Address(convertMsg.Account)
 
@@ -179,7 +178,7 @@ func QueryEvm(i queries.IXplaClient) (string, error) {
 		return jsonReturn(accountInfoResponse)
 
 	// Evm suggest gas price
-	case i.Ixplac.GetMsgType() == mevm.EvmSuggestGasPriceMsgType:
+	case i.Ixplac.GetMsgType() == EvmSuggestGasPriceMsgType:
 		gasPrice, err := evmClient.Client.SuggestGasPrice(evmClient.Ctx)
 		if err != nil {
 			return "", util.LogErr(errors.ErrEvmRpcRequest, err)
@@ -197,7 +196,7 @@ func QueryEvm(i queries.IXplaClient) (string, error) {
 		return jsonReturn(suggestGasPriceResponse)
 
 	// Evm chain ID
-	case i.Ixplac.GetMsgType() == mevm.EvmQueryChainIdMsgType:
+	case i.Ixplac.GetMsgType() == EvmQueryChainIdMsgType:
 		chainId, err := evmClient.Client.ChainID(evmClient.Ctx)
 		if err != nil {
 			return "", util.LogErr(errors.ErrEvmRpcRequest, err)
@@ -209,7 +208,7 @@ func QueryEvm(i queries.IXplaClient) (string, error) {
 		return jsonReturn(ethChainIdResponse)
 
 	// Evm latest block height
-	case i.Ixplac.GetMsgType() == mevm.EvmQueryCurrentBlockNumberMsgType:
+	case i.Ixplac.GetMsgType() == EvmQueryCurrentBlockNumberMsgType:
 		blockNumber, err := evmClient.Client.BlockNumber(evmClient.Ctx)
 		if err != nil {
 			return "", util.LogErr(errors.ErrEvmRpcRequest, err)
@@ -221,7 +220,7 @@ func QueryEvm(i queries.IXplaClient) (string, error) {
 		return jsonReturn(ethBlockNumberResponse)
 
 	// Web3 client version
-	case i.Ixplac.GetMsgType() == mevm.EvmWeb3ClientVersionMsgType:
+	case i.Ixplac.GetMsgType() == EvmWeb3ClientVersionMsgType:
 		var result string
 		err := evmClient.RpcClient.CallContext(evmClient.Ctx, &result, "web3_clientVersion")
 		if err != nil {
@@ -234,7 +233,7 @@ func QueryEvm(i queries.IXplaClient) (string, error) {
 		return jsonReturn(web3ClientVersionResponse)
 
 	// Web3 sha
-	case i.Ixplac.GetMsgType() == mevm.EvmWeb3Sha3MsgType:
+	case i.Ixplac.GetMsgType() == EvmWeb3Sha3MsgType:
 		convertMsg, _ := i.Ixplac.GetMsg().(types.Web3Sha3Msg)
 
 		var result string
@@ -249,7 +248,7 @@ func QueryEvm(i queries.IXplaClient) (string, error) {
 		return jsonReturn(web3Sha3Response)
 
 	// network ID
-	case i.Ixplac.GetMsgType() == mevm.EvmNetVersionMsgType:
+	case i.Ixplac.GetMsgType() == EvmNetVersionMsgType:
 		var result string
 		err := evmClient.RpcClient.CallContext(evmClient.Ctx, &result, "net_version")
 		if err != nil {
@@ -262,7 +261,7 @@ func QueryEvm(i queries.IXplaClient) (string, error) {
 		return jsonReturn(netVersionResponse)
 
 	// the number of peers
-	case i.Ixplac.GetMsgType() == mevm.EvmNetPeerCountMsgType:
+	case i.Ixplac.GetMsgType() == EvmNetPeerCountMsgType:
 		var result int
 		err := evmClient.RpcClient.CallContext(evmClient.Ctx, &result, "net_peerCount")
 		if err != nil {
@@ -275,7 +274,7 @@ func QueryEvm(i queries.IXplaClient) (string, error) {
 		return jsonReturn(netPeerCountResponse)
 
 	// actively listening for network connections
-	case i.Ixplac.GetMsgType() == mevm.EvmNetListeningMsgType:
+	case i.Ixplac.GetMsgType() == EvmNetListeningMsgType:
 		var result bool
 		err := evmClient.RpcClient.CallContext(evmClient.Ctx, &result, "net_listening")
 		if err != nil {
@@ -288,7 +287,7 @@ func QueryEvm(i queries.IXplaClient) (string, error) {
 		return jsonReturn(netListeningResponse)
 
 	// eth protocol version
-	case i.Ixplac.GetMsgType() == mevm.EvmEthProtocolVersionMsgType:
+	case i.Ixplac.GetMsgType() == EvmEthProtocolVersionMsgType:
 		resultBigInt := big.NewInt(0)
 
 		var result string
@@ -308,7 +307,7 @@ func QueryEvm(i queries.IXplaClient) (string, error) {
 		return jsonReturn(ethProtocolVersionResponse)
 
 	// eth syncing status
-	case i.Ixplac.GetMsgType() == mevm.EvmEthSyncingMsgType:
+	case i.Ixplac.GetMsgType() == EvmEthSyncingMsgType:
 		var result bool
 		err := evmClient.RpcClient.CallContext(evmClient.Ctx, &result, "eth_syncing")
 		if err != nil {
@@ -321,7 +320,7 @@ func QueryEvm(i queries.IXplaClient) (string, error) {
 		return jsonReturn(ethSyncingResponse)
 
 	// eth all accounts
-	case i.Ixplac.GetMsgType() == mevm.EvmEthAccountsMsgType:
+	case i.Ixplac.GetMsgType() == EvmEthAccountsMsgType:
 		var result []string
 		err := evmClient.RpcClient.CallContext(evmClient.Ctx, &result, "eth_accounts")
 		if err != nil {
@@ -334,7 +333,7 @@ func QueryEvm(i queries.IXplaClient) (string, error) {
 		return jsonReturn(ethAccountsResponse)
 
 	// the number of transaction a given block
-	case i.Ixplac.GetMsgType() == mevm.EvmEthGetBlockTransactionCountMsgType:
+	case i.Ixplac.GetMsgType() == EvmEthGetBlockTransactionCountMsgType:
 		convertMsg, _ := i.Ixplac.GetMsg().(types.EthGetBlockTransactionCountMsg)
 		resultBigInt := big.NewInt(0)
 
@@ -366,8 +365,8 @@ func QueryEvm(i queries.IXplaClient) (string, error) {
 		return jsonReturn(ethGetBlockTransactionCountResponse)
 
 	// Evm call contract
-	case i.Ixplac.GetMsgType() == mevm.EvmEthEstimateGasMsgType:
-		convertMsg, _ := i.Ixplac.GetMsg().(mevm.CallSolContractParseMsg)
+	case i.Ixplac.GetMsgType() == EvmEthEstimateGasMsgType:
+		convertMsg, _ := i.Ixplac.GetMsg().(CallSolContractParseMsg)
 		convertMsg.CallMsg.Gas = 0
 		convertMsg.CallMsg.GasPrice = gasPriceBigInt
 
@@ -382,7 +381,7 @@ func QueryEvm(i queries.IXplaClient) (string, error) {
 		return jsonReturn(estimateGasResponse)
 
 	// get transaction by block hash and index
-	case i.Ixplac.GetMsgType() == mevm.EvmGetTransactionByBlockHashAndIndexMsgType:
+	case i.Ixplac.GetMsgType() == EvmGetTransactionByBlockHashAndIndexMsgType:
 		convertMsg, _ := i.Ixplac.GetMsg().(types.GetTransactionByBlockHashAndIndexMsg)
 
 		blockHash := util.FromStringHexToHash(convertMsg.BlockHash)
@@ -396,7 +395,7 @@ func QueryEvm(i queries.IXplaClient) (string, error) {
 		return jsonReturn(res)
 
 	// get transaction receipt
-	case i.Ixplac.GetMsgType() == mevm.EvmGetTransactionReceiptMsgType:
+	case i.Ixplac.GetMsgType() == EvmGetTransactionReceiptMsgType:
 		convertMsg, _ := i.Ixplac.GetMsg().(types.GetTransactionReceiptMsg)
 
 		transactionHash := util.FromStringHexToHash(convertMsg.TransactionHash)
@@ -409,8 +408,8 @@ func QueryEvm(i queries.IXplaClient) (string, error) {
 		return jsonReturn(res)
 
 	// get filter ID by eth new filter
-	case i.Ixplac.GetMsgType() == mevm.EvmEthNewFilterMsgType:
-		convertMsg, _ := i.Ixplac.GetMsg().(mevm.EthNewFilterParseMsg)
+	case i.Ixplac.GetMsgType() == EvmEthNewFilterMsgType:
+		convertMsg, _ := i.Ixplac.GetMsg().(EthNewFilterParseMsg)
 
 		var result interface{}
 		err = evmClient.RpcClient.CallContext(evmClient.Ctx, &result, "eth_newFilter", convertMsg)
@@ -424,7 +423,7 @@ func QueryEvm(i queries.IXplaClient) (string, error) {
 		return jsonReturn(ethNewFilterResponse)
 
 	// get transaction receipt
-	case i.Ixplac.GetMsgType() == mevm.EvmEthNewBlockFilterMsgType:
+	case i.Ixplac.GetMsgType() == EvmEthNewBlockFilterMsgType:
 
 		var result interface{}
 		err := evmClient.RpcClient.CallContext(evmClient.Ctx, &result, "eth_newBlockFilter")
@@ -439,7 +438,7 @@ func QueryEvm(i queries.IXplaClient) (string, error) {
 		return jsonReturn(ethNewBlockFilterResponse)
 
 	// get transaction receipt
-	case i.Ixplac.GetMsgType() == mevm.EvmEthNewPendingTransactionFilterMsgType:
+	case i.Ixplac.GetMsgType() == EvmEthNewPendingTransactionFilterMsgType:
 
 		var result interface{}
 		err := evmClient.RpcClient.CallContext(evmClient.Ctx, &result, "eth_newPendingTransactionFilter")
@@ -454,7 +453,7 @@ func QueryEvm(i queries.IXplaClient) (string, error) {
 		return jsonReturn(ethNewPendingTransactionFilterResponse)
 
 	// uninstall filter
-	case i.Ixplac.GetMsgType() == mevm.EvmEthUninstallFilterMsgType:
+	case i.Ixplac.GetMsgType() == EvmEthUninstallFilterMsgType:
 		convertMsg, _ := i.Ixplac.GetMsg().(types.EthUninstallFilterMsg)
 
 		var result bool
@@ -470,7 +469,7 @@ func QueryEvm(i queries.IXplaClient) (string, error) {
 		return jsonReturn(ethUninstallFilterResponse)
 
 	// get filter changes
-	case i.Ixplac.GetMsgType() == mevm.EvmEthGetFilterChangesMsgType:
+	case i.Ixplac.GetMsgType() == EvmEthGetFilterChangesMsgType:
 		convertMsg, _ := i.Ixplac.GetMsg().(types.EthGetFilterChangesMsg)
 
 		var result []string
@@ -486,7 +485,7 @@ func QueryEvm(i queries.IXplaClient) (string, error) {
 		return jsonReturn(ethGetFilterChangesResponse)
 
 	// get filter logs
-	case i.Ixplac.GetMsgType() == mevm.EvmEthGetFilterLogsMsgType:
+	case i.Ixplac.GetMsgType() == EvmEthGetFilterLogsMsgType:
 		convertMsg, _ := i.Ixplac.GetMsg().(types.EthGetFilterLogsMsg)
 
 		var result []string
@@ -502,8 +501,8 @@ func QueryEvm(i queries.IXplaClient) (string, error) {
 		return jsonReturn(ethGetFilterLogsResponse)
 
 	// get logs
-	case i.Ixplac.GetMsgType() == mevm.EvmEthGetLogsMsgType:
-		convertMsg, _ := i.Ixplac.GetMsg().(mevm.EthNewFilterParseMsg)
+	case i.Ixplac.GetMsgType() == EvmEthGetLogsMsgType:
+		convertMsg, _ := i.Ixplac.GetMsg().(EthNewFilterParseMsg)
 
 		var result interface{}
 		err := evmClient.RpcClient.CallContext(evmClient.Ctx, &result, "eth_getLogs", convertMsg)
@@ -518,7 +517,7 @@ func QueryEvm(i queries.IXplaClient) (string, error) {
 		return jsonReturn(ethGetLogsResponse)
 
 	// get coinbase
-	case i.Ixplac.GetMsgType() == mevm.EvmEthCoinbaseMsgType:
+	case i.Ixplac.GetMsgType() == EvmEthCoinbaseMsgType:
 
 		var result string
 		err := evmClient.RpcClient.CallContext(evmClient.Ctx, &result, "eth_coinbase")

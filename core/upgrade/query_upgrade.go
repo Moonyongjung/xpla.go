@@ -3,8 +3,7 @@ package upgrade
 import (
 	"context"
 
-	"github.com/Moonyongjung/xpla.go/client/queries"
-	mupgrade "github.com/Moonyongjung/xpla.go/core/upgrade"
+	"github.com/Moonyongjung/xpla.go/core"
 	"github.com/Moonyongjung/xpla.go/types"
 	"github.com/Moonyongjung/xpla.go/types/errors"
 	"github.com/Moonyongjung/xpla.go/util"
@@ -20,7 +19,7 @@ var res proto.Message
 var err error
 
 // Query client for upgrade module.
-func QueryUpgrade(i queries.IXplaClient) (string, error) {
+func QueryUpgrade(i core.QueryClient) (string, error) {
 	if i.QueryType == types.QueryGrpc {
 		return queryByGrpcUpgrade(i)
 	} else {
@@ -28,12 +27,12 @@ func QueryUpgrade(i queries.IXplaClient) (string, error) {
 	}
 }
 
-func queryByGrpcUpgrade(i queries.IXplaClient) (string, error) {
+func queryByGrpcUpgrade(i core.QueryClient) (string, error) {
 	queryClient := upgradetypes.NewQueryClient(i.Ixplac.GetGrpcClient())
 
 	switch {
 	// Upgrade applied
-	case i.Ixplac.GetMsgType() == mupgrade.UpgradeAppliedMsgType:
+	case i.Ixplac.GetMsgType() == UpgradeAppliedMsgType:
 		convertMsg, _ := i.Ixplac.GetMsg().(upgradetypes.QueryAppliedPlanRequest)
 		appliedPlanRes, err := queryClient.AppliedPlan(
 			i.Ixplac.GetContext(),
@@ -53,8 +52,8 @@ func queryByGrpcUpgrade(i queries.IXplaClient) (string, error) {
 		return string(headerData), nil
 
 	// Upgrade all module versions
-	case i.Ixplac.GetMsgType() == mupgrade.UpgradeQueryAllModuleVersionsMsgType ||
-		i.Ixplac.GetMsgType() == mupgrade.UpgradeQueryModuleVersionsMsgType:
+	case i.Ixplac.GetMsgType() == UpgradeQueryAllModuleVersionsMsgType ||
+		i.Ixplac.GetMsgType() == UpgradeQueryModuleVersionsMsgType:
 		convertMsg, _ := i.Ixplac.GetMsg().(upgradetypes.QueryModuleVersionsRequest)
 		res, err = queryClient.ModuleVersions(
 			i.Ixplac.GetContext(),
@@ -65,7 +64,7 @@ func queryByGrpcUpgrade(i queries.IXplaClient) (string, error) {
 		}
 
 	// Upgrade plan
-	case i.Ixplac.GetMsgType() == mupgrade.UpgradePlanMsgType:
+	case i.Ixplac.GetMsgType() == UpgradePlanMsgType:
 		convertMsg, _ := i.Ixplac.GetMsg().(upgradetypes.QueryCurrentPlanRequest)
 		res, err = queryClient.CurrentPlan(
 			i.Ixplac.GetContext(),
@@ -79,7 +78,7 @@ func queryByGrpcUpgrade(i queries.IXplaClient) (string, error) {
 		return "", util.LogErr(errors.ErrInvalidMsgType, i.Ixplac.GetMsgType())
 	}
 
-	out, err = queries.PrintProto(i, res)
+	out, err = core.PrintProto(i, res)
 	if err != nil {
 		return "", err
 	}
@@ -93,24 +92,24 @@ const (
 	upgradeCurrentPlanLabel    = "current_plan"
 )
 
-func queryByLcdUpgrade(i queries.IXplaClient) (string, error) {
+func queryByLcdUpgrade(i core.QueryClient) (string, error) {
 	url := util.MakeQueryLcdUrl(upgradev1beta1.Query_ServiceDesc.Metadata.(string))
 
 	switch {
 	// Upgrade applied
-	case i.Ixplac.GetMsgType() == mupgrade.UpgradeAppliedMsgType:
+	case i.Ixplac.GetMsgType() == UpgradeAppliedMsgType:
 		convertMsg, _ := i.Ixplac.GetMsg().(upgradetypes.QueryAppliedPlanRequest)
 
 		url = url + util.MakeQueryLabels(upgradeAppliedPlanLabel, convertMsg.Name)
 
 	// Upgrade all module versions
-	case i.Ixplac.GetMsgType() == mupgrade.UpgradeQueryAllModuleVersionsMsgType ||
-		i.Ixplac.GetMsgType() == mupgrade.UpgradeQueryModuleVersionsMsgType:
+	case i.Ixplac.GetMsgType() == UpgradeQueryAllModuleVersionsMsgType ||
+		i.Ixplac.GetMsgType() == UpgradeQueryModuleVersionsMsgType:
 
 		url = url + upgradeModuleVersionsLabel
 
 	// Upgrade plan
-	case i.Ixplac.GetMsgType() == mupgrade.UpgradePlanMsgType:
+	case i.Ixplac.GetMsgType() == UpgradePlanMsgType:
 		url = url + upgradeCurrentPlanLabel
 
 	default:

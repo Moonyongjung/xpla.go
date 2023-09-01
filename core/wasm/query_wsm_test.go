@@ -30,7 +30,7 @@ var (
 	validatorNumber   = 1
 	testBalance       = "1000000000000000000000000000"
 	testContractLabel = "test contract"
-	testWasmFilePath  = "../../../util/testutil/test_files/cw721_metadata_onchain.wasm"
+	testWasmFilePath  = "../../util/testutil/test_files/cw721_metadata_onchain.wasm"
 )
 
 type IntegrationTestSuite struct {

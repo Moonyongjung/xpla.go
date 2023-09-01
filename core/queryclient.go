@@ -1,4 +1,4 @@
-package queries
+package core
 
 import (
 	"context"
@@ -6,6 +6,7 @@ import (
 	"github.com/Moonyongjung/xpla.go/key"
 	"github.com/Moonyongjung/xpla.go/types/errors"
 	"github.com/Moonyongjung/xpla.go/util"
+
 	cmclient "github.com/cosmos/cosmos-sdk/client"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/query"
@@ -15,12 +16,8 @@ import (
 	"github.com/xpladev/xpla/app/params"
 )
 
-var out []byte
-var res proto.Message
-var err error
-
 // Query internal XPLA client
-type IXplaClient struct {
+type QueryClient struct {
 	Ixplac    ModuleClient
 	QueryType uint8
 }
@@ -52,12 +49,12 @@ type ModuleClient interface {
 	GetMsgType() string
 }
 
-func NewIXplaClient(moduleClient ModuleClient, qt uint8) *IXplaClient {
-	return &IXplaClient{Ixplac: moduleClient, QueryType: qt}
+func NewIXplaClient(moduleClient ModuleClient, qt uint8) *QueryClient {
+	return &QueryClient{Ixplac: moduleClient, QueryType: qt}
 }
 
 // Print protobuf message by using cosmos sdk codec.
-func PrintProto(i IXplaClient, toPrint proto.Message) ([]byte, error) {
+func PrintProto(i QueryClient, toPrint proto.Message) ([]byte, error) {
 	out, err := i.Ixplac.GetEncoding().Marshaler.MarshalJSON(toPrint)
 	if err != nil {
 		return nil, util.LogErr(errors.ErrFailedToMarshal, err)
@@ -66,7 +63,7 @@ func PrintProto(i IXplaClient, toPrint proto.Message) ([]byte, error) {
 }
 
 // Print object by using cosmos sdk legacy amino.
-func PrintObjectLegacy(i IXplaClient, toPrint interface{}) ([]byte, error) {
+func PrintObjectLegacy(i QueryClient, toPrint interface{}) ([]byte, error) {
 	out, err := i.Ixplac.GetEncoding().Amino.MarshalJSON(toPrint)
 	if err != nil {
 		return nil, util.LogErr(errors.ErrFailedToMarshal, err)
@@ -75,7 +72,7 @@ func PrintObjectLegacy(i IXplaClient, toPrint interface{}) ([]byte, error) {
 }
 
 // For auth module and gov module, make cosmos sdk client for querying.
-func ClientForQuery(i IXplaClient) (cmclient.Context, error) {
+func ClientForQuery(i QueryClient) (cmclient.Context, error) {
 	client, err := cmclient.NewClientFromNode(i.Ixplac.GetRpc())
 	if err != nil {
 		return cmclient.Context{}, util.LogErr(errors.ErrSdkClient, err)

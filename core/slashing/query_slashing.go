@@ -1,8 +1,7 @@
 package slashing
 
 import (
-	"github.com/Moonyongjung/xpla.go/client/queries"
-	mslashing "github.com/Moonyongjung/xpla.go/core/slashing"
+	"github.com/Moonyongjung/xpla.go/core"
 	"github.com/Moonyongjung/xpla.go/types"
 	"github.com/Moonyongjung/xpla.go/types/errors"
 	"github.com/Moonyongjung/xpla.go/util"
@@ -17,7 +16,7 @@ var res proto.Message
 var err error
 
 // Query client for slashing module.
-func QuerySlashing(i queries.IXplaClient) (string, error) {
+func QuerySlashing(i core.QueryClient) (string, error) {
 	if i.QueryType == types.QueryGrpc {
 		return queryByGrpcSlashing(i)
 	} else {
@@ -25,12 +24,12 @@ func QuerySlashing(i queries.IXplaClient) (string, error) {
 	}
 }
 
-func queryByGrpcSlashing(i queries.IXplaClient) (string, error) {
+func queryByGrpcSlashing(i core.QueryClient) (string, error) {
 	queryClient := slashingtypes.NewQueryClient(i.Ixplac.GetGrpcClient())
 
 	switch {
 	// Slashing parameters
-	case i.Ixplac.GetMsgType() == mslashing.SlashingQuerySlashingParamsMsgType:
+	case i.Ixplac.GetMsgType() == SlashingQuerySlashingParamsMsgType:
 		convertMsg, _ := i.Ixplac.GetMsg().(slashingtypes.QueryParamsRequest)
 		res, err = queryClient.Params(
 			i.Ixplac.GetContext(),
@@ -41,7 +40,7 @@ func queryByGrpcSlashing(i queries.IXplaClient) (string, error) {
 		}
 
 	// Slashing signing information
-	case i.Ixplac.GetMsgType() == mslashing.SlashingQuerySigningInfosMsgType:
+	case i.Ixplac.GetMsgType() == SlashingQuerySigningInfosMsgType:
 		convertMsg, _ := i.Ixplac.GetMsg().(slashingtypes.QuerySigningInfosRequest)
 		res, err = queryClient.SigningInfos(
 			i.Ixplac.GetContext(),
@@ -52,7 +51,7 @@ func queryByGrpcSlashing(i queries.IXplaClient) (string, error) {
 		}
 
 	// Slashing signing information
-	case i.Ixplac.GetMsgType() == mslashing.SlashingQuerySigningInfoMsgType:
+	case i.Ixplac.GetMsgType() == SlashingQuerySigningInfoMsgType:
 		convertMsg, _ := i.Ixplac.GetMsg().(slashingtypes.QuerySigningInfoRequest)
 		res, err = queryClient.SigningInfo(
 			i.Ixplac.GetContext(),
@@ -66,7 +65,7 @@ func queryByGrpcSlashing(i queries.IXplaClient) (string, error) {
 		return "", util.LogErr(errors.ErrInvalidMsgType, i.Ixplac.GetMsgType())
 	}
 
-	out, err = queries.PrintProto(i, res)
+	out, err = core.PrintProto(i, res)
 	if err != nil {
 		return "", err
 	}
@@ -79,19 +78,19 @@ const (
 	slashingSigningInfosLabel = "signing_infos"
 )
 
-func queryByLcdSlashing(i queries.IXplaClient) (string, error) {
+func queryByLcdSlashing(i core.QueryClient) (string, error) {
 	url := util.MakeQueryLcdUrl(slashingv1beta1.Query_ServiceDesc.Metadata.(string))
 	switch {
 	// Slashing parameters
-	case i.Ixplac.GetMsgType() == mslashing.SlashingQuerySlashingParamsMsgType:
+	case i.Ixplac.GetMsgType() == SlashingQuerySlashingParamsMsgType:
 		url = url + slashingParamsLabel
 
 	// Slashing signing information
-	case i.Ixplac.GetMsgType() == mslashing.SlashingQuerySigningInfosMsgType:
+	case i.Ixplac.GetMsgType() == SlashingQuerySigningInfosMsgType:
 		url = url + slashingSigningInfosLabel
 
 	// Slashing signing information
-	case i.Ixplac.GetMsgType() == mslashing.SlashingQuerySigningInfoMsgType:
+	case i.Ixplac.GetMsgType() == SlashingQuerySigningInfoMsgType:
 		convertMsg, _ := i.Ixplac.GetMsg().(slashingtypes.QuerySigningInfoRequest)
 
 		url = url + util.MakeQueryLabels(slashingSigningInfosLabel, convertMsg.ConsAddress)

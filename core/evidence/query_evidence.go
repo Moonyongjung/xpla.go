@@ -1,8 +1,7 @@
 package evidence
 
 import (
-	"github.com/Moonyongjung/xpla.go/client/queries"
-	mevidence "github.com/Moonyongjung/xpla.go/core/evidence"
+	"github.com/Moonyongjung/xpla.go/core"
 	"github.com/Moonyongjung/xpla.go/types"
 	"github.com/Moonyongjung/xpla.go/types/errors"
 	"github.com/Moonyongjung/xpla.go/util"
@@ -17,7 +16,7 @@ var res proto.Message
 var err error
 
 // Query client for evidence module.
-func QueryEvidence(i queries.IXplaClient) (string, error) {
+func QueryEvidence(i core.QueryClient) (string, error) {
 	if i.QueryType == types.QueryGrpc {
 		return queryByGrpcEvidence(i)
 	} else {
@@ -25,12 +24,12 @@ func QueryEvidence(i queries.IXplaClient) (string, error) {
 	}
 }
 
-func queryByGrpcEvidence(i queries.IXplaClient) (string, error) {
+func queryByGrpcEvidence(i core.QueryClient) (string, error) {
 	queryClient := evidencetypes.NewQueryClient(i.Ixplac.GetGrpcClient())
 
 	switch {
 	// Query all evidences
-	case i.Ixplac.GetMsgType() == mevidence.EvidenceQueryAllMsgType:
+	case i.Ixplac.GetMsgType() == EvidenceQueryAllMsgType:
 		convertMsg, _ := i.Ixplac.GetMsg().(evidencetypes.QueryAllEvidenceRequest)
 		res, err = queryClient.AllEvidence(
 			i.Ixplac.GetContext(),
@@ -41,7 +40,7 @@ func queryByGrpcEvidence(i queries.IXplaClient) (string, error) {
 		}
 
 	// Query evidence
-	case i.Ixplac.GetMsgType() == mevidence.EvidenceQueryMsgType:
+	case i.Ixplac.GetMsgType() == EvidenceQueryMsgType:
 		convertMsg, _ := i.Ixplac.GetMsg().(evidencetypes.QueryEvidenceRequest)
 		res, err = queryClient.Evidence(
 			i.Ixplac.GetContext(),
@@ -55,7 +54,7 @@ func queryByGrpcEvidence(i queries.IXplaClient) (string, error) {
 		return "", util.LogErr(errors.ErrInvalidMsgType, i.Ixplac.GetMsgType())
 	}
 
-	out, err = queries.PrintProto(i, res)
+	out, err = core.PrintProto(i, res)
 	if err != nil {
 		return "", err
 	}
@@ -67,16 +66,16 @@ const (
 	evidenceEvidenceLabel = "evidence"
 )
 
-func queryByLcdEvidence(i queries.IXplaClient) (string, error) {
+func queryByLcdEvidence(i core.QueryClient) (string, error) {
 	url := util.MakeQueryLcdUrl(evidencev1beta1.Query_ServiceDesc.Metadata.(string))
 
 	switch {
 	// Query all evidences
-	case i.Ixplac.GetMsgType() == mevidence.EvidenceQueryAllMsgType:
+	case i.Ixplac.GetMsgType() == EvidenceQueryAllMsgType:
 		url = url + evidenceEvidenceLabel
 
 	// Query evidence
-	case i.Ixplac.GetMsgType() == mevidence.EvidenceQueryMsgType:
+	case i.Ixplac.GetMsgType() == EvidenceQueryMsgType:
 		convertMsg, _ := i.Ixplac.GetMsg().(evidencetypes.QueryEvidenceRequest)
 
 		url = url + util.MakeQueryLabels(evidenceEvidenceLabel, convertMsg.EvidenceHash.String())

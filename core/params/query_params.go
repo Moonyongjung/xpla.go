@@ -1,8 +1,7 @@
 package params
 
 import (
-	"github.com/Moonyongjung/xpla.go/client/queries"
-	mparams "github.com/Moonyongjung/xpla.go/core/params"
+	"github.com/Moonyongjung/xpla.go/core"
 	"github.com/Moonyongjung/xpla.go/types"
 	"github.com/Moonyongjung/xpla.go/types/errors"
 	"github.com/Moonyongjung/xpla.go/util"
@@ -17,7 +16,7 @@ var res proto.Message
 var err error
 
 // Query client for params module.
-func QueryParams(i queries.IXplaClient) (string, error) {
+func QueryParams(i core.QueryClient) (string, error) {
 	if i.QueryType == types.QueryGrpc {
 		return queryByGrpcParams(i)
 	} else {
@@ -26,12 +25,12 @@ func QueryParams(i queries.IXplaClient) (string, error) {
 
 }
 
-func queryByGrpcParams(i queries.IXplaClient) (string, error) {
+func queryByGrpcParams(i core.QueryClient) (string, error) {
 	queryClient := proposal.NewQueryClient(i.Ixplac.GetGrpcClient())
 
 	switch {
 	// Params subspace
-	case i.Ixplac.GetMsgType() == mparams.ParamsQuerySubpsaceMsgType:
+	case i.Ixplac.GetMsgType() == ParamsQuerySubpsaceMsgType:
 		convertMsg, _ := i.Ixplac.GetMsg().(proposal.QueryParamsRequest)
 		res, err = queryClient.Params(
 			i.Ixplac.GetContext(),
@@ -45,7 +44,7 @@ func queryByGrpcParams(i queries.IXplaClient) (string, error) {
 		return "", util.LogErr(errors.ErrInvalidMsgType, i.Ixplac.GetMsgType())
 	}
 
-	out, err = queries.PrintProto(i, res)
+	out, err = core.PrintProto(i, res)
 	if err != nil {
 		return "", err
 	}
@@ -57,12 +56,12 @@ const (
 	paramsParamsLabel = "params"
 )
 
-func queryByLcdParams(i queries.IXplaClient) (string, error) {
+func queryByLcdParams(i core.QueryClient) (string, error) {
 	url := util.MakeQueryLcdUrl(paramsv1beta1.Query_ServiceDesc.Metadata.(string))
 
 	switch {
 	// Params subspace
-	case i.Ixplac.GetMsgType() == mparams.ParamsQuerySubpsaceMsgType:
+	case i.Ixplac.GetMsgType() == ParamsQuerySubpsaceMsgType:
 		convertMsg, _ := i.Ixplac.GetMsg().(proposal.QueryParamsRequest)
 
 		parsedSubspace := convertMsg.Subspace

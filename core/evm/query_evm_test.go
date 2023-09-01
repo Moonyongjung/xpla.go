@@ -33,8 +33,8 @@ import (
 var (
 	validatorNumber          = 1
 	testBalance              = "1000000000000000000000000000"
-	testABIJsonFilePath      = "../../../util/testutil/test_files/abi.json"
-	testBytecodeJsonFilePath = "../../../util/testutil/test_files/bytecode.json"
+	testABIJsonFilePath      = "../../util/testutil/test_files/abi.json"
+	testBytecodeJsonFilePath = "../../util/testutil/test_files/bytecode.json"
 )
 
 type IntegrationTestSuite struct {

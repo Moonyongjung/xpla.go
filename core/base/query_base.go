@@ -1,8 +1,7 @@
 package base
 
 import (
-	"github.com/Moonyongjung/xpla.go/client/queries"
-	mbase "github.com/Moonyongjung/xpla.go/core/base"
+	"github.com/Moonyongjung/xpla.go/core"
 	"github.com/Moonyongjung/xpla.go/types"
 	"github.com/Moonyongjung/xpla.go/types/errors"
 	"github.com/Moonyongjung/xpla.go/util"
@@ -18,7 +17,7 @@ var res proto.Message
 var err error
 
 // Query client for bank module.
-func QueryBase(i queries.IXplaClient) (string, error) {
+func QueryBase(i core.QueryClient) (string, error) {
 	if i.QueryType == types.QueryGrpc {
 		return queryByGrpcBase(i)
 	} else {
@@ -27,12 +26,12 @@ func QueryBase(i queries.IXplaClient) (string, error) {
 
 }
 
-func queryByGrpcBase(i queries.IXplaClient) (string, error) {
+func queryByGrpcBase(i core.QueryClient) (string, error) {
 	serviceClient := tmservice.NewServiceClient(i.Ixplac.GetGrpcClient())
 
 	switch {
 	// Node info
-	case i.Ixplac.GetMsgType() == mbase.BaseNodeInfoMsgType:
+	case i.Ixplac.GetMsgType() == BaseNodeInfoMsgType:
 		convertMsg, _ := i.Ixplac.GetMsg().(tmservice.GetNodeInfoRequest)
 		res, err = serviceClient.GetNodeInfo(
 			i.Ixplac.GetContext(),
@@ -43,7 +42,7 @@ func queryByGrpcBase(i queries.IXplaClient) (string, error) {
 		}
 
 	// Syncing
-	case i.Ixplac.GetMsgType() == mbase.BaseSyncingMsgType:
+	case i.Ixplac.GetMsgType() == BaseSyncingMsgType:
 		convertMsg, _ := i.Ixplac.GetMsg().(tmservice.GetSyncingRequest)
 		res, err = serviceClient.GetSyncing(
 			i.Ixplac.GetContext(),
@@ -54,7 +53,7 @@ func queryByGrpcBase(i queries.IXplaClient) (string, error) {
 		}
 
 	// Latest block
-	case i.Ixplac.GetMsgType() == mbase.BaseLatestBlockMsgtype:
+	case i.Ixplac.GetMsgType() == BaseLatestBlockMsgtype:
 		if i.Ixplac.GetRpc() != "" {
 			var height *int64
 			return queryBlockByRpc(i, height)
@@ -71,7 +70,7 @@ func queryByGrpcBase(i queries.IXplaClient) (string, error) {
 		}
 
 	// Block by height
-	case i.Ixplac.GetMsgType() == mbase.BaseBlockByHeightMsgType:
+	case i.Ixplac.GetMsgType() == BaseBlockByHeightMsgType:
 		convertMsg, _ := i.Ixplac.GetMsg().(tmservice.GetBlockByHeightRequest)
 		if i.Ixplac.GetRpc() != "" {
 			height := &convertMsg.Height
@@ -88,7 +87,7 @@ func queryByGrpcBase(i queries.IXplaClient) (string, error) {
 		}
 
 	// Latest validator set
-	case i.Ixplac.GetMsgType() == mbase.BaseLatestValidatorSetMsgType:
+	case i.Ixplac.GetMsgType() == BaseLatestValidatorSetMsgType:
 		convertMsg, _ := i.Ixplac.GetMsg().(tmservice.GetLatestValidatorSetRequest)
 		res, err = serviceClient.GetLatestValidatorSet(
 			i.Ixplac.GetContext(),
@@ -99,7 +98,7 @@ func queryByGrpcBase(i queries.IXplaClient) (string, error) {
 		}
 
 	// Validator set by height
-	case i.Ixplac.GetMsgType() == mbase.BaseValidatorSetByHeightMsgType:
+	case i.Ixplac.GetMsgType() == BaseValidatorSetByHeightMsgType:
 		convertMsg, _ := i.Ixplac.GetMsg().(tmservice.GetValidatorSetByHeightRequest)
 		res, err = serviceClient.GetValidatorSetByHeight(
 			i.Ixplac.GetContext(),
@@ -113,7 +112,7 @@ func queryByGrpcBase(i queries.IXplaClient) (string, error) {
 		return "", util.LogErr(errors.ErrInvalidMsgType, i.Ixplac.GetMsgType())
 	}
 
-	out, err = queries.PrintProto(i, res)
+	out, err = core.PrintProto(i, res)
 	if err != nil {
 		return "", err
 	}
@@ -129,33 +128,33 @@ const (
 	baseValidatorsetsLabel = "validatorsets"
 )
 
-func queryByLcdBase(i queries.IXplaClient) (string, error) {
+func queryByLcdBase(i core.QueryClient) (string, error) {
 	url := util.MakeQueryLcdUrl(tmv1beta1.Service_ServiceDesc.Metadata.(string))
 
 	switch {
 	// Node info
-	case i.Ixplac.GetMsgType() == mbase.BaseNodeInfoMsgType:
+	case i.Ixplac.GetMsgType() == BaseNodeInfoMsgType:
 		url = url + baseNodeInfoLabel
 
 	// Syncing
-	case i.Ixplac.GetMsgType() == mbase.BaseSyncingMsgType:
+	case i.Ixplac.GetMsgType() == BaseSyncingMsgType:
 		url = url + baseSyncingLabel
 
 	// Latest block
-	case i.Ixplac.GetMsgType() == mbase.BaseLatestBlockMsgtype:
+	case i.Ixplac.GetMsgType() == BaseLatestBlockMsgtype:
 		url = util.MakeQueryLabels("/", baseBlocksLabel, baseLatestLabel)
 
 	// Block by height
-	case i.Ixplac.GetMsgType() == mbase.BaseBlockByHeightMsgType:
+	case i.Ixplac.GetMsgType() == BaseBlockByHeightMsgType:
 		convertMsg, _ := i.Ixplac.GetMsg().(tmservice.GetBlockByHeightRequest)
 		url = util.MakeQueryLabels("/", baseBlocksLabel, util.FromInt64ToString(convertMsg.Height))
 
 	// Latest validator set
-	case i.Ixplac.GetMsgType() == mbase.BaseLatestValidatorSetMsgType:
+	case i.Ixplac.GetMsgType() == BaseLatestValidatorSetMsgType:
 		url = url + util.MakeQueryLabels(baseValidatorsetsLabel, baseLatestLabel)
 
 	// Validator set by height
-	case i.Ixplac.GetMsgType() == mbase.BaseValidatorSetByHeightMsgType:
+	case i.Ixplac.GetMsgType() == BaseValidatorSetByHeightMsgType:
 		convertMsg, _ := i.Ixplac.GetMsg().(tmservice.GetValidatorSetByHeightRequest)
 		url = url + util.MakeQueryLabels(baseValidatorsetsLabel, util.FromInt64ToString(convertMsg.Height))
 
@@ -171,7 +170,7 @@ func queryByLcdBase(i queries.IXplaClient) (string, error) {
 	return string(out), nil
 }
 
-func queryBlockByRpc(i queries.IXplaClient, height *int64) (string, error) {
+func queryBlockByRpc(i core.QueryClient, height *int64) (string, error) {
 	client, err := cmclient.NewClientFromNode(i.Ixplac.GetRpc())
 	if err != nil {
 		return "", util.LogErr(errors.ErrGrpcRequest, err)
@@ -180,7 +179,7 @@ func queryBlockByRpc(i queries.IXplaClient, height *int64) (string, error) {
 	if err != nil {
 		return "", util.LogErr(errors.ErrGrpcRequest, err)
 	}
-	out, err := queries.PrintObjectLegacy(i, res)
+	out, err := core.PrintObjectLegacy(i, res)
 	if err != nil {
 		return "", util.LogErr(errors.ErrGrpcRequest, err)
 	}
